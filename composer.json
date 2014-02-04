@@ -1,0 +1,33 @@
+{
+    "name":         "uecode/qpush-bundle",
+    "type":         "library",
+    "description":  "Symfony2 Bundle for using Amazon SQS and SNS to process queues with out polling",
+    "keywords":     ["qpush", "aws", "sqs", "sns", "push", "symfony", "bundle" ],
+    "homepage":     "https://github.com/uecode/qpush-bundle",
+    "license":      "MIT",
+    "authors":      [
+        {
+            "name":     "Keith Kirk",
+            "email":    "kkirk@undergroundelephant.com",
+            "role":     "developer",
+            "homepage": "http://undergroundelephant.com"
+        }
+    ],
+    "support": {
+        "email": "kkirk@undergroundelephant.com"
+    },
+    "require": {
+        "php": ">=5.4.0",
+        "aws/aws-php-sdk": "2.*",
+        "doctrine/common": ">2.4.0"
+    },
+    "require-dev": {
+        "symfony/symfony": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {
+            "Uecode\\Bundle\\QPushBundle": "src/"
+        }
+    },
+    "target-dir": "src/Uecode/Bundle/QPushBundle"
+}

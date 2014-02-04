@@ -1,0 +1,20 @@
+uecode_qpush:
+    aws_credentials:
+        api_key: null
+        api_token: null
+        region: null
+    cache:
+        type: file
+        id: null
+        directory: null
+    queues:
+        default:
+            delay_seconds: 0
+            max_message_size: 262144
+            max_retention_seconds: 345600
+            visibility_timeout_seconds: 0
+            use_sns: true
+            subscribers:
+                default:
+                    endpoint: http://example.com
+                    protocol: http
