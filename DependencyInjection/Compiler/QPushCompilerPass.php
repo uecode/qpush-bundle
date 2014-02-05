@@ -6,7 +6,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass;
 use InvalidArgumentException;
 
 /**
@@ -89,13 +88,6 @@ class QPushCompilerPass implements CompilerPassInterface
 
                 $definition->addMethodCall('addSubscriberService', array($id, $class));
             }
-                $compilerPass = new RegisterListenersPass(
-                    'event_dispatcher',
-                    'uecode_qpush.listener.' . $listener,
-                    'uecode_qpush.subscriber.' . $listener
-                );
-
-                $container->addCompilerPass($compilerPass);
         }
     }
 
