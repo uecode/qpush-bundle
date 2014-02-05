@@ -16,11 +16,23 @@ class SubscriptionEvent extends Event
     /**
      * Constructor
      *
-     * @param array $notification SNS Notification
+     * @param string $queue        SQS Queue Name
+     * @param array  $notification SNS Notification
      */
-    public function __construct($notification)
+    public function __construct($queue, $notification)
     {
+        $this->queue        = $queue;
         $this->notification = $notification;
+    }
+
+    /**
+     * Returns the SQS Queue name
+     *
+     * return string
+     */
+    public function getQueue()
+    {
+        return $this->queue;
     }
 
     /**

@@ -29,26 +29,26 @@ class ControllerListener
             return;
         }
 
-        // Add the Notification to Request Attributes
-        $event->getRequest()->attributes->set('notification', $notification);
+        if ( 
 
-        // Add the Queue name to Request Attributes
-        $queue = str_replace('uecode_qpush_', '', $notification['Message']);
-        $event->getRequest()->attributes->set('queue', $queue);
-
-        // Direct the Request to correct Action based on Type
         $type = $event->getRequest()->headers->has('x-amz-sns-message-type');
         if ($type === 'Notification') {
+            $queue = str_replace('uecode_qpush_', '', $notification['Message']);
             $fakeRequest = $event->getRequest()->duplicate(
                 null, null, ['_controller' => 'QPushBundle:QPush:notify']
             );
             $controller = $this->resolver->getController($fakeRequest);
         } else {
+            $queue = str_replace('uecode_qpush_', '', end(explode($notification['TopicArn'], ':')));
             $fakeRequest = $event->getRequest()->duplicate(
                 null, null, ['_controller' => 'QPushBundle:QPush:subscription']
             );
             $controller = $this->resolver->getController($fakeRequest);
         }
+
+        $event->getRequest()->attributes->set('notification', $notification);
+        $event->getRequest()->attributes->set('queue', $queue);
+
         $event->setController($controller);
     }
 }

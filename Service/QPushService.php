@@ -412,7 +412,7 @@ class QPushService implements MessageListener, NotificationListener, Subscriptio
             $messageEvent   = new MessageEvent($queue, $message);
 
             $dispatcher = $event->getDispatcher();
-            $dispatcher->dispatch(Events::MESSAGE, $messageEvent);
+            $dispatcher->dispatch(Events::Message($queue), $messageEvent);
         }
     }
 

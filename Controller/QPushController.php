@@ -22,12 +22,14 @@ class QPushController extends Controller
      *
      * @param string $queue        SQS Queue Name
      * @param array  $notification SNS notification
+     * 
+     * @return Response
      */
     public function notifyAction($queue, $notification)
     {
         error_log('dispatched notification event, automagically');
         $dispatcher = $this->get('event_dispatcher');
-        $dispatcher->dispatch(Events::NOTIFY, new NotificationEvent($queue, $notification));
+        $dispatcher->dispatch(Events::Notify($queue), new NotificationEvent($queue, $notification));
 
         return new Response('success', 200);
     }
@@ -37,12 +39,14 @@ class QPushController extends Controller
      *
      * @param string $queue        SQS Queue Name
      * @param array  $notification SNS Notification
+     *
+     * @return Response
      */
-    public function subscriptionAction($notification)
+    public function subscriptionAction($queue, $notification)
     {
         error_log('dispatched subscription event, automagically');
         $dispatcher = $this->get('event_dispatcher');
-        $dispatcher->dispatch(Events::SUBSCRIPTION, new SubscriptionEvent($notification));
+        $dispatcher->dispatch(Events::Subscription($queue), new SubscriptionEvent($queue, $notification));
 
         return new Response('success', 200);
     }

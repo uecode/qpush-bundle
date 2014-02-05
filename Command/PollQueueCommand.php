@@ -56,7 +56,7 @@ class PollQueueCommand extends ContainerAwareCommand
             $messageEvent   = new MessageEvent($name, $message);
 
             $dispatcher = $this->getContainer()->get('event_dispatcher');
-            $dispatcher->dispatch(Events::MESSAGE, $messageEvent);
+            $dispatcher->dispatch(Events::message($name), $messageEvent);
         }
 
         $msg = "<info>Finished polling %s Queue, %d messages fetched.</info>";

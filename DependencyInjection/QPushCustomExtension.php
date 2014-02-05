@@ -35,7 +35,6 @@ class QPushCustomExtension extends Extension
     private function buildQueues(array $queues, ContainerBuilder $container, Definition $registry)
     {
         $prefix = 'uecode_qpush';
-        $listeners = [];
         foreach ($queues as $queue => $options) {
             $name = $prefix . '.' . $queue;
             $service = $container->setDefinition(
@@ -45,31 +44,29 @@ class QPushCustomExtension extends Extension
                 ->replaceArgument(0, $queue)
                 ->replaceArgument(1, $options)
                 ->addTag(
-                    'uecode_qpush.listener.' . $queue,
+                    'uecode_qpush.event_listener',
                     [
-                        'event' => 'uecode_qpush.notify',
+                        'event' => "{$queue}.notify",
                         'priority' => 255
                     ]
                 )
                 ->addTag(
-                    'uecode_qpush.listener.' . $queue,
+                    'uecode_qpush.event_listener',
                     [
-                        'event' => 'uecode_qpush.subscription',
+                        'event' => "{$queue}.subscription",
                         'priority' => 255
                     ]
                 )
                 ->addTag(
-                    'uecode_qpush.listener.' . $queue,
+                    'uecode_qpush.listener_event',
                     [
-                        'event' => 'uecode_qpush.message',
+                        'event' => "{$queue}.message",
                         'priority' => -255
                     ]
                 );
 
             $registry->addMethodCall('addQueue', [$queue, new Reference($name)]);
-            $listeners[] = $queue;
         }
-        $container->setParameter('uecode_qpush.event_listeners', $listeners);
     }
 
     public function getAlias()
