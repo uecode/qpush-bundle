@@ -9,10 +9,10 @@ interface MessageListener
     /**
      * Method for custom event listeners to process SQS Messages
      *
-     * When all MessageListener methods have fired, the SQS Message will 
+     * When all MessageListener methods have fired, the SQS Message will
      * automatically be removed from the Queue.
      *
-     * @param   MessageEvent $event SQS Message Event
+     * @param MessageEvent $event SQS Message Event
      */
     public function onMessage(MessageEvent $event);
 }

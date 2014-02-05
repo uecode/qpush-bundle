@@ -23,7 +23,7 @@ class QPushCustomExtension extends Extension
         $container->setParameter('uecode_qpush.cache', $config['cache_service_id']);
 
         $loader = new YamlFileLoader(
-            $container, 
+            $container,
             new FileLocator(__DIR__.'/../Resources/config')
         );
         $loader->load('services.yml');
@@ -36,36 +36,36 @@ class QPushCustomExtension extends Extension
     {
         $prefix = 'uecode_qpush';
         $listeners = [];
-        foreach($queues as $queue => $options) {
+        foreach ($queues as $queue => $options) {
             $name = $prefix . '.' . $queue;
             $service = $container->setDefinition(
-                $name, 
+                $name,
                 new DefinitionDecorator('uecode_qpush.service')
             )
                 ->replaceArgument(0, $queue)
                 ->replaceArgument(1, $options)
                 ->addTag(
-                    'uecode_qpush.listener.' . $queue, 
-                    [ 
+                    'uecode_qpush.listener.' . $queue,
+                    [
                         'event' => 'uecode_qpush.notify',
                         'priority' => 255
                     ]
                 )
                 ->addTag(
-                    'uecode_qpush.listener.' . $queue, 
-                    [ 
+                    'uecode_qpush.listener.' . $queue,
+                    [
                         'event' => 'uecode_qpush.subscription',
                         'priority' => 255
                     ]
                 )
                 ->addTag(
-                    'uecode_qpush.listener.' . $queue, 
-                    [ 
+                    'uecode_qpush.listener.' . $queue,
+                    [
                         'event' => 'uecode_qpush.message',
                         'priority' => -255
                     ]
                 );
-            
+
             $registry->addMethodCall('addQueue', [$queue, new Reference($name)]);
             $listeners[] = $queue;
         }

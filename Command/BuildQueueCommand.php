@@ -17,7 +17,7 @@ class BuildQueueCommand extends ContainerAwareCommand
             ->addArgument(
                 'name',
                 InputArgument::OPTIONAL,
-                'Name of a specific queue to build', 
+                'Name of a specific queue to build',
                 null
             );
     }
@@ -33,7 +33,7 @@ class BuildQueueCommand extends ContainerAwareCommand
             return $this->buildQueue($registry, $name);
         }
 
-        foreach($registry->getQueues() as $queue) {
+        foreach ($registry->getQueues() as $queue) {
             $this->buildQueue($registry, $queue->getName());
         }
 
@@ -53,4 +53,3 @@ class BuildQueueCommand extends ContainerAwareCommand
         return 0;
     }
 }
-

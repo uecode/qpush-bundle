@@ -17,7 +17,7 @@ class MessageCommand extends ContainerAwareCommand
             ->addArgument(
                 'name',
                 InputArgument::REQUIRED,
-                'Name of the Queue' 
+                'Name of the Queue'
             )
             ->addArgument(
                 'message',
@@ -51,4 +51,3 @@ class MessageCommand extends ContainerAwareCommand
         return 0;
     }
 }
-

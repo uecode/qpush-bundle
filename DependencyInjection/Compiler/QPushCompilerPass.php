@@ -12,8 +12,8 @@ use InvalidArgumentException;
 /**
  *  Borrows/modifies code from RegisterListenerPass to register the custom / dynamic
  *  events for QPush
- *  
- *  @see Symfony\Component\HttpKernel\DependencyInjection\RegisterListenerPass 
+ *
+ *  @see Symfony\Component\HttpKernel\DependencyInjection\RegisterListenerPass
  */
 class QPushCompilerPass implements CompilerPassInterface
 {
@@ -21,7 +21,7 @@ class QPushCompilerPass implements CompilerPassInterface
     {
         $queues = $container->getParameter('uecode_qpush.queues');
         $cache  = $container->getParameter('uecode_qpush.cache');
-       
+
         $prefix = 'uecode_qpush';
         foreach (array_keys($queues) as $queue) {
             $name = $prefix . '.' . $queue;
@@ -36,7 +36,7 @@ class QPushCompilerPass implements CompilerPassInterface
 
         $listeners = $container->getParameter('uecode_qpush.event_listeners');
         $definition = $container->getDefinition('event_dispatcher');
-        
+
         foreach ($listeners as $listener) {
 
             $listenerTag    = 'uecode_qpush.listener.' . $listener;
@@ -90,7 +90,7 @@ class QPushCompilerPass implements CompilerPassInterface
                 $definition->addMethodCall('addSubscriberService', array($id, $class));
             }
                 $compilerPass = new RegisterListenersPass(
-                    'event_dispatcher', 
+                    'event_dispatcher',
                     'uecode_qpush.listener.' . $listener,
                     'uecode_qpush.subscriber.' . $listener
                 );
@@ -100,8 +100,8 @@ class QPushCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @param string            $cache      Optional Cache Service Id
-     * @param ContainerBuilder  $container  Container from Symfony
+     * @param string           $cache     Optional Cache Service Id
+     * @param ContainerBuilder $container Container from Symfony
      *
      * @return Reference|Definition
      */
@@ -125,7 +125,7 @@ class QPushCompilerPass implements CompilerPassInterface
         return $container->setDefinition(
             'uecode_qpush.file_cache',
             new Definition(
-                'Doctrine\Common\Cache\PhpFileCache', 
+                'Doctrine\Common\Cache\PhpFileCache',
                 [$directory, $extension]
             )
         )->setPublic(false);

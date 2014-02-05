@@ -10,7 +10,7 @@ use Uecode\Bundle\QPushBundle\Event\SnsnotificationEvent;
 /**
  * SNS notification Controller
  *
- * SNS Notifications are directed to the correct action through use of a 
+ * SNS Notifications are directed to the correct action through use of a
  * Request Listener looking for custom SNS headers.
  */
 class QpushSnsController
@@ -18,8 +18,8 @@ class QpushSnsController
     /**
      * Dispatches SNS notification Event to services to poll SQS Queue
      *
-     * @param string    $queue          SQS Queue Name
-     * @param array     $notification   SNS notification
+     * @param string $queue        SQS Queue Name
+     * @param array  $notification SNS notification
      */
     protected function notifyAction($queue, $notification)
     {
@@ -32,8 +32,8 @@ class QpushSnsController
     /**
      * Dispatches SNS Subscription Event to services to confirm Subsciption change
      *
-     * @param string    $queue          SQS Queue Name
-     * @param array     $notification   SNS Notification
+     * @param string $queue        SQS Queue Name
+     * @param array  $notification SNS Notification
      */
     protected function subscriptionAction($notification)
     {

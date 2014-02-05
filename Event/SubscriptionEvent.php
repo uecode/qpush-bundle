@@ -25,7 +25,7 @@ abstract class SubscriptionEvent extends Event
 
     /**
      * Returns the entire SNS Notification
-     * 
+     *
      * return array
      */
     public function getNotification()

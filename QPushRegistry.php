@@ -25,8 +25,8 @@ class QPushRegistry
     /**
      * Adds a Listener to the chain based on priority
      *
-     * @param string                $name       The name of the Queue
-     * @param QPushClientService    $service    The QPushClientService
+     * @param string             $name    The name of the Queue
+     * @param QPushClientService $service The QPushClientService
      */
     public function addQueue($name, QPushService $service)
     {

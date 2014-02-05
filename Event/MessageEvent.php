@@ -23,9 +23,9 @@ class MessageEvent extends Event
     /**
      * Constructor.
      *
-     * @param string    $queue          The SQS Queue Name
-     * @param array     $message        SQS Message
-     * @param string    $receiptHanle   The SQS Message Receipt Handle
+     * @param string $queue        The SQS Queue Name
+     * @param array  $message      SQS Message
+     * @param string $receiptHanle The SQS Message Receipt Handle
      */
     public function __construct($queue, $message)
     {
@@ -56,7 +56,7 @@ class MessageEvent extends Event
     /**
      * Return the SQS Message Body
      *
-     * This method assumes the the body is a json string and will 
+     * This method assumes the the body is a json string and will
      * `json_decode` the Message Body before returning
      *
      * @return array

@@ -47,7 +47,7 @@ class Configuration implements ConfigurationInterface
             ->prototype('array')
                 ->children()
                     ->scalarNode('delay_seconds')
-                        ->defaultValue(0)                
+                        ->defaultValue(0)
                         ->info('An integer from 0 to 900 (15 minutes)')
                         ->example(0)
                     ->end()

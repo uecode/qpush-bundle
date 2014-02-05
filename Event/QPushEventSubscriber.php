@@ -3,7 +3,6 @@
 namespace Uecode\Bundle\QPushBundle\Event;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
 use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
@@ -17,7 +16,7 @@ class QPushEventSubscriber implements EventSubscriberInterface
 {
     /**
      * Arraservices tagged with `uecode_qpush.receive` event
-     * @var 
+     * @var
      */
     protected $messageChain;
 
@@ -36,11 +35,11 @@ class QPushEventSubscriber implements EventSubscriberInterface
     /**
      * Constructor.
      *
-     * @param NotificationChain $notificationChain  Services tagged for notifications
-     * @param SubscriptionChain $subscriptionChain  Services tagged for subscriptions
-     * @param MessageChain      $messageChain       Services tagged for messages
+     * @param NotificationChain $notificationChain Services tagged for notifications
+     * @param SubscriptionChain $subscriptionChain Services tagged for subscriptions
+     * @param MessageChain      $messageChain      Services tagged for messages
      */
-    public function __construct(NotificationChain $notificationChain, 
+    public function __construct(NotificationChain $notificationChain,
         SubscriptionChain $subscriptionChain, MessageChain $messageChain)
     {
         $this->notificationChain    = $notificationChain;
@@ -60,7 +59,7 @@ class QPushEventSubscriber implements EventSubscriberInterface
     public function onNotify(NotificationEvent $event)
     {
         $listeners = $this->notificationChain->getListeners();
-        foreach($listeners as $listener) {
+        foreach ($listeners as $listener) {
             $listener['service']->process($event);
         }
     }
@@ -70,7 +69,7 @@ class QPushEventSubscriber implements EventSubscriberInterface
         $listeners = $this->notificationChain->getListeners();
 
         $type = str_replace('uecode_qpush.', '', $event->getName());
-        foreach($listeners as $listener) {
+        foreach ($listeners as $listener) {
             if ($listener['event'] !== $type) {
                 $listener['service']->process($event);
             }
@@ -82,7 +81,7 @@ class QPushEventSubscriber implements EventSubscriberInterface
         $listeners = $this->notificationChain->getListeners();
 
         $queue = $event->getQueue();
-        foreach($listeners as $listener) {
+        foreach ($listeners as $listener) {
             if ($listener['queue'] !== $queue) {
                 $listener['service']->process($event);
             }

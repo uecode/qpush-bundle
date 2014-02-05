@@ -23,8 +23,8 @@ class NotificationEvent extends Event
     /**
      * Constructor
      *
-     * @param string    $queue          SQS Queue Name
-     * @param array     $notification   SNS Notification
+     * @param string $queue        SQS Queue Name
+     * @param array  $notification SNS Notification
      */
     public function __construct($queue, $notification)
     {

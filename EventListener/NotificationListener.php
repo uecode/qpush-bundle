@@ -9,7 +9,7 @@ interface NotificationListener
     /**
      * Method for custom event handlers to process SNS Notification Event
      *
-     * @param   SubscriptionEvent $event SNS Subscription Event
+     * @param SubscriptionEvent $event SNS Subscription Event
      */
     public function onNotify(NotificationEvent $event);
 }

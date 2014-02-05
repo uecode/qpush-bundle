@@ -20,7 +20,7 @@ class PollQueueCommand extends ContainerAwareCommand
             ->addArgument(
                 'name',
                 InputArgument::OPTIONAL,
-                'Name of a specific queue to poll', 
+                'Name of a specific queue to poll',
                 null
             );
     }
@@ -36,7 +36,7 @@ class PollQueueCommand extends ContainerAwareCommand
             return $this->pollQueue($registry, $name);
         }
 
-        foreach($registry->getQueues() as $queue) {
+        foreach ($registry->getQueues() as $queue) {
             $this->pollQueue($registry, $queue->getName());
         }
 
@@ -57,7 +57,7 @@ class PollQueueCommand extends ContainerAwareCommand
 
             $dispatcher = $this->getContainer()->get('event_dispatcher');
             $dispatcher->dispatch(Events::MESSAGE, $messageEvent);
-        }  
+        }
 
         $msg = "<info>Finished polling %s Queue, %d messages fetched.</info>";
         $this->output->writeln(sprintf($msg, $name, $count));
@@ -65,4 +65,3 @@ class PollQueueCommand extends ContainerAwareCommand
         return 0;
     }
 }
-

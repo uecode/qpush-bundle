@@ -71,11 +71,11 @@ class QPushService implements MessageListener, NotificationListener, Subscriptio
     /**
      * Constructor.
      *
-     * @param string    $name       Queue name
-     * @param array     $options    Queue Options
-     * $param Cache     $cache  A Doctrine Cache Providier
-     * @param SqsClient $sqs    An AWS SQS Client
-     * @param SnsClient $sns    An AWS SNS Client
+     * @param string    $name    Queue name
+     * @param array     $options Queue Options
+     *                           $param Cache     $cache  A Doctrine Cache Providier
+     * @param SqsClient $sqs     An AWS SQS Client
+     * @param SnsClient $sns     An AWS SNS Client
      */
     public function __construct($name, array $options, Cache $cache, SqsClient $sqs, SnsClient $sns)
     {
@@ -119,7 +119,7 @@ class QPushService implements MessageListener, NotificationListener, Subscriptio
     /**
      * Pushes a message to the Queue
      *
-     * This method will either use a SNS Topic to publish a queued message or 
+     * This method will either use a SNS Topic to publish a queued message or
      * straight to SQS depending on the application configuration.
      *
      * @param array $message The message to queue
@@ -177,15 +177,15 @@ class QPushService implements MessageListener, NotificationListener, Subscriptio
 
            // Add the SQS Queue as a Subscriber to the SNS Topic
            $this->subscribeEndpoint(
-               $topicArn, 
-               'sqs', 
+               $topicArn,
+               'sqs',
                $this->sqsClient->getQueueArn($queueUrl)
            );
 
            // Add configured Subscribers to the SNS Topic
            foreach ($this->options['subscribers'] as $subscriber) {
                 $this->subscribeEndpoint(
-                    $topicArn, 
+                    $topicArn,
                     $subscriber['protocol'],
                     $subscriber['endpoint']
                 );
@@ -230,7 +230,7 @@ class QPushService implements MessageListener, NotificationListener, Subscriptio
         if ($this->cache->contains($urlKey)) {
             return $this->queueUrl = $this->cache->fetch($urlKey);
         }
-        
+
         return $this->createQueue();
     }
 
@@ -278,7 +278,7 @@ class QPushService implements MessageListener, NotificationListener, Subscriptio
         if ($this->cache->contains($arnKey)) {
             return $this->topicArn = $this->cache->fetch($arnKey);
         }
-        
+
         return $this->createTopic();
     }
 
@@ -326,7 +326,7 @@ class QPushService implements MessageListener, NotificationListener, Subscriptio
      * Subscribes an endpoint to a SNS Topic
      *
      * @param string $topicArn The ARN of the Topic
-     * @param string $protocol The protocol of the Endpoint 
+     * @param string $protocol The protocol of the Endpoint
      * @param string $endpoint The Endpoint of the Subscriber
      *
      * @return string
@@ -357,7 +357,7 @@ class QPushService implements MessageListener, NotificationListener, Subscriptio
      * have a Subscription on the SNS Topic
      *
      * @param string $topicArn The ARN of the Topic
-     * @param string $protocol The protocol of the Endpoint 
+     * @param string $protocol The protocol of the Endpoint
      * @param string $endpoint The Endpoint of the Subscriber
      *
      * @return boolean
@@ -411,7 +411,7 @@ class QPushService implements MessageListener, NotificationListener, Subscriptio
 
             $dispatcher = $event->getDispatcher();
             $dispatcher->dispatch(Events::MESSAGE, $messageEvent);
-        }  
+        }
     }
 
     /**

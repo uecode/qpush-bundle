@@ -2,7 +2,6 @@
 
 namespace Uecode\Bundle\QPushBundle\EventListener;
 
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 class SnsRequestListener
@@ -32,8 +31,7 @@ class SnsRequestListener
         $type = $event->getRequest()->headers->has('x-amz-sns-message-type');
         if ($type === 'Notification') {
             $event->setController([new Uecode\Bundle\QPushBundle\Controller\QpushSnsController, 'notify']);
-        }
-        else {
+        } else {
             $event->setController([new Uecode\Bundle\QPushBundle\Controller\QpushSnsController, 'subscription']);
         }
     }

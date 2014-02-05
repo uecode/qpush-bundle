@@ -12,7 +12,7 @@ interface SubscriptionListener
      * The SubscriptionEvent can be either for a `SubscriptionConfirmation` or
      * a `UnsubscribeConfirmation`.  The method should check the event type.
      *
-     * @param   SubscriptionEvent $event SNS Subscription Event
+     * @param SubscriptionEvent $event SNS Subscription Event
      */
     public function onSubscription(SubscriptionEvent $event);
 }
