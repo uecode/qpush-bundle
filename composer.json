@@ -24,6 +24,7 @@
     "require-dev": {
         "symfony/symfony": "dev-master"
     },
+    "minimum-stability": "alpha",
     "autoload": {
         "psr-0": {
             "Uecode\\Bundle\\QPushBundle": "src/"
