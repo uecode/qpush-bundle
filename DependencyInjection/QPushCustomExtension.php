@@ -47,6 +47,7 @@ class QPushCustomExtension extends Extension
                     'uecode_qpush.event_listener',
                     [
                         'event' => "{$queue}.notify",
+                        'method' => "onNotify",
                         'priority' => 255
                     ]
                 )
@@ -54,6 +55,7 @@ class QPushCustomExtension extends Extension
                     'uecode_qpush.event_listener',
                     [
                         'event' => "{$queue}.subscription",
+                        'method' => "onSubscription",
                         'priority' => 255
                     ]
                 )
@@ -61,6 +63,7 @@ class QPushCustomExtension extends Extension
                     'uecode_qpush.listener_event',
                     [
                         'event' => "{$queue}.message",
+                        'method' => "onMessage",
                         'priority' => -255
                     ]
                 );

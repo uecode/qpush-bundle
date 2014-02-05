@@ -84,7 +84,7 @@ class SubscriptionEvent extends Event
      *
      * return string
      */
-    public function getSubscriptionToken()
+    public function getToken()
     {
         return $this->notification['Token'];
     }

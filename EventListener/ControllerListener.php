@@ -29,9 +29,7 @@ class ControllerListener
             return;
         }
 
-        if ( 
-
-        $type = $event->getRequest()->headers->has('x-amz-sns-message-type');
+        $type = $event->getRequest()->headers->get('x-amz-sns-message-type');
         if ($type === 'Notification') {
             $queue = str_replace('uecode_qpush_', '', $notification['Message']);
             $fakeRequest = $event->getRequest()->duplicate(
@@ -39,7 +37,9 @@ class ControllerListener
             );
             $controller = $this->resolver->getController($fakeRequest);
         } else {
-            $queue = str_replace('uecode_qpush_', '', end(explode($notification['TopicArn'], ':')));
+            $arnParts = explode(':', $notification['TopicArn']);
+            $last = end($arnParts);
+            $queue = str_replace('uecode_qpush_', '', $last);
             $fakeRequest = $event->getRequest()->duplicate(
                 null, null, ['_controller' => 'QPushBundle:QPush:subscription']
             );

@@ -27,7 +27,6 @@ class QPushController extends Controller
      */
     public function notifyAction($queue, $notification)
     {
-        error_log('dispatched notification event, automagically');
         $dispatcher = $this->get('event_dispatcher');
         $dispatcher->dispatch(Events::Notify($queue), new NotificationEvent($queue, $notification));
 
@@ -44,7 +43,6 @@ class QPushController extends Controller
      */
     public function subscriptionAction($queue, $notification)
     {
-        error_log('dispatched subscription event, automagically');
         $dispatcher = $this->get('event_dispatcher');
         $dispatcher->dispatch(Events::Subscription($queue), new SubscriptionEvent($queue, $notification));
 
