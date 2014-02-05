@@ -45,18 +45,18 @@ class QPushCompilerPass implements CompilerPassInterface
                 $def = $container->getDefinition($id);
 
                 if (!$def->isPublic()) {
-                    throw new \InvalidArgumentException(sprintf('The service "%s" must be public as event listeners are lazy-loaded.', $id));
+                    throw new InvalidArgumentException(sprintf('The service "%s" must be public as event listeners are lazy-loaded.', $id));
                 }
 
                 if ($def->isAbstract()) {
-                    throw new \InvalidArgumentException(sprintf('The service "%s" must not be abstract as event listeners are lazy-loaded.', $id));
+                    throw new InvalidArgumentException(sprintf('The service "%s" must not be abstract as event listeners are lazy-loaded.', $id));
                 }
 
                 foreach ($events as $event) {
                     $priority = isset($event['priority']) ? $event['priority'] : 0;
 
                     if (!isset($event['event'])) {
-                        throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "%s" tags.', $id, $listenerTag));
+                        throw new InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "%s" tags.', $id, $listenerTag));
                     }
 
                     if (!isset($event['method'])) {
@@ -74,7 +74,7 @@ class QPushCompilerPass implements CompilerPassInterface
             foreach ($container->findTaggedServiceIds($subscriberTag) as $id => $attributes) {
                 $def = $container->getDefinition($id);
                 if (!$def->isPublic()) {
-                    throw new \InvalidArgumentException(sprintf('The service "%s" must be public as event subscribers are lazy-loaded.', $id));
+                    throw new InvalidArgumentException(sprintf('The service "%s" must be public as event subscribers are lazy-loaded.', $id));
                 }
 
                 // We must assume that the class value has been correctly filled, even if the service is created by a factory
@@ -83,7 +83,7 @@ class QPushCompilerPass implements CompilerPassInterface
                 $refClass = new \ReflectionClass($class);
                 $interface = 'Symfony\Component\EventDispatcher\EventSubscriberInterface';
                 if (!$refClass->implementsInterface($interface)) {
-                    throw new \InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
+                    throw new InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
                 }
 
                 $definition->addMethodCall('addSubscriberService', array($id, $class));
