@@ -13,7 +13,6 @@ interface MessageListener
      * automatically be removed from the Queue.
      *
      * @param   MessageEvent $event SQS Message Event
-     * @return  boolean
      */
-    public function onMessageRetrieved(MessageEvent $event);
+    public function onMessage(MessageEvent $event);
 }

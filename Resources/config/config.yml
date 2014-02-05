@@ -10,11 +10,10 @@ uecode_qpush:
     queues:
         default:
             delay_seconds: 0
-            max_message_size: 262144
-            max_retention_seconds: 345600
-            visibility_timeout_seconds: 0
+            maximum_message_size: 262144
+            message_retention_period: 345600
+            visibility_timeout: 30
+            receive_message_wait_time_seconds: 5
             use_sns: true
             subscribers:
-                default:
-                    endpoint: http://example.com
-                    protocol: http
+                - { endpoint: http://example.com, protocol: http }

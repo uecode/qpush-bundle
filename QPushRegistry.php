@@ -1,8 +1,8 @@
 <?php
 
-namespace Uecode\Bundle\QPushBundle\DependencyInjection\Compiler;
+namespace Uecode\Bundle\QPushBundle;
 
-use Uecode\Bundle\QPushBundle\Service\QPushClientService;
+use Uecode\Bundle\QPushBundle\Service\QPushService;
 
 use InvalidArgumentException;
 
@@ -28,7 +28,7 @@ class QPushRegistry
      * @param string                $name       The name of the Queue
      * @param QPushClientService    $service    The QPushClientService
      */
-    public function addQueue($name, QPushClientService $service)
+    public function addQueue($name, QPushService $service)
     {
         $this->queues[$name] = $service;
     }

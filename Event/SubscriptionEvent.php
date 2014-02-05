@@ -38,7 +38,7 @@ abstract class SubscriptionEvent extends Event
      *
      * return string
      */
-    public function getSubscriptionEventType()
+    public function getType()
     {
         return $this->notification['Type'];
     }

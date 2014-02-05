@@ -7,17 +7,20 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class BuildQueueCommand extends ContainerAwareCommand
+use Uecode\Bundle\QPushBundle\Event\Events;
+use Uecode\Bundle\QPushBundle\Event\MessageEvent;
+
+class PollQueueCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('qpush:build:queue')
-            ->setDescription('Builds the configured Queues')
+            ->setName('qpush:poll:queue')
+            ->setDescription('Polls the configured Queues')
             ->addArgument(
                 'name',
                 InputArgument::OPTIONAL,
-                'Name of a specific queue to build', 
+                'Name of a specific queue to poll', 
                 null
             );
     }
@@ -30,16 +33,16 @@ class BuildQueueCommand extends ContainerAwareCommand
         $name = $input->getArgument('name');
 
         if (null !== $name) {
-            return $this->buildQueue($registry, $name);
+            return $this->pollQueue($registry, $name);
         }
 
         foreach($registry->getQueues() as $queue) {
-            $this->buildQueue($registry, $queue->getName());
+            $this->pollQueue($registry, $queue->getName());
         }
 
     }
 
-    private function buildQueue($registry, $name)
+    private function pollQueue($registry, $name)
     {
         if (!$registry->hasQueue($name)) {
             return $output->writeln(
@@ -47,8 +50,17 @@ class BuildQueueCommand extends ContainerAwareCommand
             );
         }
 
-        $registry->getQueue($name)->build();
-        $this->output->writeln(sprintf("The %s queue has been built successfully.", $name));
+        $messages   = $registry->getQueue($name)->pollQueue();
+        $count      = sizeof($messages);
+        foreach ($messages as $message) {
+            $messageEvent   = new MessageEvent($name, $message);
+
+            $dispatcher = $this->getContainer()->get('event_dispatcher');
+            $dispatcher->dispatch(Events::MESSAGE, $messageEvent);
+        }  
+
+        $msg = "<info>Finished polling %s Queue, %d messages fetched.</info>";
+        $this->output->writeln(sprintf($msg, $name, $count));
 
         return 0;
     }

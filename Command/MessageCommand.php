@@ -7,18 +7,22 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class BuildQueueCommand extends ContainerAwareCommand
+class MessageCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('qpush:build:queue')
-            ->setDescription('Builds the configured Queues')
+            ->setName('qpush:send:message')
+            ->setDescription('Sends a Message to a Queue')
             ->addArgument(
                 'name',
-                InputArgument::OPTIONAL,
-                'Name of a specific queue to build', 
-                null
+                InputArgument::REQUIRED,
+                'Name of the Queue' 
+            )
+            ->addArgument(
+                'message',
+                InputArgument::REQUIRED,
+                'Message to send to the Queue'
             );
     }
 
@@ -28,18 +32,12 @@ class BuildQueueCommand extends ContainerAwareCommand
         $registry = $this->getContainer()->get('uecode_qpush');
 
         $name = $input->getArgument('name');
+        $message = $input->getArgument('message');
 
-        if (null !== $name) {
-            return $this->buildQueue($registry, $name);
-        }
-
-        foreach($registry->getQueues() as $queue) {
-            $this->buildQueue($registry, $queue->getName());
-        }
-
+        return $this->sendMessage($registry, $name, $message);
     }
 
-    private function buildQueue($registry, $name)
+    private function sendMessage($registry, $name, $message)
     {
         if (!$registry->hasQueue($name)) {
             return $output->writeln(
@@ -47,8 +45,8 @@ class BuildQueueCommand extends ContainerAwareCommand
             );
         }
 
-        $registry->getQueue($name)->build();
-        $this->output->writeln(sprintf("The %s queue has been built successfully.", $name));
+        $registry->getQueue($name)->push([$message]);
+        $this->output->writeln("<info>The message has been sent.</info>");
 
         return 0;
     }

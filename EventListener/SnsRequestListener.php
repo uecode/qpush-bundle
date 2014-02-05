@@ -16,7 +16,7 @@ class SnsRequestListener
         $notification = json_encode($event->getRequest()->getContent(), true);
 
         if (!empty($notification['Subject'])
-            || strpos($notification['Subject'], 'uecode_qpush:') === false)
+            || false === strpos($notification['Subject'], 'uecode_qpush_'))
         {
             return;
         }
@@ -25,7 +25,7 @@ class SnsRequestListener
         $event->getRequest()->attributes->set('notification', $notification);
 
         // Add the Queue name to Request Attributes
-        $queue = str_replace('uecode_qpush:', '', $notification['Message']);
+        $queue = str_replace('uecode_qpush_', '', $notification['Message']);
         $event->getRequest()->attributes->set('queue', $queue);
 
         // Direct the Request to correct Action based on Type

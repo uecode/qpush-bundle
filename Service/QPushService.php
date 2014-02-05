@@ -15,11 +15,10 @@ use Uecode\Bundle\QPushBundle\EventListener\MessageListener;
 use Uecode\Bundle\QPushBundle\EventListener\NotificationListener;
 use Uecode\Bundle\QPushBundle\EventListener\SubscriptionListener;
 
-class QPushService implements 
-    MessageListener, 
-    NotificationListener,
-    SubscriptionListener
+class QPushService implements MessageListener, NotificationListener, SubscriptionListener
 {
+    const QPUSH_PREFIX = 'uecode_qpush_';
+
     /**
      * QPush Queue Name
      *
@@ -88,46 +87,6 @@ class QPushService implements
     }
 
     /**
-     * Pushes a message to the Queue
-     *
-     * This method will either use a SNS Topic to publish a queued message or 
-     * straight to SQS depending on the application configuration.
-     *
-     * @param array     $message    The message to queue
-     *
-     * @return string
-     */
-    public function push(array $message)
-    {
-        if ($this->options[$name]['use_sns']) {
-
-            $message    = [
-                'default'   => self::QPUSH_PREFIX . $name,
-                'sqs'       => json_encode($message),
-                'http'      => self::QPUSH_PREFIX . $name,
-                'https'     => self::QPUSH_PREFIX . $name,
-            ];
-
-            $result = $this->snsClient->publish([
-                'TopicArn'          => $this->getTopicArn($name),
-                'Subject'           => self::QPUSH_PREFIX . $name,
-                'Message'           => json_encode($message),
-                'MessageStructure'  => 'json'
-            ]);
-
-            return $result->get('MessageId');
-        }
-
-        $result = $this->sqsClient->sendMessage([
-            'QueueUrl'      => $this->getQueueUrl($name),
-            'MessageBody'   => json_encode($message),
-            'DelaySeconds'  => $this->queues['delay_seconds']
-        ]);
-
-        return $result->get('MessageId');
-    }
-
-    /**
      * Returns the Queue Name
      *
      * @return string
@@ -158,6 +117,46 @@ class QPushService implements
     }
 
     /**
+     * Pushes a message to the Queue
+     *
+     * This method will either use a SNS Topic to publish a queued message or 
+     * straight to SQS depending on the application configuration.
+     *
+     * @param array $message The message to queue
+     *
+     * @return string
+     */
+    public function push(array $message)
+    {
+        if ($this->options['use_sns']) {
+
+            $message    = [
+                'default'   => $this->getNameWithPrefix(),
+                'sqs'       => json_encode($message),
+                'http'      => $this->getNameWithPrefix(),
+                'https'     => $this->getNameWithPrefix(),
+            ];
+
+            $result = $this->snsClient->publish([
+                'TopicArn'          => $this->getTopicArn(),
+                'Subject'           => $this->getNameWithPrefix(),
+                'Message'           => json_encode($message),
+                'MessageStructure'  => 'json'
+            ]);
+
+            return $result->get('MessageId');
+        }
+
+        $result = $this->sqsClient->sendMessage([
+            'QueueUrl'      => $this->getQueueUrl(),
+            'MessageBody'   => json_encode($message),
+            'DelaySeconds'  => $this->options['delay_seconds']
+        ]);
+
+        return $result->get('MessageId');
+    }
+
+    /**
      * Builds the configured queues
      *
      * If a Queue name is passed and configured, this method will build only that
@@ -166,38 +165,51 @@ class QPushService implements
      * All Create methods are idempotent, if the resource exists, the current ARN
      * will be returned
      *
-     * @param string $name An optional Queue name
      */
-    public function build($name = null)
+    public function build()
     {
-        $queues = $this->queues;
+        // Create the SQS Queue
+        $queueUrl = $this->createQueue();
 
-        if (!is_null($name) && array_key_exists($name, $queues)) {
-            $queues = [$name => $queues[$name]];
-        }
+        if ($this->options['use_sns']) {
+           // Create the SNS Topic
+           $topicArn = $this->createTopic();
 
-        foreach ($queues as $queue => $options) {
-            // Create the SQS Queue
-            $queueUrl = $this->createQueue($queue, $options);
+           // Add the SQS Queue as a Subscriber to the SNS Topic
+           $this->subscribeEndpoint(
+               $topicArn, 
+               'sqs', 
+               $this->sqsClient->getQueueArn($queueUrl)
+           );
 
-            if ($options['use_sns']) {
-
-                // Create the SNS Topic
-                $topicArn = $this->createTopic($queue);
-
-                // Add the SQS Queue as a Subscriber to the SNS Topic
-                $this->subscribeEndpoint($topicArn, 'sqs', $queueUrl);
-
-                // Add configured Subscribers to the SNS Topic
-                foreach ($options['subscribers'] as $subscriber) {
-                    $this->subscribeEndpoint(
-                        $topicArn, 
-                        $subscriber['protocol'],
-                        $subscriber['endpoint']
-                    );
-                }
+           // Add configured Subscribers to the SNS Topic
+           foreach ($this->options['subscribers'] as $subscriber) {
+                $this->subscribeEndpoint(
+                    $topicArn, 
+                    $subscriber['protocol'],
+                    $subscriber['endpoint']
+                );
             }
         }
+    }
+
+    /**
+     * Polls the Queue for Messages
+     *
+     * The `receiveMessage` method will remain open for the configured
+     * `received_message_wait_time_seconds` value on this queue, to allow for
+     * long polling.
+     *
+     * @return array
+     */
+    public function pollQueue()
+    {
+        $result = $this->sqsClient->receiveMessage([
+            'QueueUrl'          => $this->getQueueUrl(),
+            'WaitTimeSeconds'   => $this->options['receive_message_wait_time_seconds']
+        ]);
+
+        return $result->get('Messages') ?: [];
     }
 
     /**
@@ -235,8 +247,8 @@ class QPushService implements
         $result = $this->sqsClient->createQueue([
             'QueueName'     => $this->getNameWithPrefix(),
             'Attributes'    => [
-                'DelaySeconds'                  => $this->options['delay_settings'],
-                'MaximumMessageSize'            => $this->options['max_message_size'],
+                'DelaySeconds'                  => $this->options['delay_seconds'],
+                'MaximumMessageSize'            => $this->options['maximum_message_size'],
                 'MessageRetentionPeriod'        => $this->options['message_retention_period'],
                 'VisibilityTimeout'             => $this->options['visibility_timeout'],
                 'ReceiveMessageWaitTimeSeconds' => $this->options['receive_message_wait_time_seconds']
@@ -254,18 +266,16 @@ class QPushService implements
     /**
      * Get a Topic ARN by name
      *
-     * @param string $name The name of the Queue
-     *
      * @return string
      */
-    public function getTopicArn($name)
+    public function getTopicArn()
     {
         if (!empty($this->queueUrl)) {
             return $this->queueUrl;
         }
 
         $arnKey = $this->getNameWithPrefix() . '_topic_arn';
-        if ($this->cache->contains($topicArnKey)) {
+        if ($this->cache->contains($arnKey)) {
             return $this->topicArn = $this->cache->fetch($arnKey);
         }
         
@@ -284,7 +294,7 @@ class QPushService implements
      */
     public function createTopic()
     {
-        $result = $client->createTopic([
+        $result = $this->snsClient->createTopic([
             'Name' => $this->getNameWithPrefix()
         ]);
 
@@ -305,7 +315,7 @@ class QPushService implements
      */
     public function getTopicSubscriptions($topicArn)
     {
-        $result = $client->listSubscriptionsByTopic([
+        $result = $this->snsClient->listSubscriptionsByTopic([
             'TopicArn' => $topicArn
         ]);
 
@@ -377,14 +387,12 @@ class QPushService implements
      *
      * @param SubscriptionEvent $event The SNS Subscription Event
      */
-    public function onSubscriptionChange(SubscriptionEvent $event)
+    public function onSubscription(SubscriptionEvent $event)
     {
-        $params = [
+        $this->snsClient->confirmSubscription([
             'TopicArn'  => $event->getTopicArn(),
             'Token'     => $event->getToken()
-        ];
-
-        $this->snsClient->confirmSubscription($params);
+        ]);
     }
 
     /**
@@ -395,17 +403,10 @@ class QPushService implements
      *
      * @param NotificationEvent $event The SNS Notification Event
      */
-    public function onNotificationReceived(NotificationEvent $event)
+    public function onNotify(NotificationEvent $event)
     {
-        $queue      = $event->getQueue();
-        $options    = $this->queues[$queue];
-
-        $result = $this->sqsClient->receiveMessage([
-            'QueueUrl'          => $this->getQueueUrl($queue),
-            'WaitTimeSeconds'   => $options['polling_wait_time']
-        ]);
-
-        foreach ($result->get('Messages') as $message) {
+        $messages = $this->pollQueue();
+        foreach ($messages as $message) {
             $messageEvent   = new MessageEvent($queue, $message);
 
             $dispatcher = $event->getDispatcher();
@@ -423,10 +424,10 @@ class QPushService implements
      *
      * @param MessageEvent $event The SQS Message Event
      */
-    public function onMessageRetrieved(MessageEvent $event)
+    public function onMessage(MessageEvent $event)
     {
         $result = $this->sqsClient->deleteMessage([
-            'QueueUrl'      => $this->getQueueUrl($event->getQueueName()),
+            'QueueUrl'      => $this->getQueueUrl(),
             'ReceiptHandle' => $event->getReceiptHandle()
         ]);
 

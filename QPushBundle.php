@@ -4,7 +4,8 @@ namespace Uecode\Bundle\QPushBundle;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
+use Uecode\Bundle\QPushBundle\DependencyInjection\QPushCustomExtension;
+use Uecode\Bundle\QPushBundle\DependencyInjection\Compiler\QPushCompilerPass;
 
 class QPushBundle extends Bundle
 {
@@ -15,18 +16,7 @@ class QPushBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new QPushCompilerPass());
-
-        $listeners = $container->getParameter('uecode_qpush.event_listeners');
-        foreach ($listeners as $listener) {
-
-            $compilerPass = new RegisterListenersPass(
-                'event_dispatcher', 
-                'uecode_qpush.event_listener.' . $name,
-                'uecode_qpush.event_subscriber.' . $name
-            );
-
-            $container->addCompilerPass($compilerPass);
-        }
+        $container->registerExtension(new QPushCustomExtension);
+        $container->addCompilerPass(new QPushCompilerPass);
     }
 }

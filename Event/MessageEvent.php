@@ -71,7 +71,7 @@ class MessageEvent extends Event
      *
      * @return string
      */
-    public function getMessageReceiptHandle()
+    public function getReceiptHandle()
     {
         return $this->message['ReceiptHandle'];
     }
