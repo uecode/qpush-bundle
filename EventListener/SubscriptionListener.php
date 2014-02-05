@@ -7,12 +7,12 @@ use Uecode\Bundle\QpushBundle\Event\SubscriptionEvent;
 interface SubscriptionListener
 {
     /**
-     * Method for custom event handlers to process SNS Subscription Event
+     * Handles a SubscriptionEvent for the Queue
      *
-     * The SubscriptionEvent can be either for a `SubscriptionConfirmation` or
-     * a `UnsubscribeConfirmation`.  The method should check the event type.
+     * Some Queue Providers (like AWS SNS) send and require confirmation 
+     * requests to add or remove subscriptions to the Queue
      *
-     * @param SubscriptionEvent $event SNS Subscription Event
+     * @param SubscriptionEvent $event The Subscription Event
      */
     public function onSubscription(SubscriptionEvent $event);
 }

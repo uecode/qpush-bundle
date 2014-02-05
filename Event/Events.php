@@ -19,7 +19,7 @@ abstract class Events
      */
     static public function Notify($name)
     {
-        return $name . '.' . self::NOTIFY;
+        return sprintf('%s.%s', $name, self::NOTIFY);
     }
 
     /**
@@ -31,7 +31,7 @@ abstract class Events
      */
     static public function Subscription($name)
     {
-        return $name . '.' . self::SUBSCRIPTION;
+        return sprintf('%s.%s', $name, self::SUBSCRIPTION);
     }
     
     /**
@@ -43,6 +43,6 @@ abstract class Events
      */
     static public function Message($name)
     {
-        return $name . '.' . self::MESSAGE;
+        return sprintf('%s.%s', $name, self::MESSAGE);
     }
 }

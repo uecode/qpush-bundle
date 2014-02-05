@@ -1,6 +1,5 @@
 parameters:
-    uecode_qpush.registry.class: Uecode\Bundle\QPushBundle\QPushRegistry
-    uecode_qpush.service.class: Uecode\Bundle\QPushBundle\Service\QPushService
+    uecode_qpush.registry.class: Uecode\Bundle\QPushBundle\Queue\QPushQueueRegistry
 
 services:
 ### QPush Registry
@@ -9,35 +8,9 @@ services:
     uecode_qpush:
         alias: uecode_qpush.registry
 
-### QPush Service
-    uecode_qpush.service:
-        class: %uecode_qpush.service.class%
-        abstract: true
-        arguments:
-            - null
-            - null
-            - null
-            - @uecode_qpush.sqs_client
-            - @uecode_qpush.sns_client
-
 ### QPush Event Listeners
     uecode_qpush.controller_listener:
-        class: Uecode\Bundle\QPushBundle\EventListener\ControllerListener
+        class: Uecode\Bundle\QPushBundle\EventListener\AwsControllerListener
         arguments: [ @controller_resolver ]
         tags:
             - { name: kernel.event_listener, event: kernel.controller, priority: 254 }
-
-### AWS Clients
-    uecode_qpush.sns_client:
-        class:              Aws\Sns\SnsClient
-        factory_class:      Aws\Sns\SnsClient
-        factory_method:     factory
-        arguments: [ %aws.credentials% ]
-        public: false
-
-    uecode_qpush.sqs_client:
-        class:              Aws\Sqs\SqsClient
-        factory_class:      Aws\Sqs\SqsClient
-        factory_method:     factory
-        arguments: [ %aws.credentials% ]
-        public: false

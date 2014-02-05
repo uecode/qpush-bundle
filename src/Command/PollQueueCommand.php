@@ -36,7 +36,7 @@ class PollQueueCommand extends ContainerAwareCommand
             return $this->pollQueue($registry, $name);
         }
 
-        foreach ($registry->getQueues() as $queue) {
+        foreach ($registry->all() as $queue) {
             $this->pollQueue($registry, $queue->getName());
         }
 
@@ -44,13 +44,13 @@ class PollQueueCommand extends ContainerAwareCommand
 
     private function pollQueue($registry, $name)
     {
-        if (!$registry->hasQueue($name)) {
+        if (!$registry->has($name)) {
             return $output->writeln(
                 sprintf("This [%s] is not the queue you are looking for...", $name)
             );
         }
 
-        $messages   = $registry->getQueue($name)->pollQueue();
+        $messages   = $registry->get($name)->pollQueue();
         $count      = sizeof($messages);
         foreach ($messages as $message) {
             $messageEvent   = new MessageEvent($name, $message);

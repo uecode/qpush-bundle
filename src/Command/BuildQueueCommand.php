@@ -33,7 +33,7 @@ class BuildQueueCommand extends ContainerAwareCommand
             return $this->buildQueue($registry, $name);
         }
 
-        foreach ($registry->getQueues() as $queue) {
+        foreach ($registry->all() as $queue) {
             $this->buildQueue($registry, $queue->getName());
         }
 
@@ -41,13 +41,13 @@ class BuildQueueCommand extends ContainerAwareCommand
 
     private function buildQueue($registry, $name)
     {
-        if (!$registry->hasQueue($name)) {
+        if (!$registry->has($name)) {
             return $output->writeln(
                 sprintf("This [%s] is not the queue you are looking for...", $name)
             );
         }
 
-        $registry->getQueue($name)->build();
+        $registry->get($name)->build();
         $this->output->writeln(sprintf("The %s queue has been built successfully.", $name));
 
         return 0;

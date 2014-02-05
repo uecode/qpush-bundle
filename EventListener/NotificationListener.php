@@ -7,9 +7,12 @@ use Uecode\Bundle\QpushBundle\Event\NotificationEvent;
 interface NotificationListener
 {
     /**
-     * Method for custom event handlers to process SNS Notification Event
+     * Handles a NotificaitonEvent from the Queue
      *
-     * @param SubscriptionEvent $event SNS Subscription Event
+     * The NotificaitonEvent is used to notify subscribers that a Message is
+     * waiting in the Queue 
+     *
+     * @param NotificationEvent $event The SNS Notification Event
      */
     public function onNotify(NotificationEvent $event);
 }
