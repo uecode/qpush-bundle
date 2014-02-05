@@ -2,18 +2,20 @@
 
 namespace Uecode\Bundle\QpushBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
 use Uecode\Bundle\QPushBundle\Event\Events;
-use Uecode\Bundle\QPushBundle\Event\SnsnotificationEvent;
+use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
+use Uecode\Bundle\QPushBundle\Event\SubscriptionEvent;
 
 /**
- * SNS notification Controller
+ * QPush Controller
  *
  * SNS Notifications are directed to the correct action through use of a
  * Request Listener looking for custom SNS headers.
  */
-class QpushSnsController
+class QPushController extends Controller
 {
     /**
      * Dispatches SNS notification Event to services to poll SQS Queue
@@ -21,10 +23,11 @@ class QpushSnsController
      * @param string $queue        SQS Queue Name
      * @param array  $notification SNS notification
      */
-    protected function notifyAction($queue, $notification)
+    public function notifyAction($queue, $notification)
     {
+        error_log('dispatched notification event, automagically');
         $dispatcher = $this->get('event_dispatcher');
-        $dispatcher->dispatch(Events::NOTIFY, new SnsNotificationEvent($queue, $notification));
+        $dispatcher->dispatch(Events::NOTIFY, new NotificationEvent($queue, $notification));
 
         return new Response('success', 200);
     }
@@ -35,10 +38,11 @@ class QpushSnsController
      * @param string $queue        SQS Queue Name
      * @param array  $notification SNS Notification
      */
-    protected function subscriptionAction($notification)
+    public function subscriptionAction($notification)
     {
+        error_log('dispatched subscription event, automagically');
         $dispatcher = $this->get('event_dispatcher');
-        $dispatcher->dispatch(Events::SUBSCRIPTION, new SnsSubscriptionEvent($notification));
+        $dispatcher->dispatch(Events::SUBSCRIPTION, new SubscriptionEvent($notification));
 
         return new Response('success', 200);
     }

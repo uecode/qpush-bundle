@@ -4,7 +4,7 @@ namespace Uecode\Bundle\QPushBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-abstract class SubscriptionEvent extends Event
+class SubscriptionEvent extends Event
 {
     /**
      * Entire notification from SNS

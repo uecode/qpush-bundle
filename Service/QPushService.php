@@ -389,6 +389,7 @@ class QPushService implements MessageListener, NotificationListener, Subscriptio
      */
     public function onSubscription(SubscriptionEvent $event)
     {
+        error_log('caught subscription event!');
         $this->snsClient->confirmSubscription([
             'TopicArn'  => $event->getTopicArn(),
             'Token'     => $event->getToken()
@@ -405,6 +406,7 @@ class QPushService implements MessageListener, NotificationListener, Subscriptio
      */
     public function onNotify(NotificationEvent $event)
     {
+        error_log('caught notification event!');
         $messages = $this->pollQueue();
         foreach ($messages as $message) {
             $messageEvent   = new MessageEvent($queue, $message);
