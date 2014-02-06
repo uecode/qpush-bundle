@@ -11,13 +11,6 @@ This provider relies on the [AWS SDK for PHP](https://github.com/aws/aws-sdk-php
 it is recommened to use the [Uecode Amazon Bundle](https://github.com/uecode/amazon-bundle)
 to make semantic configuration easy.
 
-######compser.json
-```json
-"require": {
-    "uecode/amazon-bundle": "~2.0.0",
-}
-```
-
 To configure the use of this provider, you must have the `Aws\Common\Aws` service locator
 configured as a service in the container.
 
