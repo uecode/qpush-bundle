@@ -22,7 +22,7 @@
     },
     "suggest": {
         "uecode/amazon-bundle": "Allows semantic configuration of the AWS PHP SDK"
-    }
+    },
     "require-dev": {
         "symfony/symfony": "dev-master"
     },
