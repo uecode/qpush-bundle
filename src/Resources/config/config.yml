@@ -1,5 +1,5 @@
 uecode_qpush:
-    cache_service_id: null
+    cache_service: null
     providers:
         - { name: aws, provider_service: my_service_id
     queues:

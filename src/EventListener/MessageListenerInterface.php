@@ -4,7 +4,7 @@ namespace Uecode\Bundle\QPushBundle\EventListener;
 
 use Uecode\Bundle\QpushBundle\Event\MessageEvent;
 
-interface MessageListener
+interface MessageListenerInterface
 {
     /**
      * Handles a MessageEvent from the Queue

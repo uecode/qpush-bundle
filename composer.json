@@ -26,9 +26,8 @@
     },
     "minimum-stability": "alpha",
     "autoload": {
-        "psr-0": {
+        "psr-4": {
             "Uecode\\Bundle\\QPushBundle": "src/"
         }
-    },
-    "target-dir": "src/Uecode/Bundle/QPushBundle"
+    }
 }

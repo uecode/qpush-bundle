@@ -1,5 +1,6 @@
 parameters:
     uecode_qpush.registry.class: Uecode\Bundle\QPushBundle\Queue\QPushQueueRegistry
+    uecode_qpush.provider.aws: Uecode\Bundle\QPushBundle\Queue\AwsQueueProvider
 
 services:
 ### QPush Registry

@@ -4,7 +4,7 @@ namespace Uecode\Bundle\QPushBundle\EventListener;
 
 use Uecode\Bundle\QpushBundle\Event\NotificationEvent;
 
-interface NotificationListener
+interface NotificationListenerInterface
 {
     /**
      * Handles a NotificaitonEvent from the Queue

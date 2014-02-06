@@ -12,15 +12,27 @@ class QPushCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        $queues = $container->getParameter('uecode_qpush.queues');
-        $cache  = $container->getParameter('uecode_qpush.cache');
+        $cache      = $container->getParameter('uecode_qpush.cache');
+        $queues     = $container->getParameter('uecode_qpush.queues');
 
-        $prefix = 'uecode_qpush';
-        foreach (array_keys($queues) as $queue) {
-            $name = $prefix . '.' . $queue;
+        foreach ($queues as $queue => $optons) {
+            $name = sprintf('uecode_push.%s', $queue);
+
             $definition = $container->getDefinition($name);
-            $cache = $this->getCache($cache, $container);
-            $definition->replaceArgument(2, $cache);
+
+            if ($cache = $this->getCache($cache, $container)) {
+                $definition->replaceArgument(2, $cache);
+            }
+
+            if (isset($options['provider_service'])) {
+                $service = $options['provider_service'];
+                if (!$container->hasDefinition($service)) {
+                    throw new InvalidArgumentException(
+                        sprintf("The service \"%s\" does not exist.", $service)
+                    );
+                }
+                $definition->addMethodCall('setService', [new Reference($service)]);
+            }
         }
     }
 
@@ -35,24 +47,13 @@ class QPushCompilerPass implements CompilerPassInterface
         if (null !== $cache) {
             if (!$container->hasDefinition($cache)) {
                 throw new InvalidArgumentException(
-                    sprintf(
-                        "The service \"%s\" does not exist.", $cache
-                    )
+                    sprintf("The service \"%s\" does not exist.", $cache)
                 );
             }
 
             return new Reference($cache);
         }
 
-        $directory = $container->getParameter('kernel.cache_dir') . '/qpush/';
-        $extension = 'uecode.php';
-
-        return $container->setDefinition(
-            'uecode_qpush.file_cache',
-            new Definition(
-                'Doctrine\Common\Cache\PhpFileCache',
-                [$directory, $extension]
-            )
-        )->setPublic(false);
+        return false;
     }
 }

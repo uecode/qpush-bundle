@@ -4,7 +4,7 @@ namespace Uecode\Bundle\QPushBundle\EventListener;
 
 use Uecode\Bundle\QpushBundle\Event\SubscriptionEvent;
 
-interface SubscriptionListener
+interface SubscriptionListenerInterface
 {
     /**
      * Handles a SubscriptionEvent for the Queue
