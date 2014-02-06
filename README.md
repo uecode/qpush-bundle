@@ -66,7 +66,7 @@ own cache service, as long as its an instance of `Doctrine\Common\Cache\Cache`.
 The configuration parameter `cache_service` expects the container service id of a registered
 Cache service.
 
-######example:
+######Example:
 ```yaml
 #app/config.yml
 
@@ -82,7 +82,7 @@ uecode_qpush:
 
 A full configuration might look like the follow:
 
-######example
+######Example
 
 ```yaml
 #app/config.yml
