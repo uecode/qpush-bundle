@@ -27,7 +27,7 @@
     "minimum-stability": "alpha",
     "autoload": {
         "psr-4": {
-            "Uecode\\Bundle\\QPushBundle": "src/"
+            "Uecode\\Bundle\\QPushBundle\\": "src/"
         }
     }
 }
