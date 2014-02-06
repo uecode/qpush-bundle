@@ -50,10 +50,13 @@ class PollQueueCommand extends ContainerAwareCommand
             );
         }
 
-        $messages   = $registry->get($name)->pollQueue();
+        $provider = $registry->get($name);
+        $messages   = $provider->pollQueue();
         $count      = sizeof($messages);
         foreach ($messages as $message) {
-            $messageEvent   = new MessageEvent($name, $message);
+
+            $metadata = $provider->createMetadata($message);
+            $messageEvent   = new MessageEvent($name, $message, $metadata);
 
             $dispatcher = $this->getContainer()->get('event_dispatcher');
             $dispatcher->dispatch(Events::message($name), $messageEvent);

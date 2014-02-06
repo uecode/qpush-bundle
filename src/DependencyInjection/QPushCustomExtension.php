@@ -45,15 +45,22 @@ class QPushCustomExtension extends Extension
 
             $provider = sprintf('uecode_qpush.provider.%', $config['provider']);
             if (!$container->hasParameter($provider)) {
-                throw new InvalidArgumentException(
+                throw new \InvalidArgumentException(
                     sprintf('Invalid "%s" provider on "%s" queue.', $config['provider'], $queue)
                 );
             }
 
-            $definition = new Definition(
-                $container->getParameter($provider),
-                [ $queue, $config['options'], $fileCache ]
-            );
+            $provider = $container->getParameter($provider);
+
+            $interfaces = class_implements($provider);
+            $interface = 'Uecode\Bundle\QpushBundle\Queue\QueueProviderInterface';
+            if (!isset($interfaces[$interface])) {
+                throw new \Exception(
+                    sprintf('The class %s must implement the %s', $provider, $interface)
+                );
+            }
+
+            $definition = new Definition($provider, [$queue, $config['options'], $fileCache]);
 
             $service = $container->setDefinition($name, $definition)
                 ->addTag(

@@ -18,9 +18,11 @@
     },
     "require": {
         "php": ">=5.4.0",
-        "aws/aws-sdk-php": "2.5.2",
         "doctrine/common": ">2.4.0"
     },
+    "suggest": {
+        "uecode/amazon-bundle": "Allows semantic configuration of the AWS PHP SDK"
+    }
     "require-dev": {
         "symfony/symfony": "dev-master"
     },

@@ -45,8 +45,13 @@ class AwsQueueProvider extends QueueProvider
      */
     private $topicArn;
 
+    public function getProvider()
+    {
+        return "Aws";
+    }
+
     /**
-     * Constructor.
+     * Sets the Aws Services, SQS & SNS
      *
      * @param Aws $service An instance of Aws\Common\Aws;
      */
@@ -60,6 +65,14 @@ class AwsQueueProvider extends QueueProvider
 
         $this->sqs = $service->get('SQS');
         $this->sns = $service->get('SNS');
+    }
+
+    /**
+     * Adds the Message Receipt Handle to the Metadata
+     */
+    public function createMetaData($message)
+    {
+        return ['ReceiptHandle' => $message['ReceiptHandle']];
     }
 
     /**
@@ -362,9 +375,9 @@ class AwsQueueProvider extends QueueProvider
     {
         $messages = $this->receive();
         foreach ($messages as $message) {
-            $messageEvent   = new MessageEvent($this->name, $message);
-
-            $dispatcher = $event->getDispatcher();
+            $metadata       = $this->createMetadata($message);
+            $messageEvent   = new MessageEvent($this->name, $message, $metadata);
+            $dispatcher     = $event->getDispatcher();
             $dispatcher->dispatch(Events::Message($this->name), $messageEvent);
         }
     }
@@ -383,7 +396,7 @@ class AwsQueueProvider extends QueueProvider
     {
         $result = $this->sqs->deleteMessage([
             'QueueUrl'      => $this->queueUrl,
-            'ReceiptHandle' => $event->getReceiptHandle()
+            'ReceiptHandle' => $event->getMetadata()['ReceiptHandle']
         ]);
 
         $event->stopPropagation();

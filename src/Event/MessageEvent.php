@@ -7,30 +7,38 @@ use Symfony\Component\EventDispatcher\Event;
 class MessageEvent extends Event
 {
     /**
-     * SQS Queue name
+     * Queue name
      *
      * @var string
      */
     protected $queue;
 
     /**
-     * SQS Message
+     * Message
      *
      * @var array
      */
     protected $message;
 
     /**
+     * Message Meta Data
+     *
+     * @var array
+     */
+    protected $metadata;
+
+    /**
      * Constructor.
      *
-     * @param string $queue        The SQS Queue Name
-     * @param array  $message      SQS Message
-     * @param string $receiptHanle The SQS Message Receipt Handle
+     * @param string $queue     The Queue Name
+     * @param array  $message   Message
+     * @param string $metadata  Optional Message Metadata
      */
-    public function __construct($queue, $message)
+    public function __construct($queue, array $message, array $metadata = array())
     {
-        $this->queue            = $queue;
-        $this->message          = $message;
+        $this->queue    = $queue;
+        $this->message  = $message;
+        $this->metadata = $metadata
     }
 
     /**
@@ -54,25 +62,12 @@ class MessageEvent extends Event
     }
 
     /**
-     * Return the SQS Message Body
-     *
-     * This method assumes the the body is a json string and will
-     * `json_decode` the Message Body before returning
-     *
-     * @return array
-     */
-    public function getMessageBody()
-    {
-        return json_decode($this->message['Body'], true);
-    }
-
-    /**
      * Return the SQS Message Receipt Handle
      *
      * @return string
      */
-    public function getReceiptHandle()
+    public function getMetadata()
     {
-        return $this->message['ReceiptHandle'];
+        return $this->metadata;
     }
 }

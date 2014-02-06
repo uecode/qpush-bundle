@@ -42,6 +42,13 @@ interface QueueProviderInterface
     public function getNameWithPrefix();
 
     /**
+     * Returns the Queue Provider name
+     *
+     * @return string
+     */
+    public function getProvider();
+
+    /**
      * Returns the Provider's Configuration Options
      *
      * @return array
@@ -54,6 +61,13 @@ interface QueueProviderInterface
      * @return Cache
      */
     public function getCache();
+
+    /**
+     * Creates optional Metadata for the Message
+     *
+     * @return array
+     */
+    public function createMetaData($message);
 
     /**
      * Creates the Queue

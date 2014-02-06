@@ -6,7 +6,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use InvalidArgumentException;
 
 class QPushCompilerPass implements CompilerPassInterface
 {
@@ -14,6 +13,7 @@ class QPushCompilerPass implements CompilerPassInterface
     {
         $cache      = $container->getParameter('uecode_qpush.cache');
         $queues     = $container->getParameter('uecode_qpush.queues');
+        $providers  = $container->getParameter('uecode_qpush.providers');
 
         foreach ($queues as $queue => $optons) {
             $name = sprintf('uecode_push.%s', $queue);
@@ -24,8 +24,9 @@ class QPushCompilerPass implements CompilerPassInterface
                 $definition->replaceArgument(2, $cache);
             }
 
-            if (isset($options['provider_service'])) {
-                $service = $options['provider_service'];
+            $provider = $options['provider'];
+            if (isset($providers[$provider]['provider_service'])) {
+                $service = $providers[$provider]['provider_service'];
                 if (!$container->hasDefinition($service)) {
                     throw new InvalidArgumentException(
                         sprintf("The service \"%s\" does not exist.", $service)
@@ -46,7 +47,7 @@ class QPushCompilerPass implements CompilerPassInterface
     {
         if (null !== $cache) {
             if (!$container->hasDefinition($cache)) {
-                throw new InvalidArgumentException(
+                throw new \InvalidArgumentException(
                     sprintf("The service \"%s\" does not exist.", $cache)
                 );
             }

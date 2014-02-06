@@ -78,6 +78,11 @@ abstract class QueueProvider implements QueueProviderInterface
         return $this->cache;
     }
 
+    public function createMetaData($message)
+    {
+        return [];
+    }
+
     /**
      * @return bool
      */
@@ -101,6 +106,8 @@ abstract class QueueProvider implements QueueProviderInterface
     {
         return false;
     }
+
+    abstract public function getProvider();
 
     abstract public function create();
 
