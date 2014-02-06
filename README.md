@@ -3,11 +3,15 @@ QPush Bundle
 
 ###Overview
 
-###QPush Bundle Installation
+The QPush Bundle relies on a Pub/Sub model of Worker Queues to provide asynchronous
+processing in your Symfony application.  This allows you to distribute processing to
+multiple consumers and create and chain services by binding to simple events.
+
+###Installation
 
 The bundle should be installed through composer.
 
-#####Add the bundle to Composer
+#####Add the bundle to your `composer.json` file
 
 ```json
 "require": {
@@ -17,64 +21,102 @@ The bundle should be installed through composer.
 
 #####Update AppKernel.php of your Symfony Application
 
-Add The QPushBundle to your kernel bootstrap sequence
+Add The UecodeQPushBundle to your kernel bootstrap sequence
 
 ```php
 public function registerBundles()
 {
 	$bundles = array(
     	// ...
-    	new Uecode\Bundle\QPushBundle\QPushBundle(),
+    	new Uecode\Bundle\QPushBundle\UecodeQPushBundle(),
     );
 
     return $bundles;
 }
 ```
 
-####Configure the Bundle
+###Configure the Bundle
 
-The bundle allows you to create multiple queues, with or without the use of SNS
-and provide a list of subscribers for SNS.
+The bundle allows you to specify different Message Queue providers - however, 
+Amazon AWS is the only one currently supported. We are actively looking to add
+more and are accepting contributions.
+
+####Providers
+
+This bundle allows you to configure and use multiple supported providers with in the same 
+application.  Each queue that you create is attached to one of you registered providers.
+
+Providers may require a Service or Client injected into them to provide basic
+interaction with that Worker Queue.  As an example, the `aws` provider requires the
+`Aws\Common\Aws` client.
+
+For specific instructions on how to configure each provider, please view their configuration
+documents below:
+
+ - [AWS Queue Provider](#)
+
+####Caching
+
+Some providers can leverage a caching layer to limit the amount of calls to the Worker Queue
+for basic lookup functionality for things like the Queue ARN, etc.
 
 By default the library will attempt to use file cache, however you can pass your
-own cache class, as long as its an instance of `Doctrine\Common\Cache\Cache`.
-Caching allows the library to remove the latency from some API calls.
+own cache service, as long as its an instance of `Doctrine\Common\Cache\Cache`.
 
-#####An example configuration might look like this:
+The configuration parameter `cache_service` expects the container service id of a registered
+Cache service.
+
+######example:
+```yaml
+#app/config.yml
+
+services:
+	my_cache_service:
+		class: My\Caching\CacheService
+
+uecode_qpush:
+	cache_service: my_cache_service
+```
+
+####Full Configuration:
+
+A full configuration might look like the follow:
+
+######example
 
 ```yaml
 #app/config.yml
 
 uecode_qpush:
-    aws_credentials:
-        api_key: long_string_here
-        api_token: longer_string_here
-        region: us-east-1
-    cache_service_id: my_cache_class
+	cache_service: my_cache_service
+    providers:
+    	aws:
+    		provider_service: aws.main
     queues:
-        example:
-            use_sns: true
+        my_queue_name:
+        	provider: aws
+            push_notifications: true
             subscribers:
                 - { endpoint: http://example.com, protocol: http }
 ```
 
 ###Usage
 
-Once configured, you can create messages and push them to the queue and create
-services that will automatically be fired as messages are pushed to your application.
+Once configured, you can create messages and publish them to the queue.  You may also
+create services that will automatically be fired as messages are pushed to your application.
 
-####Pushing a Message to your Queue
+For your convenience, a custom `QueueProvider` service will be created and registered in the Container for
+each of your defined Queues. The service id will be in the format of `uecode_qpush.{queue name}`.
 
-To push Messages into your queue, you can use the built in service methods.  For
-your convenience, a custom service will be created for every Queue you configure
-and can be found in the service container: 
+####Publishing a Message to your Worker Queue
 
-    uecode_qpush.{queue name}
+Publishing messages is simple: fetch your `QueueProvider` service from the container and
+call the `publish` method, which accepts an array.
 
-######Pushing messages
+######Example
 
 ```php
-#src/AcmeBundle/Controller/MyController.php
+#src/My/Bundle/ExampleBundle/Controller/MyController.php
 
 public function getId()
 {
@@ -85,81 +127,53 @@ public function getId()
         ]
     ];
     
-    $this->get('uecode_qpush.example')->push($message);
-
-    // Or you can fetch the base service and use a getter
-    $this->get('qpush')->getQueue('example')->push($message);
+    $this->get('uecode_qpush.my_queue_name')->publish($message);
 }
 
 ```
 
-#####Consuming Messages from your Queues
+####Working with Messages from your Queue
 
-Messages are ether automatically received by your application from SNS Callbacks,
-or can be picked up by Cron through an included command if you are not using SNS.
+Messages are ether automatically received by your application from Subscriber callbacks,
+or can be picked up by Cron through an included command if you are not using AWS SNS.
 
-As long as you have an externally accessible HTTP or HTTPS subscriber, this library
-will automatically poll for new messages in the queue on notificaiton from SNS.
+Once a message is received from your Worker Queue, a `MessageEvent` is dispatched which
+can be handled by your services.
 
-Messages are available through an events.  You may have one or more service
-that can consume these events per application.
+Services to be called on events must be tagged with  `uecode_qpush.event_listener`, the
+`event` to listen for, the `method` to call on, and optionally a `priority` between `1` and `100`.
 
-This library relies on your services being tagged properly
+Each `event` fired by the Qpush Bundle is prefixed with the name of your `queue`, ex: `my_queue_name.message`.
+This allows you to assign which services should be used based on the `queue`.
 
-#####Tagging your service
-```yaml 
+You may also have multiple tags on a single service, so that one service can handle multiple `queue`'s events.
 
+######Example
+```yaml
+	services:
+		my_example_service:
+			class: My\Example\ExampleService
+			tags:
+				- { uecode_qpush.event_listener, event: my_queue_name.message, method: onMessage }
 ```
 
+The `method` used in the tag must be publicly available in your service and take one argument,
+an instance of `Uecode\Bundle\QPushBundle\Event\MessageEvent`.
+
+######Example
 ```php
-#src/AcmeBundle/Controller/MyController.php
+#src/My/Bundle/ExampleBundle/Service/MyService.php
 
-public function getId()
+use Uecode\Bundle\QpushBundle\Event\MessageEvent;
+
+// ...
+
+public function onMessage(MessageEvent $event)
 {
-    $message = [ 
-        'messages should be an array'.
-        'they can be flat arrays' => [
-            'or multidimensional'
-        ]
-    ];
+    $queueName	= $event->getQueueName();
+    $message	= $event->getMessage();
+    $metadata	= $event->getMetadata();
     
-    $this->get('uecode_qpush.example')->push($message);
-
-    // Or you can fetch the base service and use a getter
-    $this->get('qpush')->getQueue('example')->push($message);
-}
-```
-
-###Annotation Reference
-
-Property | Description | Example
--------- | ----------- | -------
-`name` | The property name inside the 'links' attribute | `user`
-`href` | The relative (path) url of the resource, including url tokens | `/user/{id}/`
-`params` | An associative array of token names with their corresponding getter methods | `{ "id" = "getId" }`
-`groups` | Serializer Groups, Used the same way as JMS Serializer Groups | `{ "partial", "full" }`
-`type` | 'Absolute' or 'Embedded' | `absolute`
-
-####Using Params
-You can have multiple tokens in the `href`.  The `params` array should be an associative array
-with keys matching the tokens in the path.  Methods listed should be methods that exist in the 
-annotated class.
-
-####Groups
-Specifying `groups` allow you to control the output of the links based on 
-[Exclusion Groups](http://jmsyst.com/libs/serializer/master/reference/annotations#groups)
-
-####Embedded vs Absolute Links
-While `absolute` (default value), will allows include the API Host and optional prefix, 
-`embedded` urls live beneath another resource. Setting type to '`embedded` will allow you 
-to have links like:
-
-```json
-{
-    "_links": {
-        "self": {
-            "href": "http://api.example.com/api/user/1/email/1/"
-        }
-    }
+    // Process ...
 }
 ```
