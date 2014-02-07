@@ -39,9 +39,10 @@ uecode_qpush:
     queues:
         my_queue_name:
         	provider: aws
-            push_notifications: true
-            subscribers:
-                - { endpoint: http://example.com, protocol: http }
+        	options:
+            	push_notifications: true
+            	subscribers:
+                	- { endpoint: http://example.com, protocol: http }
 ```
 
 ###Using SNS
