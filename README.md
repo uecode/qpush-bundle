@@ -44,7 +44,7 @@ more and would be more than happy to accept contributions.
 ####Providers
 
 This bundle allows you to configure and use multiple supported providers with in the same 
-application.  Each queue that you create is attached to one of you registered providers.
+application.  Each queue that you create is attached to one of your registered providers.
 
 Providers may require a Service or Client injected into them to provide basic
 interaction with that Worker Queue.  As an example, the `aws` provider requires the
@@ -80,7 +80,7 @@ uecode_qpush:
 
 ####Full Configuration:
 
-A full configuration might look like the follow:
+A full configuration might look like the following:
 
 ######Example
 
@@ -141,13 +141,14 @@ or can be picked up by Cron through an included command if you are not using AWS
 Once a message is received from your Worker Queue, a `MessageEvent` is dispatched which
 can be handled by your services.
 
-Services to be called on events must be tagged with the `name` as `uecode_qpush.event_listener`, the
-`event` to listen for, the `method` to call on, and optionally a `priority` between `1` and `100`.
+Services to be called on events must be tagged with the name `uecode_qpush.event_listener` and the tag should 
+contain the`event` to listen for, the `method` to call, and optionally a `priority` between `1` and `100`. The
+`priority` is useful to chain services and ensure they fire in a certain order - the higher priorities fire earlier.
 
 Each `event` fired by the Qpush Bundle is prefixed with the name of your `queue`, ex: `my_queue_name.message`.
 This allows you to assign which services should be used based on the `queue`.
 
-You may also have multiple tags on a single service, so that one service can handle multiple `queue`'s events.
+You may also have multiple tags on a single service, so that one service can handle events from multiple queues.
 
 ######Example
 ```yaml
@@ -158,7 +159,7 @@ You may also have multiple tags on a single service, so that one service can han
     			- { name: uecode_qpush.event_listener, event: my_queue_name.message, method: onMessage }
 ```
 
-The `method` used in the tag must be publicly available in your service and take one argument,
+The method listed in the tag must be publicly available in your service and should take a single argument,
 an instance of `Uecode\Bundle\QPushBundle\Event\MessageEvent`.
 
 ######Example
@@ -178,3 +179,14 @@ public function onMessage(MessageEvent $event)
     // Process ...
 }
 ```
+
+####Console Commands
+
+This bundle includes some Console Commands which can be used to for building and polling your queues
+as well as sending simple messages.
+
+Command | Description
+------- | -----------
+`qpush:build:queue` | Builds the queues and warms cache.  Can take an optional queue name as an argument to build a single queue.
+`qpush:poll:queue` | Polls messages from the queues.  Can take an optional queue name as an argument to poll from a single queue.
+`qpush:send:message` | Sends a message to a queue. Takes a queue name and a string message as required arguments.
