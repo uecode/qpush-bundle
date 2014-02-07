@@ -1,8 +1,8 @@
 {
     "name":         "uecode/qpush-bundle",
     "type":         "library",
-    "description":  "Symfony2 Bundle for using Amazon SQS and SNS to process queues with out polling",
-    "keywords":     ["qpush", "aws", "sqs", "sns", "push", "symfony", "bundle" ],
+    "description":  "Asynchronous processing for Symfony using Pub/Sub Worker Queues",
+    "keywords":     ["qpush", "pub/sub", "aws", "asynch", "push", "symfony", "bundle" ],
     "homepage":     "https://github.com/uecode/qpush-bundle",
     "license":      "MIT",
     "authors":      [
