@@ -6,14 +6,9 @@ use Doctrine\Common\Cache\Cache;
 
 use Uecode\Bundle\QPushBundle\Queue\QueueProviderInterface;
 
-use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
 use Uecode\Bundle\QPushBundle\Event\SubscriptionEvent;
-use Uecode\Bundle\QPushBundle\EventListener\MessageListenerInterface;
-use Uecode\Bundle\QPushBundle\EventListener\NotificationListenerInterface;
-use Uecode\Bundle\QPushBundle\EventListener\SubscriptionListenerInterface;
-
 
 abstract class QueueProvider implements QueueProviderInterface
 {

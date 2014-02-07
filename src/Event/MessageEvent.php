@@ -30,9 +30,9 @@ class MessageEvent extends Event
     /**
      * Constructor.
      *
-     * @param string $queue     The Queue Name
-     * @param array  $message   Message
-     * @param string $metadata  Optional Message Metadata
+     * @param string $queue    The Queue Name
+     * @param array  $message  Message
+     * @param string $metadata Optional Message Metadata
      */
     public function __construct($queue, array $message, array $metadata = array())
     {

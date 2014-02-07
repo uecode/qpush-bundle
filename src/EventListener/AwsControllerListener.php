@@ -4,7 +4,6 @@ namespace Uecode\Bundle\QPushBundle\EventListener;
 
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
-use Uecode\Bundle\QPushBundle\Controller\QPushController;
 
 class AwsControllerListener
 {

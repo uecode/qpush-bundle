@@ -17,7 +17,7 @@ abstract class Events
      *
      * return string
      */
-    static public function Notify($name)
+    public static function Notify($name)
     {
         return sprintf('%s.%s', $name, self::NOTIFY);
     }
@@ -29,11 +29,11 @@ abstract class Events
      *
      * return string
      */
-    static public function Subscription($name)
+    public static function Subscription($name)
     {
         return sprintf('%s.%s', $name, self::SUBSCRIPTION);
     }
-    
+
     /**
      * Returns a QPush Notificaiton Event Name
      *
@@ -41,7 +41,7 @@ abstract class Events
      *
      * return string
      */
-    static public function Message($name)
+    public static function Message($name)
     {
         return sprintf('%s.%s', $name, self::MESSAGE);
     }

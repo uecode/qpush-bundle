@@ -9,7 +9,7 @@ interface SubscriptionListenerInterface
     /**
      * Handles a SubscriptionEvent for the Queue
      *
-     * Some Queue Providers (like AWS SNS) send and require confirmation 
+     * Some Queue Providers (like AWS SNS) send and require confirmation
      * requests to add or remove subscriptions to the Queue
      *
      * @param SubscriptionEvent $event The Subscription Event

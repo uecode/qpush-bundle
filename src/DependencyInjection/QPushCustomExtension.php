@@ -33,7 +33,7 @@ class QPushCustomExtension extends Extension
 
     private function buildQueues(array $queues, ContainerBuilder $container, Definition $registry)
     {
-        
+
         $directory = $container->getParameter('kernel.cache_dir') . '/qpush/';
         $fileCache = $container->setDefinition(
             'uecode_qpush.file_cache',
@@ -64,7 +64,7 @@ class QPushCustomExtension extends Extension
 
             $service = $container->setDefinition($name, $definition)
                 ->addTag(
-                    'uecode_qpush.event_listener', 
+                    'uecode_qpush.event_listener',
                     ['event' => "{$queue}.notify", 'method' => "onNotify", 'priority' => 255]
                 )
                 ->addTag(

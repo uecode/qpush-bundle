@@ -10,7 +10,7 @@ interface MessageListenerInterface
      * Handles a MessageEvent from the Queue
      *
      * The MessageEvent is fired when a Message is successfully received from
-     * the Queue 
+     * the Queue
      *
      * @param MessageEvent $event The SQS Message Event
      */

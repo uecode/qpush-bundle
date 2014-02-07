@@ -22,7 +22,7 @@ class AwsEventController extends Controller
      *
      * @param string $queue        SQS Queue Name
      * @param array  $notification SNS notification
-     * 
+     *
      * @return Response
      */
     public function notifyAction($queue, $notification)

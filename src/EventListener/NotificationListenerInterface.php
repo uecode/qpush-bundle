@@ -10,7 +10,7 @@ interface NotificationListenerInterface
      * Handles a NotificaitonEvent from the Queue
      *
      * The NotificaitonEvent is used to notify subscribers that a Message is
-     * waiting in the Queue 
+     * waiting in the Queue
      *
      * @param NotificationEvent $event The SNS Notification Event
      */

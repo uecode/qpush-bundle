@@ -4,7 +4,6 @@ namespace Uecode\Bundle\QPushBundle\Queue;
 
 use Aws\Common\Aws;
 use Aws\Sqs\SqsClient;
-use Aws\Sns\SnsClient;
 
 use Doctrine\Common\Cache\Cache;
 
@@ -19,14 +18,14 @@ class AwsQueueProvider extends QueueProvider
 {
     /**
      * Aws SQS Client
-     * 
+     *
      * @var SqsClient
      */
     private $sqs;
 
     /**
      * Aws SQS Client
-     * 
+     *
      * @var SqsClient
      */
     private $sns;
@@ -138,9 +137,9 @@ class AwsQueueProvider extends QueueProvider
            $topicArn = $this->createTopic();
 
            // Add the SQS Queue as a Subscriber to the SNS Topic
-           $this->subscribeToTopic( 
+           $this->subscribeToTopic(
                $this->topicArn,
-               'sqs', 
+               'sqs',
                $this->sqs->getQueueArn($this->queueUrl)
            );
 
@@ -208,6 +207,7 @@ class AwsQueueProvider extends QueueProvider
         $key = $this->getNameWithPrefix() . '_url';
         if ($this->cache->contains($key)) {
             $this->queueUrl = $this->cache->fetch($key);
+
             return true;
         }
 
@@ -252,6 +252,7 @@ class AwsQueueProvider extends QueueProvider
         $key = $this->getNameWithPrefix() . '_arn';
         if ($this->cache->contains($key)) {
             $this->topicArn = $this->cache->fetch($key);
+
             return true;
         }
 

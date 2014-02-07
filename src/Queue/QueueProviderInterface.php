@@ -16,9 +16,9 @@ interface QueueProviderInterface
     /**
      * Queue Providers constructor - should not be overriden
      *
-     * @param string    $name       Queue name
-     * @param array     $options    Queue Options
-     * @param Cache     $cache      A Doctrine Cache Provider 
+     * @param string $name    Queue name
+     * @param array  $options Queue Options
+     * @param Cache  $cache   A Doctrine Cache Provider
      */
     public function __construct($name, array $options, Cache $cache);
 
