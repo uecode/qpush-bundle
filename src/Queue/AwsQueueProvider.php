@@ -69,7 +69,6 @@ class AwsQueueProvider extends QueueProvider
     public function createMessageEvent($message)
     {
         $msg = json_decode($message['Body'], true);
-        unset($message['Body']);
 
         return new MessageEvent($this->name, $msg, $message);
     }
