@@ -91,7 +91,7 @@ uecode_qpush:
 	cache_service: my_cache_service
     providers:
     	aws:
-    		provider_service: aws.main
+    		provider_service: uecode_amazon.instance.main
     queues:
         my_queue_name:
         	provider: aws
@@ -119,7 +119,7 @@ call the `publish` method, which accepts an array.
 ```php
 #src/My/Bundle/ExampleBundle/Controller/MyController.php
 
-public function getId()
+public function publishAction()
 {
     $message = [ 
         'messages should be an array'.
@@ -141,7 +141,7 @@ or can be picked up by Cron through an included command if you are not using AWS
 Once a message is received from your Worker Queue, a `MessageEvent` is dispatched which
 can be handled by your services.
 
-Services to be called on events must be tagged with  `uecode_qpush.event_listener`, the
+Services to be called on events must be tagged with the `name` as `uecode_qpush.event_listener`, the
 `event` to listen for, the `method` to call on, and optionally a `priority` between `1` and `100`.
 
 Each `event` fired by the Qpush Bundle is prefixed with the name of your `queue`, ex: `my_queue_name.message`.
@@ -155,7 +155,7 @@ You may also have multiple tags on a single service, so that one service can han
 		my_example_service:
 			class: My\Example\ExampleService
 			tags:
-				- { uecode_qpush.event_listener, event: my_queue_name.message, method: onMessage }
+				- { name: uecode_qpush.event_listener, event: my_queue_name.message, method: onMessage }
 ```
 
 The `method` used in the tag must be publicly available in your service and take one argument,
