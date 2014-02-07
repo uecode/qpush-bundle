@@ -78,9 +78,9 @@ abstract class QueueProvider implements QueueProviderInterface
         return $this->cache;
     }
 
-    public function createMetaData($message)
+    public function createMessageEvent($message)
     {
-        return [];
+        return new MessageEvent($this->name, $message);
     }
 
     /**
@@ -115,5 +115,5 @@ abstract class QueueProvider implements QueueProviderInterface
 
     abstract public function receive();
 
-    abstract public function delete();
+    abstract public function delete($message);
 }

@@ -39,13 +39,13 @@ class MessageCommand extends ContainerAwareCommand
 
     private function sendMessage($registry, $name, $message)
     {
-        if (!$registry->hasQueue($name)) {
+        if (!$registry->has($name)) {
             return $output->writeln(
                 sprintf("This [%s] is not the queue you are looking for...", $name)
             );
         }
 
-        $registry->getQueue($name)->push([$message]);
+        $registry->get($name)->publish([$message]);
         $this->output->writeln("<info>The message has been sent.</info>");
 
         return 0;

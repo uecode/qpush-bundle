@@ -2,9 +2,7 @@
 
 namespace Uecode\Bundle\QPushBundle\Queue;
 
-use Uecode\Bundle\QPushBundle\Service\QPushService;
-
-use InvalidArgumentException;
+use Uecode\Bundle\QPushBundle\Queue\QueueProviderInterface;
 
 class QPushQueueRegistry
 {
@@ -25,10 +23,10 @@ class QPushQueueRegistry
     /**
      * Adds a Listener to the chain based on priority
      *
-     * @param string             $name    The name of the Queue
-     * @param QPushClientService $service The QPushClientService
+     * @param string                    $name    The name of the Queue
+     * @param QueueProviderInterface    $service The QueueProvider
      */
-    public function addQueue($name, QPushService $service)
+    public function addQueue($name, QueueProviderInterface $service)
     {
         $this->queues[$name] = $service;
     }
@@ -63,7 +61,7 @@ class QPushQueueRegistry
     public function get($name)
     {
         if (!array_key_exists($name, $this->queues)) {
-            throw new InvalidArgumentException("The queue does not exist. {$name}");
+            throw new \InvalidArgumentException("The queue does not exist. {$name}");
         }
 
         return $this->queues[$name];

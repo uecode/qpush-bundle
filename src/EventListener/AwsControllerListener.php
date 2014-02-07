@@ -34,7 +34,7 @@ class AwsControllerListener
             $queue = str_replace('uecode_qpush_', '', $notification['Message']);
 
             $fakeRequest = $event->getRequest()->duplicate(
-                null, null, ['_controller' => 'QPushBundle:AwsEvent:notify']
+                null, null, ['_controller' => 'UecodeQPushBundle:AwsEvent:notify']
             );
             $controller = $this->resolver->getController($fakeRequest);
         } else {
@@ -44,7 +44,7 @@ class AwsControllerListener
             $queue = str_replace('uecode_qpush_', '', $last);
 
             $fakeRequest = $event->getRequest()->duplicate(
-                null, null, ['_controller' => 'QPushBundle:AwsEvent:subscription']
+                null, null, ['_controller' => 'UecodeQPushBundle:AwsEvent:subscription']
             );
             $controller = $this->resolver->getController($fakeRequest);
         }

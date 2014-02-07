@@ -14,7 +14,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->addDefaultsIfNotSet()
             ->children()
-                ->scalarNode('cache_service_id')
+                ->scalarNode('cache_service')
                     ->defaultNull()
                 ->end()
                 ->append($this->getProvidersNode())
@@ -31,8 +31,8 @@ class Configuration implements ConfigurationInterface
 
         $node
             ->requiresAtLeastOneElement()
-            ->prototype('array')
             ->useAttributeAsKey('name')
+            ->prototype('array')
                 ->children()
                     ->scalarNode('provider_service')
                         ->isRequired()
@@ -40,6 +40,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end();
+        return $node;
     }
 
     private function getQueuesNode()

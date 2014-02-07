@@ -4,6 +4,8 @@ namespace Uecode\Bundle\QPushBundle\Queue;
 
 use Doctrine\Common\Cache\Cache;
 
+use Uecode\Bundle\QpushBundle\Event\MessageEvent;
+
 interface QueueProviderInterface
 {
     /**
@@ -63,11 +65,11 @@ interface QueueProviderInterface
     public function getCache();
 
     /**
-     * Creates optional Metadata for the Message
+     * Creates a MessageEvent to be dispatched
      *
-     * @return array
+     * @return MessageEvent
      */
-    public function createMetaData($message);
+    public function createMessageEvent($message);
 
     /**
      * Creates the Queue
@@ -105,5 +107,5 @@ interface QueueProviderInterface
      *
      * @param mixed $message An message identifier or resource
      */
-    public function delete();
+    public function delete($message);
 }

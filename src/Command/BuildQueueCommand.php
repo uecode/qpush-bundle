@@ -47,7 +47,7 @@ class BuildQueueCommand extends ContainerAwareCommand
             );
         }
 
-        $registry->get($name)->build();
+        $registry->get($name)->create();
         $this->output->writeln(sprintf("The %s queue has been built successfully.", $name));
 
         return 0;

@@ -41,9 +41,9 @@ class QPushCustomExtension extends Extension
         )->setPublic(false);
 
         foreach ($queues['queues'] as $queue => $config) {
-            $name = sprintf('uecode_qpush.%s', $prefix, $queue);
+            $name = sprintf('uecode_qpush.%s', $queue);
 
-            $provider = sprintf('uecode_qpush.provider.%', $config['provider']);
+            $provider = sprintf('uecode_qpush.provider.%s', $config['provider']);
             if (!$container->hasParameter($provider)) {
                 throw new \InvalidArgumentException(
                     sprintf('Invalid "%s" provider on "%s" queue.', $config['provider'], $queue)
@@ -53,7 +53,7 @@ class QPushCustomExtension extends Extension
             $provider = $container->getParameter($provider);
 
             $interfaces = class_implements($provider);
-            $interface = 'Uecode\Bundle\QpushBundle\Queue\QueueProviderInterface';
+            $interface = 'Uecode\Bundle\QPushBundle\Queue\QueueProviderInterface';
             if (!isset($interfaces[$interface])) {
                 throw new \Exception(
                     sprintf('The class %s must implement the %s', $provider, $interface)

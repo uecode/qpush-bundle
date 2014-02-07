@@ -15,8 +15,8 @@ class QPushCompilerPass implements CompilerPassInterface
         $queues     = $container->getParameter('uecode_qpush.queues');
         $providers  = $container->getParameter('uecode_qpush.providers');
 
-        foreach ($queues as $queue => $optons) {
-            $name = sprintf('uecode_push.%s', $queue);
+        foreach ($queues as $queue => $options) {
+            $name = sprintf('uecode_qpush.%s', $queue);
 
             $definition = $container->getDefinition($name);
 
@@ -28,7 +28,7 @@ class QPushCompilerPass implements CompilerPassInterface
             if (isset($providers[$provider]['provider_service'])) {
                 $service = $providers[$provider]['provider_service'];
                 if (!$container->hasDefinition($service)) {
-                    throw new InvalidArgumentException(
+                    throw new \InvalidArgumentException(
                         sprintf("The service \"%s\" does not exist.", $service)
                     );
                 }

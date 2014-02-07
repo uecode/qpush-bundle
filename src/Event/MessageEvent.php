@@ -38,7 +38,7 @@ class MessageEvent extends Event
     {
         $this->queue    = $queue;
         $this->message  = $message;
-        $this->metadata = $metadata
+        $this->metadata = $metadata;
     }
 
     /**
