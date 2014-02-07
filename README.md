@@ -15,7 +15,7 @@ The bundle should be installed through composer.
 
 ```json
 "require": {
-    "uecode/qpush-bundle": "~0.2",
+    "uecode/qpush-bundle": "~0.2.1",
 }
 ```
 
