@@ -68,7 +68,14 @@ class AwsQueueProvider extends QueueProvider
 
     public function createMessageEvent($message)
     {
-        $msg = json_decode($message['Body'], true);
+        $body   = $message['Body'];
+        $msg    = json_decode($message['Body'], true);
+
+        if (!empty($msg) && isset($msg['Message'])) {
+            $msg = json_decode($msg['Message'], true);
+        } else {
+            $msg = json_decode($body, true);
+        }
 
         return new MessageEvent($this->name, $msg, $message);
     }
@@ -86,9 +93,11 @@ class AwsQueueProvider extends QueueProvider
     public function publish(array $message)
     {
         // ensures that the SQS Queue and SNS Topic exist
-        $this->create();
+        if(!$this->queueExists()) {
+            $this->create();
+        }
 
-        if ($this->options['push_notifications']) {
+        if ($this->options['push_notifications'] && $this->topicExists()) {
             $message    = [
                 'default'   => $this->getNameWithPrefix(),
                 'sqs'       => json_encode($message),
@@ -128,12 +137,12 @@ class AwsQueueProvider extends QueueProvider
     {
         // Create the SQS Queue
         if (!$this->queueExists()) {
-            $queueUrl = $this->createQueue();
+            $this->createQueue();
         }
 
         if ($this->options['push_notifications'] && !$this->topicExists()) {
            // Create the SNS Topic
-           $topicArn = $this->createTopic();
+           $this->createTopic();
 
            // Add the SQS Queue as a Subscriber to the SNS Topic
            $this->subscribeToTopic(
@@ -171,7 +180,9 @@ class AwsQueueProvider extends QueueProvider
         }
 
         $result = $this->sqs->receiveMessage([
-            'QueueUrl' => $this->queueUrl
+            'QueueUrl'              => $this->queueUrl,
+            'MaxNumberOfMessages'   => 10,
+            'WaitTimeSeconds'       => 3
         ]);
 
         return $result->get('Messages') ?: [];
@@ -224,13 +235,41 @@ class AwsQueueProvider extends QueueProvider
     public function createQueue()
     {
         $result = $this->sqs->createQueue([
-            'QueueName'     => $this->getNameWithPrefix()
+            'QueueName' => $this->getNameWithPrefix()
         ]);
 
         $this->queueUrl = $result->get('QueueUrl');
 
-        $urlKey = $this->getNameWithPrefix() . '_url';
-        $this->cache->save($urlKey, $this->queueUrl);
+        $key = $this->getNameWithPrefix() . '_url';
+        $this->cache->save($key, $this->queueUrl);
+
+        if ($this->options['push_notifications']) {
+            $policy = $this->createPolicy();
+            $this->sqs->setQueueAttributes([
+                'QueueUrl'      => $this->queueUrl,
+                'Attributes'    => [
+                    'Policy'    => $policy
+                ]
+            ]);
+        }
+    }
+
+    public function createPolicy()
+    {
+        $arn = $this->sqs->getQueueArn($this->queueUrl);
+        return json_encode([
+            'Version'   => '2008-10-17',
+            'Id'        =>  sprintf('%s/SQSDefaultPolicy', $arn),
+            'Statement' => [
+                [
+                    'Sid'       => 'SNSPermissions',
+                    'Effect'    => 'Allow',
+                    'Principal' => ['AWS' => '*'],
+                    'Action'    => 'SQS:SendMessage',
+                    'Resource'  => $arn
+                ]
+            ]
+        ]);
     }
 
     /**
@@ -270,14 +309,18 @@ class AwsQueueProvider extends QueueProvider
      */
     public function createTopic()
     {
+        if (!$this->options['push_notifications']) {
+            return false;
+        }
+
         $result = $this->sns->createTopic([
             'Name' => $this->getNameWithPrefix()
         ]);
 
         $this->topicArn = $result->get('TopicArn');
 
-        $arnKey = $this->getNameWithPrefix() . '_topic_arn';
-        $this->cache->save($arnKey, $this->queueUrl);
+        $key = $this->getNameWithPrefix() . '_arn';
+        $this->cache->save($key, $this->topicArn);
     }
 
     /**
@@ -382,8 +425,7 @@ class AwsQueueProvider extends QueueProvider
         $messages = $this->receive();
         foreach ($messages as $message) {
             $messageEvent   = $this->createMessageEvent($message);
-            $dispatcher     = $event->getDispatcher();
-            $dispatcher->dispatch(Events::Message($this->name), $messageEvent);
+            $event->getDispatcher()->dispatch(Events::Message($this->name), $messageEvent);
         }
     }
 

@@ -72,7 +72,7 @@ class QPushCustomExtension extends Extension
                     ['event' => "{$queue}.subscription", 'method' => "onSubscription", 'priority' => 255]
                 )
                 ->addTag(
-                    'uecode_qpush.listener_event',
+                    'uecode_qpush.event_listener',
                     ['event' => "{$queue}.message", 'method' => "onMessage", 'priority' => -255 ]
                 );
 
