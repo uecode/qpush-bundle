@@ -32,17 +32,17 @@ From there, the rest of the configuration is simple.
 #app/config.yml
 
 uecode_qpush:
-	cache_service: my_cache_service
+    cache_service: my_cache_service
     providers:
-    	aws:
-    		provider_service: uecode_amazon.instance.main
+        aws:
+            provider_service: uecode_amazon.instance.main
     queues:
         my_queue_name:
-        	provider: aws
-        	options:
-            	push_notifications: true
-            	subscribers:
-                	- { endpoint: http://example.com, protocol: http }
+            provider: aws
+            options:
+                push_notifications: true
+                subscribers:
+                    - { endpoint: http://example.com, protocol: http }
 ```
 
 ###Using SNS

@@ -26,9 +26,9 @@ Add the `UecodeQPushBundle` to your kernel bootstrap sequence, in the `$bundles`
 ```php
 public function registerBundles()
 {
-	$bundles = array(
-    	// ...
-    	new Uecode\Bundle\QPushBundle\UecodeQPushBundle(),
+    $bundles = array(
+        // ...
+        new Uecode\Bundle\QPushBundle\UecodeQPushBundle(),
     );
 
     return $bundles;
@@ -71,11 +71,11 @@ Cache service.
 #app/config.yml
 
 services:
-	my_cache_service:
-		class: My\Caching\CacheService
+    my_cache_service:
+    	class: My\Caching\CacheService
 
 uecode_qpush:
-	cache_service: my_cache_service
+    cache_service: my_cache_service
 ```
 
 ####Full Configuration:
@@ -88,17 +88,17 @@ A full configuration might look like the follow:
 #app/config.yml
 
 uecode_qpush:
-	cache_service: my_cache_service
+    cache_service: my_cache_service
     providers:
-    	aws:
-    		provider_service: uecode_amazon.instance.main
+        aws:
+        	provider_service: uecode_amazon.instance.main
     queues:
         my_queue_name:
-        	provider: aws
-        	options:
-            	push_notifications: true
-            	subscribers:
-                	- { endpoint: http://example.com, protocol: http }
+            provider: aws
+            options:
+                push_notifications: true
+                subscribers:
+                    - { endpoint: http://example.com, protocol: http }
 ```
 
 ###Usage
@@ -151,11 +151,11 @@ You may also have multiple tags on a single service, so that one service can han
 
 ######Example
 ```yaml
-	services:
-		my_example_service:
-			class: My\Example\ExampleService
-			tags:
-				- { name: uecode_qpush.event_listener, event: my_queue_name.message, method: onMessage }
+    services:
+    	my_example_service:
+    		class: My\Example\ExampleService
+    		tags:
+    			- { name: uecode_qpush.event_listener, event: my_queue_name.message, method: onMessage }
 ```
 
 The `method` used in the tag must be publicly available in your service and take one argument,
@@ -171,9 +171,9 @@ use Uecode\Bundle\QpushBundle\Event\MessageEvent;
 
 public function onMessage(MessageEvent $event)
 {
-    $queueName	= $event->getQueueName();
-    $message	= $event->getMessage();
-    $metadata	= $event->getMetadata();
+    $queueName    = $event->getQueueName();
+    $message    = $event->getMessage();
+    $metadata    = $event->getMetadata();
     
     // Process ...
 }
