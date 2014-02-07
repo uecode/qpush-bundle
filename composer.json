@@ -2,7 +2,7 @@
     "name":         "uecode/qpush-bundle",
     "type":         "library",
     "description":  "Asynchronous processing for Symfony using Pub/Sub Worker Queues",
-    "keywords":     ["qpush", "pub/sub", "aws", "asynch", "push", "symfony", "bundle" ],
+    "keywords":     ["qpush", "pub-sub", "aws", "asynch", "push", "symfony", "bundle" ],
     "homepage":     "https://github.com/uecode/qpush-bundle",
     "license":      "MIT",
     "authors":      [
