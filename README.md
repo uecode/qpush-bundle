@@ -21,7 +21,7 @@ The bundle should be installed through composer.
 
 #####Update AppKernel.php of your Symfony Application
 
-Add The UecodeQPushBundle to your kernel bootstrap sequence
+Add the `UecodeQPushBundle` to your kernel bootstrap sequence, in the `$bundles` array.
 
 ```php
 public function registerBundles()
@@ -37,9 +37,9 @@ public function registerBundles()
 
 ###Configure the Bundle
 
-The bundle allows you to specify different Message Queue providers - however, 
+The bundle allows you to specify different Worker Queue providers - however, 
 Amazon AWS is the only one currently supported. We are actively looking to add
-more and are accepting contributions.
+more and would be more than happy to accept contributions.
 
 ####Providers
 
