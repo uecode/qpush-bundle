@@ -445,7 +445,7 @@ class AwsProvider extends QueueProvider
      * the Subscription request
      *
      * For Message notifications, this method polls the queue and dispatches 
-     * the `{queue}.on_message` event for each message retrieved
+     * the `{queue}.message_received` event for each message retrieved
      *
      * @param NotificationEvent $event The Notification Event
      */

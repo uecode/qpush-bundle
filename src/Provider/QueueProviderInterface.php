@@ -82,7 +82,7 @@ interface QueueProviderInterface
     /**
      * Deletes the Queue Message
      *
-     * @param mixed $id An message identifier or resource
+     * @param mixed $id A message identifier or resource
      */
     public function delete($id);
 

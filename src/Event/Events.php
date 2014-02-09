@@ -5,7 +5,7 @@ namespace Uecode\Bundle\QPushBundle\Event;
 abstract class Events
 {
     const ON_NOTIFICATION  = 'on_notification';
-    const ON_MESSAGE       = 'on_message';
+    const ON_MESSAGE       = 'message_received';
 
     final private function __construct() { }
 

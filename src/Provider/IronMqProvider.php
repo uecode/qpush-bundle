@@ -201,7 +201,7 @@ class IronMqProvider extends QueueProvider
     /**
      * Polls the Queue on Notification from IronMQ
      *
-     * Dispatches the `{queue}.on_message` event
+     * Dispatches the `{queue}.message_received` event
      *
      * @param NotificationEvent $event The Notification Event
      */

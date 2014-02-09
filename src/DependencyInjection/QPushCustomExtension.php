@@ -49,11 +49,11 @@ class QPushCustomExtension extends Extension
                 ->replaceArgument(1, $options)
                 ->addTag(
                     'uecode_qpush.event_listener',
-                    ['event' => "{$queue}.notify", 'method' => "onNotification", 'priority' => 255]
+                    ['event' => "{$queue}.on_notification", 'method' => "onNotification", 'priority' => 255]
                 )
                 ->addTag(
                     'uecode_qpush.event_listener',
-                    ['event' => "{$queue}.message", 'method' => "onMessage", 'priority' => -255 ]
+                    ['event' => "{$queue}.message_received", 'method' => "onMessage", 'priority' => -255 ]
                 );
 
             $registry->addMethodCall('addProvider', [$queue, new Reference($name)]);
