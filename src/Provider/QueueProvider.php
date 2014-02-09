@@ -4,7 +4,7 @@ namespace Uecode\Bundle\QPushBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
 
-use Uecode\Bundle\QPushBundle\Queue\QueueProviderInterface;
+use Uecode\Bundle\QPushBundle\Provider\QueueProviderInterface;
 
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;

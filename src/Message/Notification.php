@@ -36,7 +36,7 @@ class Notification
      * @param string\array  $body       The Notification Message
      * @param array         $metadata   The Notification Metadata
      */
-    public function __construct($id, $type, $body, array $metadata)
+    public function __construct($id, $body, array $metadata)
     {
         $this->id       = $id;
         $this->body     = $body;

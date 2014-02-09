@@ -78,11 +78,11 @@ class IronMqProvider extends QueueProvider
             $params = ['push_type' => 'pull'];  
         }
 
-        $result = $this->ironmq->updateQueue($this->name, $params);
+        $result = $this->ironmq->updateQueue($this->getNameWithPrefix(), $params);
         $this->queue = $result;
 
         $key = $this->getNameWithPrefix();
-        $this->cache->save($key, $this->queue);
+        $this->cache->save($key, json_encode($this->queue));
 
         return true;
     }
@@ -92,7 +92,14 @@ class IronMqProvider extends QueueProvider
      */
     public function destroy()
     {
-        $this->ironmq->deleteQueue($this->name);
+        // Catch `queue not found` exceptions, throw the rest.
+        try {
+            $this->ironmq->deleteQueue($this->getNameWithPrefix());
+        } catch( \Exception $e) {
+            if ($e->getMessage() != 'http error: 404 | {"msg":"Queue not found"}') {
+                throw $e;
+            }
+        }
 
         $key = $this->getNameWithPrefix();
         $this->cache->delete($key);
@@ -114,7 +121,7 @@ class IronMqProvider extends QueueProvider
         }
     
         $result = $this->ironmq->postMessage(
-            $this->name,
+            $this->getNameWithPrefix(),
             json_encode([$this->name => $message]),
             [
                 'timeout'       => $this->options['message_timeout'],
@@ -123,6 +130,7 @@ class IronMqProvider extends QueueProvider
             ]
         );
 
+        error_log(json_encode($result));
         return $result->id;
     }
 
@@ -138,7 +146,7 @@ class IronMqProvider extends QueueProvider
         }
 
         $messages = $this->ironmq->getMessages(
-            $this->name,
+            $this->getNameWithPrefix(),
             $this->options['messages_to_receive'],
             $this->options['message_timeout']
         );
@@ -168,7 +176,7 @@ class IronMqProvider extends QueueProvider
             return false;
         }
 
-        $result = $this->ironmq->deleteMessage($this->name, $message);
+        $result = $this->ironmq->deleteMessage($this->getNameWithPrefix(), $id);
 
         return true;
     }
@@ -190,7 +198,7 @@ class IronMqProvider extends QueueProvider
 
         $key = $this->getNameWithPrefix();
         if ($this->cache->contains($key)) {
-            $this->queue = $this->cache->fetch($key);
+            $this->queue = json_decode($this->cache->fetch($key));
 
             return true;
         }
@@ -209,8 +217,8 @@ class IronMqProvider extends QueueProvider
     {
         $message = new Message(
             $event->getNotification()->getId(),
-            $event->getBody(),
-            $event->Metadata()->toArray()
+            $event->getNotification()->getBody(),
+            $event->getNotification()->getMetadata()->toArray()
         );
 
         $messageEvent = new MessageEvent($this->name, $message);
@@ -229,9 +237,12 @@ class IronMqProvider extends QueueProvider
      */
     public function onMessage(MessageEvent $event)
     {
-        $id = $event->getMessage()->getId();
+        $metadata = $event->getMessage()->getMetadata();
 
-        $this->delete($id);
+        if (!$metadata->containsKey('iron-subscriber-message-id')) {
+            $id = $event->getMessage()->getId();
+            $this->delete($id);
+        }
 
         $event->stopPropagation();
     }

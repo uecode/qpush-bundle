@@ -224,7 +224,7 @@ class AwsProvider extends QueueProvider
 
         $result = $this->sqs->deleteMessage([
             'QueueUrl'      => $this->queueUrl,
-            'ReceiptHandle' => $message
+            'ReceiptHandle' => $id
         ]);
 
         return true;
@@ -283,7 +283,7 @@ class AwsProvider extends QueueProvider
                 'Attributes'    => [
                     'Policy'                        => $policy,
                     'VisibilityTimeout'             => $this->options['message_timeout'],
-                    'MessageRentionPeriod'          => $this->options['message_expiration'], 
+                    'MessageRetentionPeriod'        => $this->options['message_expiration'], 
                     'ReceiveMessageWaitTimeSeconds' => $this->options['receive_wait_time']
                 ]
             ]);

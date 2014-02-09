@@ -11,7 +11,7 @@ interface QueueProviderInterface
     /**
      * Prefix prepended to the queue names
      */
-    const QPUSH_PREFIX = 'uecode_qpush';
+    const QPUSH_PREFIX = 'qpush';
 
     /**
      * Returns the name of the Queue that this Provider is for

@@ -3,11 +3,13 @@
 namespace Uecode\Bundle\QPushBundle\EventListener;
 
 use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Uecode\Bundle\QPushBundle\Message\Message;
 use Uecode\Bundle\QPushBundle\Message\Notification;
+use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
 
@@ -42,9 +44,13 @@ class RequestListener
         }
 
         if ($event->getRequest()->headers->has('x-amz-sns-message-type')) {
-             $this->handleSnsNotifications($event);
+            try {
+                $this->handleSnsNotifications($event);
 
-            $event->setResponse(new Response("", 200));
+                $event->setResponse(new Response("", 200));
+            } catch (\Exception $e) {
+                error_log($e->getTraceAsString());
+            }
         }
 
         if ($event->getRequest()->headers->has('iron-message-id')) {
@@ -72,16 +78,15 @@ class RequestListener
             'iron-subscriber-message-url'   => $headers->get('iron-subscriber-message-url')
         ];
         
-        $notification = new Notificiation(
+        $notification = new Notification(
             $messageId,
-            NotificationEvent::TYPE_MESSAGE,
             $message[$queue],
             $metadata
         );
 
-        $dispatcher->dispatch(
+        $this->dispatcher->dispatch(
             Events::Notification($queue),
-            new NotificationEvent($queue, $notification)
+            new NotificationEvent($queue, NotificationEvent::TYPE_MESSAGE, $notification)
         );
 
     }
@@ -95,7 +100,7 @@ class RequestListener
     {
         $notification = json_decode($event->getRequest()->getContent(), true);
 
-        if (false === strpos($notification['TopicArn'], 'uecode_qpush_')) {
+        if (false === strpos($notification['TopicArn'], 'qpush_')) {
             return;
         }
 
@@ -103,7 +108,6 @@ class RequestListener
 
         $metadata = [
             'Type'      => $notification['Type'],
-            'Subject'   => $notification['Subject'],
             'TopicArn'  => $notification['TopicArn'],
             'Timestamp' => $notification['Timestamp'],
         ];
@@ -111,13 +115,18 @@ class RequestListener
         if ($type === 'Notification') {
 
             // We put the queue name in the Subject field
-            $queue          = $notification['Subject'];
+            $queue                  = $notification['Subject'];
+            $metadata['Subject']    = $queue;
 
-            $notification   = new Notification(
+            $notification           = new Notification(
                 $notification['MessageId'],
-                NotificationEvent::TYPE_MESSAGE,
                 $notification['Message'],
                 $metadata
+            );
+
+            $this->dispatcher->dispatch(
+                Events::Notification($queue), 
+                new NotificationEvent($queue, NotificationEvent::TYPE_MESSAGE, $notification)
             );
 
         } else {
@@ -125,23 +134,21 @@ class RequestListener
             // the Topic ARN
             $arnParts           = explode(':', $notification['TopicArn']);
             $last               = end($arnParts);
-            $queue              = str_replace('uecode_qpush_', '', $last);
+            $queue              = str_replace('qpush_', '', $last);
 
             // Get the token for the Subscription Confirmation
             $metadata['Token']  = $notification['Token'];
 
             $notification = new Notification(
                 $notification['MessageId'],
-                NotificationEvent::TYPE_SUBSCRIPTION,
                 $notification['Message'],
                 $metadata
             );
+
+            $this->dispatcher->dispatch(
+                Events::Notification($queue), 
+                new NotificationEvent($queue, NotificationEvent::TYPE_SUBSCRIPTION, $notification)
+            );
         }
-
-        $dispatcher->dispatch(
-            Events::Notification($queue), 
-            new NotificationEvent($queue, $notification)
-        );
-
     }
 }

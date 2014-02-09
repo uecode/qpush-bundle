@@ -45,7 +45,7 @@ class QPushCompilerPass implements CompilerPassInterface
      */
     private function getCache($cache, ContainerBuilder $container)
     {
-        if (null !== $cache) {
+        if (!empty($cache)) {
             if (!$container->hasDefinition($cache)) {
                 throw new \InvalidArgumentException(
                     sprintf("The service \"%s\" does not exist.", $cache)

@@ -18,7 +18,7 @@ abstract class Events
      */
     public static function Notification($name)
     {
-        return sprintf('%s.%s', $name, self::NOTIFY);
+        return sprintf('%s.%s', $name, self::ON_NOTIFICATION);
     }
 
     /**
@@ -30,6 +30,6 @@ abstract class Events
      */
     public static function Message($name)
     {
-        return sprintf('%s.%s', $name, self::MESSAGE);
+        return sprintf('%s.%s', $name, self::ON_MESSAGE);
     }
 }

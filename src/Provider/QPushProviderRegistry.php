@@ -2,7 +2,7 @@
 
 namespace Uecode\Bundle\QPushBundle\Provider;
 
-use Uecode\Bundle\QPushBundle\Queue\QueueProviderInterface;
+use Uecode\Bundle\QPushBundle\Provider\QueueProviderInterface;
 
 class QPushProviderRegistry
 {

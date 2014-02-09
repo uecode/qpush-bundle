@@ -45,7 +45,7 @@ class QueuePublishCommand extends ContainerAwareCommand
             );
         }
 
-        $registry->get($name)->publish($message);
+        $registry->get($name)->publish(json_decode($message, true));
         $this->output->writeln("<info>The message has been sent.</info>");
 
         return 0;

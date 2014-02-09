@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class QueueBuildCommand extends ContainerAwareCommand
+class QueueDestroyCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
@@ -34,7 +34,7 @@ class QueueBuildCommand extends ContainerAwareCommand
             $response = $dialog->askConfirmation(
                 $output,
                 sprintf(
-                    '<question>This will remove the <info>%s</info> queue, even if it has messages! Are you sure?</question>',
+                    '<comment>This will remove the %s queue, even if it has messages! Are you sure? </comment>',
                     $name
                 ),
                 false
@@ -49,7 +49,7 @@ class QueueBuildCommand extends ContainerAwareCommand
 
         $response = $dialog->askConfirmation(
             $output,
-            '<question>This will remove <info>ALL</info> queues, even if they have messages.  Are you sure?</question>',
+            '<comment>This will remove ALL queues, even if they have messages.  Are you sure? </comment>',
             false
         );
 
@@ -72,7 +72,7 @@ class QueueBuildCommand extends ContainerAwareCommand
         }
 
         $registry->get($name)->destroy();
-        $this->output->writeln(sprintf("The %s queue has been built successfully.", $name));
+        $this->output->writeln(sprintf("The %s queue has been successfully destroyed.", $name));
 
         return 0;
     }

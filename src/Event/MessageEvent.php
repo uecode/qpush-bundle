@@ -4,6 +4,8 @@ namespace Uecode\Bundle\QPushBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
+use Uecode\Bundle\QpushBundle\Message\Message;
+
 class MessageEvent extends Event
 {
     /**
@@ -26,7 +28,7 @@ class MessageEvent extends Event
      * @param string    $queue      The queue name
      * @param Message   $message    The Message
      */
-    public function __construct($queue, Message $message)
+    public function __construct($queueName, Message $message)
     {
         $this->queueName    = $queueName;
         $this->message      = $message;
