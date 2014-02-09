@@ -7,19 +7,19 @@ The QPush Bundle relies on a Pub/Sub model of Message Queues to provide asynchro
 processing in your Symfony application. This allows you to distribute processing to
 multiple consumers and create and chain services by binding to simple events.
 
- - [Installation](#installation)
- - [Configuring](#configure-the-bundle)
+ * [Installation](#installation)
+ * [Configuring](#configure-the-bundle)
     - [Providers](#providers)
     - [Caching](#caching)
     - [Queue Options](#queue-options)
     - [Example Configuration](#example-configuration)
-- [Usage](#usage)
+ * [Usage](#usage)
     - [Publishing Messages to your Message Queue](#publishing-messages-to-your-message-queue)
     - [Working with Messages from your Message Queue](#working-with-messages-from-your-message-queue)
         - [Message Events](#message-events)
         - [Tagging Your Services](#tagging-your-services)
         - [Cleaning up the Queue](#cleaning-up-the-queue)
-- [Console Commands](#console-commands)
+ * [Console Commands](#console-commands)
         
 
 ##Installation
