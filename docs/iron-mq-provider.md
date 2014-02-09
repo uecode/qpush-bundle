@@ -7,12 +7,14 @@ Pull queues by utilizing a provided Console Command to poll the queue.
 
 ###Configuration
 
-This provider relies on the [Iron MQ PHP SDK](https://github.com/iron-io/iron_mq_php)
+This provider relies on the [Iron MQ](https://github.com/iron-io/iron_mq_php) classes
 and needs to have the library included in your `composer.json` file.
 
 Configuring the provider is very easy. It requires that you have already created
-an account and Project. [Iron.io](http://www.iron.io/) provides free accounts for
-Development.
+an account and Project. 
+
+[Iron.io](http://www.iron.io/) provides free accounts for Development, which makes
+testing and using this easy.
 
 Just include your OAuth `token` and `project_id` in the configuration and set your
 queue to use the `ironmq` provider.
@@ -32,7 +34,7 @@ uecode_qpush:
             options:
                 push_notifications: true
                 subscribers:
-                    - { endpoint: http://example.com, protocol: http }
+                    - { endpoint: http://example.com/qpush, protocol: http }
 ```
 
 ###Using Push Queues
@@ -56,4 +58,5 @@ If you need to test the Push Queue functionality from a local stack or internal
 machine, it possible to use [ngrok](https://ngrok.com/) to allow your development
 environment to be reachable by IronMQ. 
 
-You would need to update your `config_dev.yml` configuration to use the `ngrok` url.
+You would need to update your `config_dev.yml` configuration to use the `ngrok` url for
+your subscribers.
