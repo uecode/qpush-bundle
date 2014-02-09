@@ -99,7 +99,7 @@ Each queue can their own options that determine how messages are published or re
 The options and their descriptions are listed below.
 
 Option | Description | Default
------- | -----------
+------ | ----------- | -------
 `push_notifications` | Whether or not to POST notifications to subscribers of a Queue | `false`
 `message_delay` | Time in seconds of how long before a new Message is available to be read in a Queue | `0`
 `message_timeout` | How long in secons a worker has to respond or delete a Message before its again made available | `30`
@@ -143,11 +143,11 @@ create services that will automatically be fired as messages are pushed to your 
 
 For your convenience, a custom `Provider` service will be created and registered 
 in the Container for each of your defined Queues. The container service id will be 
-in the format of `uecode_qpush.{you queue name}`.
+in the format of `uecode_qpush.{your queue name}`.
 
 ###Publishing a Message to your Message Queue
 
-Publishing messages is simple - fetch your `QueueProvider` service from the container and
+Publishing messages is simple - fetch your `Provider` service from the container and
 call the `publish` method, which accepts an array.
 
 ######Example
@@ -173,7 +173,7 @@ public function publishAction()
 
 Messages are either automatically received by your application from Subscriber 
 callbacks (setting `push_notification` to true), or can be picked up by Cron jobs
-through an included command if you are not using a Message Queue provier that supports
+through an included command if you are not using a Message Queue provider that supports
 Push notifications.
 
 ####MessageEvents
@@ -204,19 +204,19 @@ The message `body` is an array matching your original message. The `metadata` pr
 ####Tagging Your Services
 
 For your Services to be called on QPush events, they  must be tagged with the name
-`uecode_qpush.event_listener`. 
+`uecode_qpush.event_listener`. A complete tag is made up of the following properties:
 
 Tag Property | Example | Description
 ------------ | ------- | -----------
 `name` | `uecode_qpush.event_listener` | The Qpush Event Listener Tag
-`event` | `{queue name}.message_received | The `message_received` event, prefixed with the Queue name
-`method` | `onMessage` | A publicly accessbile method on your service
-`priority` | `100` | Priority, 100 - 1 to control order of services. Higher priorities are called earlier
+`event` | `{queue name}.message_received` | The `message_received` event, prefixed with the Queue name
+`method` | `onMessageReceived` | A publicly accessbile method on your service
+`priority` | `100` | Priority, `1`-`100` to control order of services. Higher priorities are called earlier
 
 The `priority` is useful to chain services and ensure they fire in a certain order - 
 the higher priorities fire earlier.
 
-Each `event` fired by the Qpush Bundle is prefixed with the name of your `queue`, 
+Each event fired by the Qpush Bundle is prefixed with the name of your queue, 
 ex: `my_queue_name.message_received`. 
 
 This allows you to assign services to fire only on certain queues should be used based on the `queue`.
@@ -229,7 +229,7 @@ events from multiple queues.
     	my_example_service:
     		class: My\Example\ExampleService
     		tags:
-    			- { name: uecode_qpush.event_listener, event: my_queue_name.message_received, method: onMessage }
+    			- { name: uecode_qpush.event_listener, event: my_queue_name.message_received, method: onMessageReceived }
 ```
 
 The method listed in the tag must be publicly available in your service and should
@@ -243,7 +243,7 @@ use Uecode\Bundle\QpushBundle\Event\MessageEvent;
 
 // ...
 
-public function onMessage(MessageEvent $event)
+public function onMessageReceived(MessageEvent $event)
 {
     $queueName    = $event->getQueueName();
     $message    = $event->getMessage();
@@ -263,7 +263,7 @@ the Message will not be removed automatically and may be picked up by other work
 
 If you would like to remove the message in your service, you can do so by calling the `delete`
 method on your provider and passing it the message `id`.  However, you must also stop
-the event propagation to avoid other serices (including the Queue Provider) from firing on that
+the event propagation to avoid other services (including the Provider service) from firing on that
 `MessageEvent`.
 
 ######Example
@@ -274,7 +274,7 @@ use Uecode\Bundle\QpushBundle\Event\MessageEvent;
 
 // ...
 
-public function onMessage(MessageEvent $event)
+public function onMessageReceived(MessageEvent $event)
 {
     $id = $event->getMessage()->getId();
     // Removes the message from the queue
