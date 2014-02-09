@@ -68,7 +68,7 @@ For specific instructions on how to configure each provider, please view their c
 documents below:
 
  - [AWS Provider](/docs/aws-provider.md)
- - [IRON MQ Provider](/docs/iron-mq-provider.md)
+ - [IronMQ Provider](/docs/iron-mq-provider.md)
 
 ###Caching
 
