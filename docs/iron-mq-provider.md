@@ -7,7 +7,7 @@ Pull queues by utilizing a provided Console Command to poll the queue.
 
 ###Configuration
 
-This provider relies on the [AWS SDK for PHP](https://github.com/iron-io/iron_mq_php)
+This provider relies on the [Iron MQ PHP SDK](https://github.com/iron-io/iron_mq_php)
 and needs to have the library included in your `composer.json` file.
 
 Configuring the provider is very easy. It requires that you have already created
