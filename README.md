@@ -3,9 +3,14 @@ QPush Bundle
 
 ##Overview
 
-The QPush Bundle relies on a Pub/Sub model of Message Queues to provide asynchronous
-processing in your Symfony application. This allows you to distribute processing to
-multiple consumers and create and chain services by binding to simple events.
+The QPush Bundle relies on the Push Queue model of Message Queues to provide asynchronous
+processing in your Symfony application. This allows you to remove blocking processes from the
+immediate flow of your application and delegate them to another part of your application or, say, a 
+cluster of workers.
+
+This bundle allows you to easily consume and process messages by simply tagging your service or
+services and relying on Symfony's event dispatching - without needing to run a daemon or background
+process to continuously poll your queue.
 
  * [Installation](#installation)
  * [Configuring](#configure-the-bundle)
@@ -53,8 +58,9 @@ public function registerBundles()
 ##Configure the Bundle
 
 The bundle allows you to specify different Message Queue providers - however, 
-Amazon AWS and IronMQ are the only ones currently supported. We are actively looking to add
-more and would be more than happy to accept contributions.
+Amazon AWS and IronMQ are the only ones currently supported. 
+
+We are actively looking to add more and would be more than happy to accept contributions.
 
 ###Providers
 
@@ -95,7 +101,7 @@ uecode_qpush:
 
 ###Queue Options
 
-Each queue can their own options that determine how messages are published or receieved. 
+Each queue can their have own options that determine how messages are published or receieved. 
 The options and their descriptions are listed below.
 
 Option | Description | Default
@@ -172,7 +178,7 @@ public function publishAction()
 
 ###Working with Messages from your Queue
 
-Messages are either automatically received by your application by be POSTed by the Queue
+Messages are either automatically received by your application and events dispatched
 (setting `push_notification` to true), or can be picked up by Cron jobs through an included 
 command if you are not using a Message Queue provider that supports Push notifications.
 
@@ -258,7 +264,7 @@ public function onMessageReceived(MessageEvent $event)
 ####Cleaning Up the Queue
 
 Once all other Event Listeners have been invoked on a `MessageEvent`, the QPush Bundle
-will automatically attempt to remove the Message from your Queue.
+will automatically attempt to remove the Message from your Queue for you.
 
 If an error or exception is thrown, or event propagation is stopped earlier in the chain,
 the Message will not be removed automatically and may be picked up by other workers.
@@ -291,7 +297,7 @@ public function onMessageReceived(MessageEvent $event)
 
 ##Console Commands
 
-This bundle includes some Console Commands which can be used to for building and polling your queues
+This bundle includes some Console Commands which can be used to for building, destroying and polling your queues
 as well as sending simple messages.
 
 Command | Description
