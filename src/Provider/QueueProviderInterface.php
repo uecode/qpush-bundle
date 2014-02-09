@@ -1,6 +1,6 @@
 <?php
 
-namespace Uecode\Bundle\QPushBundle\Queue;
+namespace Uecode\Bundle\QPushBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
 
@@ -12,22 +12,6 @@ interface QueueProviderInterface
      * Prefix prepended to the queue names
      */
     const QPUSH_PREFIX = 'uecode_qpush';
-
-    /**
-     * Queue Providers constructor - should not be overriden
-     *
-     * @param string $name    Queue name
-     * @param array  $options Queue Options
-     * @param Cache  $cache   A Doctrine Cache Provider
-     */
-    public function __construct($name, array $options, Cache $cache);
-
-    /**
-     * Allows for a Service to be injected into the Queue Provider
-     *
-     * @param mixed $service A service object
-     */
-    public function setService($service);
 
     /**
      * Returns the name of the Queue that this Provider is for
@@ -65,13 +49,6 @@ interface QueueProviderInterface
     public function getCache();
 
     /**
-     * Creates a MessageEvent to be dispatched
-     *
-     * @return MessageEvent
-     */
-    public function createMessageEvent($message);
-
-    /**
      * Creates the Queue
      *
      * All Create methods are idempotent, if the resource exists, the current ARN
@@ -105,7 +82,14 @@ interface QueueProviderInterface
     /**
      * Deletes the Queue Message
      *
-     * @param mixed $message An message identifier or resource
+     * @param mixed $id An message identifier or resource
      */
-    public function delete($message);
+    public function delete($id);
+
+    /**
+     * Destroys a Queue and clears any Queue related Cache
+     *
+     * @return bool
+     */
+    public function destroy();
 }

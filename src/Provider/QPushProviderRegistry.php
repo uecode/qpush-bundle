@@ -1,10 +1,10 @@
 <?php
 
-namespace Uecode\Bundle\QPushBundle\Queue;
+namespace Uecode\Bundle\QPushBundle\Provider;
 
 use Uecode\Bundle\QPushBundle\Queue\QueueProviderInterface;
 
-class QPushQueueRegistry
+class QPushProviderRegistry
 {
     /**
      * All services tagged with `uecode_qpush.receive`
@@ -26,7 +26,7 @@ class QPushQueueRegistry
      * @param string                 $name    The name of the Queue
      * @param QueueProviderInterface $service The QueueProvider
      */
-    public function addQueue($name, QueueProviderInterface $service)
+    public function addProvider($name, QueueProviderInterface $service)
     {
         $this->queues[$name] = $service;
     }
@@ -42,7 +42,7 @@ class QPushQueueRegistry
     }
 
     /**
-     * Checks whether a Queue exists in the Regisitry
+     * Checks whether a Queue Provider exists in the Regisitry
      *
      * @param string $name The name of the Queue to check for
      *
@@ -54,9 +54,9 @@ class QPushQueueRegistry
     }
 
     /**
-     * Returns a Single QPushClientService by Queue Name
+     * Returns a Single QueueProvider by Queue Name
      *
-     * @return QPushClientService
+     * @return QueueProviderInterface
      */
     public function get($name)
     {

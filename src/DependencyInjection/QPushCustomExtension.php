@@ -28,58 +28,159 @@ class QPushCustomExtension extends Extension
         $loader->load('services.yml');
 
         $registry = $container->getDefinition('uecode_qpush.registry');
-        $this->buildQueues($config, $container, $registry);
-    }
 
-    private function buildQueues(array $queues, ContainerBuilder $container, Definition $registry)
-    {
+        foreach ($config['queues'] as $queue => $options) {
 
-        $directory = $container->getParameter('kernel.cache_dir') . '/qpush/';
-        $fileCache = $container->setDefinition(
-            'uecode_qpush.file_cache',
-            new Definition('Doctrine\Common\Cache\PhpFileCache',[$directory, 'uecode.php'])
-        )->setPublic(false);
+            $provider = $options['provider'];
+            switch($provider)
+            {
+                case 'aws':
+                    $definition = $this->createAwsProvider($config['providers'][$provider], $container);
+                    break;
+                case 'ironmq':
+                    $definition = $this->createIronMQProvider($config['providers'][$provider], $container);
+                    break;
+            }
 
-        foreach ($queues['queues'] as $queue => $config) {
             $name = sprintf('uecode_qpush.%s', $queue);
-
-            $provider = sprintf('uecode_qpush.provider.%s', $config['provider']);
-            if (!$container->hasParameter($provider)) {
-                throw new \InvalidArgumentException(
-                    sprintf('Invalid "%s" provider on "%s" queue.', $config['provider'], $queue)
-                );
-            }
-
-            $provider = $container->getParameter($provider);
-
-            $interfaces = class_implements($provider);
-            $interface = 'Uecode\Bundle\QPushBundle\Queue\QueueProviderInterface';
-            if (!isset($interfaces[$interface])) {
-                throw new \Exception(
-                    sprintf('The class %s must implement the %s', $provider, $interface)
-                );
-            }
-
-            $definition = new Definition($provider, [$queue, $config['options'], $fileCache]);
-
             $service = $container->setDefinition($name, $definition)
+                ->setPublic(true)
+                ->replaceArgument(0, $queue)
+                ->replaceArgument(1, $options)
                 ->addTag(
                     'uecode_qpush.event_listener',
-                    ['event' => "{$queue}.notify", 'method' => "onNotify", 'priority' => 255]
-                )
-                ->addTag(
-                    'uecode_qpush.event_listener',
-                    ['event' => "{$queue}.subscription", 'method' => "onSubscription", 'priority' => 255]
+                    ['event' => "{$queue}.notify", 'method' => "onNotification", 'priority' => 255]
                 )
                 ->addTag(
                     'uecode_qpush.event_listener',
                     ['event' => "{$queue}.message", 'method' => "onMessage", 'priority' => -255 ]
                 );
 
-            $registry->addMethodCall('addQueue', [$queue, new Reference($name)]);
+            $registry->addMethodCall('addProvider', [$queue, new Reference($name)]);
         }
     }
 
+    /**
+     * Creates a definition for the AWS provider
+     *
+     * @param array             $config     A Configuration array for the client
+     * @param ContainerBuilder  $container  The container
+     *
+     * return Definition
+     */
+    private function createAwsProvider($config, ContainerBuilder $container)
+    {
+        if (!class_exists('Aws\Common\Aws')) {
+            throw new \RuntimeException(
+                'You must require "aws/aws-sdk-php" to use the AWS provider.'
+            );
+        }
+
+        if (!$container->hasDefintion('uecode_qpush.provider.aws')) {
+
+            // Validate the config
+            if (empty($config['key']) || empty($config['secret'])) {
+                throw new \InvalidArgumentException(
+                    'The `key` and `secret` must be set in your configuration file to use the AWS Provider'
+                );
+            }
+
+            $cache = $container->getDefintion('uecode_qpush.file_cache');
+
+            $aws = new Definition('Aws\Common\Aws');
+            $aws->setFactoryClass('Aws\Common\Aws');
+            $aws->setFactoryMethod('factory');
+            $aws->setArguments([
+                [
+                    'key'      => $config['key'],
+                    'secret'   => $config['secret'],
+                    'region'   => $config['region']
+                ]
+            ]);
+
+            $parameter  = $container->getParameter('uecode_qpush.provider.aws');
+            $provider   = new Definition($parameter, [null, null, $cache, $aws]);
+            $container
+                        ->setDefinition('uecode_qpush.provider.aws', $provider)
+                        ->setPublic(false);
+        } else {
+            $provider = $container->getDefintion('uecode_qpush.provider.aws');
+        }
+
+        return $provider;
+    }
+
+    /**
+     * Creates a definition for the IronMQ provider
+     *
+     * @param array             $config     A Configuration array for the provider
+     * @param ContainerBuilder  $container  The container
+     *
+     * return Definition
+     */
+    private function createIronMQProvider($config, ContainerBuilder $container)
+    {
+        if (!class_exists('IronMQ')) {
+            throw new \RuntimeException(
+                'You must require "iron-io/ironmq" to use the Iron MQ provider.'
+            );
+        }
+
+        if (!$container->hasDefintion('uecode_qpush.provider.ironmq')) {
+
+            // Validate the config
+            if (empty($config['token']) || empty($config['project'])) {
+                throw new \InvalidArgumentException(
+                    'The `token` and `project_id` must be properly set in your configuration file to use the IronMQ Provider'
+                );
+            }
+
+            $cache = $container->getDefintion('uecode_qpush.file_cache');
+
+            $ironMq = new Definition('IronMQ');
+            $ironMq->setArguments([
+                [
+                    'token'         => $config['token'],
+                    'project_id'    => $config['project_id']
+                ]
+            ]);
+
+            $parameter  = $container->getParameter('uecode_qpush.provider.ironmq');
+            $provider   = new Definition($parameter, [null, null, $cache, $ironMq]);
+            $container
+                        ->setDefinition('uecode_qpush.provider.ironmq', $provider)
+                        ->setPublic(false);
+        } else {
+            $provider = $container->getDefinition('uecode_qpush.provider.ironmq');
+        }
+
+        return $provider;
+    }
+
+    /**
+     * Sets a Definition for PhpFileCache in the container
+     *
+     * @param ContainerBuilder $container The container
+     */
+    private function createFileCache(ContainerBuilder $container)
+    {
+        if (!$container->hasDefinition('uecode_qpush.file_cache')) {
+            $directory = $container->getParameter('kernel.cache_dir') . '/qpush/';
+            $fileCache = $container->setDefinition(
+                'uecode_qpush.file_cache',
+                new Definition(
+                    'Doctrine\Common\Cache\PhpFileCache',
+                    [$directory, 'uecode.php']
+                )
+            )->setPublic(false);
+        }
+    }
+
+    /**
+     * Returns the Extension Alias
+     *
+     * @return string
+     */
     public function getAlias()
     {
         return 'uecode_qpush';

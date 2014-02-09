@@ -1,6 +1,6 @@
 <?php
 
-namespace Uecode\Bundle\QPushBundle\Queue;
+namespace Uecode\Bundle\QPushBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
 
@@ -8,7 +8,6 @@ use Uecode\Bundle\QPushBundle\Queue\QueueProviderInterface;
 
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
-use Uecode\Bundle\QPushBundle\Event\SubscriptionEvent;
 
 abstract class QueueProvider implements QueueProviderInterface
 {
@@ -32,27 +31,7 @@ abstract class QueueProvider implements QueueProviderInterface
      * @var Cache
      */
     protected $cache;
-
-    final public function __construct($name, array $options, Cache $cache)
-    {
-        $this->name     = $name;
-        $this->options  = $options;
-        $this->cache    = $cache;
-    }
-
-    /**
-     * Allows for a Service to be injected into the Queue Provider
-     *
-     * Override this method when using a Service with the Queue
-     * Provider
-     *
-     * @return bool
-     */
-    public function setService($service)
-    {
-        return false;
-    }
-
+  
     public function getName()
     {
         return $this->name;
@@ -71,19 +50,6 @@ abstract class QueueProvider implements QueueProviderInterface
     public function getCache()
     {
         return $this->cache;
-    }
-
-    public function createMessageEvent($message)
-    {
-        return new MessageEvent($this->name, $message);
-    }
-
-    /**
-     * @return bool
-     */
-    public function onSubscription(SubscriptionEvent $event)
-    {
-        return false;
     }
 
     /**
@@ -110,5 +76,7 @@ abstract class QueueProvider implements QueueProviderInterface
 
     abstract public function receive();
 
-    abstract public function delete($message);
+    abstract public function delete($id);
+
+    abstract public function destroy();
 }

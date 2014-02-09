@@ -7,12 +7,12 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class BuildQueueCommand extends ContainerAwareCommand
+class QueueBuildCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('qpush:build:queue')
+            ->setName('uecode:qpush:build')
             ->setDescription('Builds the configured Queues')
             ->addArgument(
                 'name',
@@ -43,7 +43,7 @@ class BuildQueueCommand extends ContainerAwareCommand
     {
         if (!$registry->has($name)) {
             return $output->writeln(
-                sprintf("This [%s] is not the queue you are looking for...", $name)
+                sprintf("The [%s] queue you have specified does not exists!", $name)
             );
         }
 

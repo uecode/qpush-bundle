@@ -1,4 +1,4 @@
-AWS Queue Provider
+The AWS Provider
 ==================
 
 The AWS Provider uses SQS & SNS to create a Pub/Sub model.  SNS is optional with
@@ -7,26 +7,11 @@ Command to poll the queue.
 
 ###Configuration
 
-This provider relies on the [AWS SDK for PHP](https://github.com/aws/aws-sdk-php) and
-it is recommened to use the [Uecode Amazon Bundle](https://github.com/uecode/amazon-bundle)
-to make semantic configuration easy.
+This provider relies on the [AWS SDK for PHP](https://github.com/aws/aws-sdk-php), which
+needs to be required in your `composer.json` file.
 
-To configure the use of this provider, you must have the `Aws\Common\Aws` service locator
-configured as a service in the container.
-
-Using the `Uecode Amazon Bundle`, that would look like this:
-
-```yaml
-uecode_amazon:
-    accounts:
-        main:
-            key: somekey
-            secret: somesecret
-```
-
-This would provide you with a container service id `uecode_amazon.instance.main`.
-
-From there, the rest of the configuration is simple.
+From there, the rest of the configuration is simple. You need to provide your
+credentials in your configuration.
 
 ```yaml
 #app/config.yml
@@ -35,7 +20,9 @@ uecode_qpush:
     cache_service: my_cache_service
     providers:
         aws:
-            provider_service: uecode_amazon.instance.main
+            key:
+            secret:
+            region:
     queues:
         my_queue_name:
             provider: aws

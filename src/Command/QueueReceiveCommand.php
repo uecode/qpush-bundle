@@ -10,12 +10,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 
-class PollQueueCommand extends ContainerAwareCommand
+class QueueReceiveCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('qpush:poll:queue')
+            ->setName('uecode:qpush:receive')
             ->setDescription('Polls the configured Queues')
             ->addArgument(
                 'name',
@@ -45,8 +45,8 @@ class PollQueueCommand extends ContainerAwareCommand
     private function pollQueue($registry, $name)
     {
         if (!$registry->has($name)) {
-            return $output->writeln(
-                sprintf("This [%s] is not the queue you are looking for...", $name)
+            return $this->output->writeln(
+                sprintf("The [%s] queue you have specified does not exists!", $name)
             );
         }
 
@@ -55,10 +55,10 @@ class PollQueueCommand extends ContainerAwareCommand
         $count      = sizeof($messages);
         foreach ($messages as $message) {
 
-            $messageEvent   = $provider->createMessageEvent($message);
+            $messageEvent   = new MessageEvent($name, $message);
             $dispatcher     = $this->getContainer()->get('event_dispatcher');
 
-            $dispatcher->dispatch(Events::message($name), $messageEvent);
+            $dispatcher->dispatch(Events::Message($name), $messageEvent);
         }
 
         $msg = "<info>Finished polling %s Queue, %d messages fetched.</info>";

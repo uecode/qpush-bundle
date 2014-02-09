@@ -11,34 +11,25 @@ class MessageEvent extends Event
      *
      * @var string
      */
-    protected $queue;
+    protected $queueName;
 
     /**
      * Message
      *
-     * @var array
+     * @var mixed
      */
     protected $message;
 
     /**
-     * Message Meta Data
-     *
-     * @var array
-     */
-    protected $metadata;
-
-    /**
      * Constructor.
      *
-     * @param string $queue    The Queue Name
-     * @param array  $message  Message
-     * @param string $metadata Optional Message Metadata
+     * @param string    $queue      The queue name
+     * @param Message   $message    The Message
      */
-    public function __construct($queue, array $message, array $metadata = array())
+    public function __construct($queue, Message $message)
     {
-        $this->queue    = $queue;
-        $this->message  = $message;
-        $this->metadata = $metadata;
+        $this->queueName    = $queueName;
+        $this->message      = $message;
     }
 
     /**
@@ -48,26 +39,16 @@ class MessageEvent extends Event
      */
     public function getQueueName()
     {
-        return $this->queue;
+        return $this->queueName;
     }
 
     /**
      * Return the Full SQS Message
      *
-     * @return array
+     * @return Message
      */
     public function getMessage()
     {
         return $this->message;
-    }
-
-    /**
-     * Return the SQS Message Receipt Handle
-     *
-     * @return string
-     */
-    public function getMetadata()
-    {
-        return $this->metadata;
     }
 }

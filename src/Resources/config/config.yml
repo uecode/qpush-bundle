@@ -1,10 +1,24 @@
+#Example Configuration
 uecode_qpush:
     cache_service: null
     providers:
-        - { name: aws, provider_service: my_service_id
+        aws:
+            key:
+            secret:
+            region:
+        ironmq:
+            token:
+            project_id:
     queues:
         default:
-            provider: aws
-            push_notifications: true
-            subscribers:
-                - { endpoint: http://example.com, protocol: http }
+            provider: aws #or ironmq
+            options:
+                push_notifications:     true
+                message_delay:          0
+                message_timeout:        30
+                message_expiration:     604800
+                messages_to_receive:    1
+                receive_wait_time:      3
+                subscribers:
+                    - { endpoint: http://example1.com/push, protocol: http }
+                    - { endpoint: http://example2.com/endpoint, protocol: http }

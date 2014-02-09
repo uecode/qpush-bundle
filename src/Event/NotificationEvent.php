@@ -4,17 +4,35 @@ namespace Uecode\Bundle\QPushBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
+use Uecode\Bundle\QPushBundle\Message\Notification;
+
 class NotificationEvent extends Event
 {
     /**
-     * SQS Queue name sent in Subject of SNS Notification
+     * A Subscription Notification Type
+     */
+    const TYPE_SUBSCRIPTION  = 'SubscriptionNotification';
+    /**
+     * A Message Notification Type
+     */
+    const TYPE_MESSAGE       = 'MessageNotification';
+
+    /**
+     * Queue name
      *
      * @var string
      */
-    protected $queue;
+    protected $queueName;
 
     /**
-     * Entire notification from SNS
+     * Notification Type
+     *
+     * @var string
+     */
+    protected $type;
+
+    /**
+     * Notification
      *
      * @var array
      */
@@ -23,27 +41,39 @@ class NotificationEvent extends Event
     /**
      * Constructor
      *
-     * @param string $queue        SQS Queue Name
-     * @param array  $notification SNS Notification
+     * @param string        $queueName      The Queue Name
+     * @param string        $type           The Notification Type
+     * @param Notification  $notification   The Notification
      */
-    public function __construct($queue, $notification)
+    public function __construct($queueName, $type, Notification $notification)
     {
-        $this->queue        = $queue;
+        $this->queueName    = $queueName;
+        $this->type         = $type;
         $this->notification = $notification;
     }
 
     /**
-     * Returns the SQS Queue name
+     * Returns the Queue name
      *
      * return string
      */
-    public function getQueue()
+    public function getQueueName()
     {
-        return $this->queue;
+        return $this->queueName;
     }
 
     /**
-     * Returns the entire SNS Notification
+     * Returns the Notification Type
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Returns the Notification
      *
      * return array
      */

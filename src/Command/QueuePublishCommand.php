@@ -7,12 +7,12 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MessageCommand extends ContainerAwareCommand
+class QueuePublishCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('qpush:send:message')
+            ->setName('uecode:qpush:publish')
             ->setDescription('Sends a Message to a Queue')
             ->addArgument(
                 'name',
@@ -22,7 +22,7 @@ class MessageCommand extends ContainerAwareCommand
             ->addArgument(
                 'message',
                 InputArgument::REQUIRED,
-                'Message to send to the Queue'
+                'A JSON encoded Message to send to the Queue'
             );
     }
 
@@ -41,11 +41,11 @@ class MessageCommand extends ContainerAwareCommand
     {
         if (!$registry->has($name)) {
             return $output->writeln(
-                sprintf("This [%s] is not the queue you are looking for...", $name)
+                sprintf("The [%s] queue you have specified does not exists!", $name)
             );
         }
 
-        $registry->get($name)->publish([$message]);
+        $registry->get($name)->publish($message);
         $this->output->writeln("<info>The message has been sent.</info>");
 
         return 0;
