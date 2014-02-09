@@ -1,7 +1,9 @@
 The IronMQ Provider
 ==================
 
-The IronMQ Provider uses the idea of Push Queues to create a Pub/Sub model. 
+The IronMQ Provider uses the its Push Queues to notify subscribers of new queued
+messages with out needing to continually poll the queue.
+
 Using a Push Queue is optional with this provider and its possible to use simple
 Pull queues by utilizing a provided Console Command to poll the queue.
 
