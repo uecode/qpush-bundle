@@ -101,12 +101,13 @@ The options and their descriptions are listed below.
 Option | Description | Default
 ------ | ----------- | -------
 `push_notifications` | Whether or not to POST notifications to subscribers of a Queue | `false`
-`message_delay` | Time in seconds of how long before a new Message is available to be read in a Queue | `0`
-`message_timeout` | How long in secons a worker has to respond or delete a Message before its again made available | `30`
-`message_expiration` | How long in seconds the Messages may remain in the queue before being deleted | `604800`
-`messages_to_receive` | How many messages should be received when polling the queue | `1`
-`receive_wait_time` | If supported, how long in seconds to leave the polling request open - for long polling operations | `3`
-`subscribers` | An array of Subscribers, containing an `endpoint` and `protocol` - used when `push_notificaitons` is `true` | `empty`
+`notification_retries` | How many attempts notifications are resent in case of errors | `3`
+`message_delay` | Time in seconds before a published Message is available to be read in a Queue | `0`
+`message_timeout` | Time in seconds that a worker has to delete a Message before its available to other workers | `30`
+`message_expiration` | Time in seconds that Messages may remain in the Queue before being removed | `604800`
+`messages_to_receive` | Maximum amount of messages that can be received when polling the queue | `1`
+`receive_wait_time` | If supported, time in seconds to leave the polling request open - for long polling | `3`
+`subscribers` | An array of Subscribers, each containing an `endpoint` and `protocol` - used when `push_notificaitons` is `true` | `empty`
 
 ###Example Configuration:
 
@@ -133,7 +134,7 @@ uecode_qpush:
             options:
                 push_notifications: true
                 subscribers:
-                    - { endpoint: http://example.com, protocol: http }
+                    - { endpoint: http://example.com/qpush, protocol: http }
 ```
 
 ##Usage
@@ -171,10 +172,12 @@ public function publishAction()
 
 ###Working with Messages from your Queue
 
-Messages are either automatically received by your application from Subscriber 
-callbacks (setting `push_notification` to true), or can be picked up by Cron jobs
-through an included command if you are not using a Message Queue provider that supports
-Push notifications.
+Messages are either automatically received by your application by be POSTed by the Queue
+(setting `push_notification` to true), or can be picked up by Cron jobs through an included 
+command if you are not using a Message Queue provider that supports Push notifications.
+
+When the notifications or messages are Pushed to your application, the QPush Bundle automatically
+catches the request and dispatches an event which can be easily hooked into.
 
 ####MessageEvents
 
@@ -213,13 +216,12 @@ Tag Property | Example | Description
 `method` | `onMessageReceived` | A publicly accessbile method on your service
 `priority` | `100` | Priority, `1`-`100` to control order of services. Higher priorities are called earlier
 
-The `priority` is useful to chain services and ensure they fire in a certain order - 
+The `priority` is useful to chain services, ensuring that they fire in a certain order - 
 the higher priorities fire earlier.
 
-Each event fired by the Qpush Bundle is prefixed with the name of your queue, 
-ex: `my_queue_name.message_received`. 
+Each event fired by the Qpush Bundle is prefixed with the name of your queue, ex: `my_queue_name.message_received`. 
 
-This allows you to assign services to fire only on certain queues should be used based on the `queue`.
+This allows you to assign services to fire only on certain queues, based on the queue name.
 However, you may also have multiple tags on a single service, so that one service can handle
 events from multiple queues.
 
@@ -245,9 +247,9 @@ use Uecode\Bundle\QpushBundle\Event\MessageEvent;
 
 public function onMessageReceived(MessageEvent $event)
 {
-    $queueName    = $event->getQueueName();
+    $queueName  = $event->getQueueName();
     $message    = $event->getMessage();
-    $metadata    = $event->Message()->getMetadata();
+    $metadata   = $event->Message()->getMetadata();
     
     // Process ...
 }
@@ -261,7 +263,7 @@ will automatically attempt to remove the Message from your Queue.
 If an error or exception is thrown, or event propagation is stopped earlier in the chain,
 the Message will not be removed automatically and may be picked up by other workers.
 
-If you would like to remove the message in your service, you can do so by calling the `delete`
+If you would like to remove the message inside your service, you can do so by calling the `delete`
 method on your provider and passing it the message `id`.  However, you must also stop
 the event propagation to avoid other services (including the Provider service) from firing on that
 `MessageEvent`.
