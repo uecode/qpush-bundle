@@ -1,8 +1,8 @@
 The AWS Provider
 ==================
 
-The AWS Provider uses SQS & SNS to create a Pub/Sub model.  SNS is optional with
-this provider and its possible to use just SQS by utilizing a provided Console
+The AWS Provider uses SQS & SNS to create a Push Queue model.  SNS is optional with
+this provider and its possible to use just SQS by utilizing the provided Console
 Command to poll the queue.
 
 ###Configuration
@@ -29,13 +29,13 @@ uecode_qpush:
             options:
                 push_notifications: true
                 subscribers:
-                    - { endpoint: http://example.com, protocol: http }
+                    - { endpoint: http://example.com/qpush, protocol: http }
 ```
 
 ###Using SNS
 
 If you set `push_notifications` to `true` in your queue config, this provider
-will automatically create the SNS Topic and subscribe your SQS queue, as well
+will automatically create the SNS Topic, subscribe your SQS queue to it, as well
 as loop over your list of `subscribers`, adding them to your Topic.
 
 This provider automatically handles Subscription Confirmations sent from SNS, as
@@ -48,5 +48,7 @@ It is recommended to use your `config_dev.yml` file to disable the
 Console Command to receive messages from SQS.
 
 It is also possible to use [ngrok](https://ngrok.com/) to allow your development
-environment to be reachable by SNS.  You would need to update your `config_dev.yml`
-configuration to use the `ngrok` url.
+environment to be reachable by SNS.  
+
+You would need to update your `config_dev.yml` configuration to use the `ngrok` url on 
+your subscribers.
