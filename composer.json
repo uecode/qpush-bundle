@@ -25,7 +25,7 @@
         "iron-io/iron_mq": "Required to use IronMQ as a Queue Provider"
     },
     "require-dev": {
-        "symfony/symfony": "dev-master"
+        "symfony/symfony": "dev-master",
         "aws/aws-sdk-php": "~2.5.2",
         "iron-io/iron_mq": "~1.5.0"
     },
