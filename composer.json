@@ -21,7 +21,7 @@
         "doctrine/common": ">2.4.0"
     },
     "suggest": {
-        "aws/aws-sdk-php": "Required to use AWS as a Queue Provider"
+        "aws/aws-sdk-php": "Required to use AWS as a Queue Provider",
         "iron-io/iron_mq": "Required to use IronMQ as a Queue Provider"
     },
     "require-dev": {
