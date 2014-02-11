@@ -1,12 +1,31 @@
 <?php
 
+/**
+ * Copyright 2014 Underground Elephant
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @package     qpush-bundle
+ * @copyright   Underground Elephant 2014
+ * @license     Apache License, Version 2.0
+ */
+
 namespace Uecode\Bundle\QPushBundle\Provider;
 
 use IronMQ;
 
 use Doctrine\Common\Cache\Cache;
-
-use Uecode\Bundle\QPushBundle\Provider\QueueProvider;
+use Symfony\Bridge\Monolog\Logger;
 
 use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
@@ -14,7 +33,12 @@ use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
 
 use Uecode\Bundle\QPushBundle\Message\Message;
 
-class IronMqProvider extends QueueProvider
+/**
+ * IronMqProvider
+ *
+ * @author Keith Kirk <kkirk@undergroundelephant.com>
+ */
+class IronMqProvider extends AbstractProvider
 {
     /**
      * IronMQ Client
@@ -28,13 +52,15 @@ class IronMqProvider extends QueueProvider
      *
      * @var stdObject
      */
+    private $queue;
 
-    public function __construct($name, array $options, Cache $cache, IronMQ $ironmq)
+    public function __construct($name, array $options, $client, Cache $cache, Logger $logger)
     {
         $this->name     = $name;
         $this->options  = $options;
+        $this->ironmq   = $client;
         $this->cache    = $cache;
-        $this->ironmq   = $ironmq;
+        $this->logger   = $logger;
     }
 
 
@@ -84,6 +110,8 @@ class IronMqProvider extends QueueProvider
         $key = $this->getNameWithPrefix();
         $this->cache->save($key, json_encode($this->queue));
 
+        $this->log(200, "Queue has been created.", $params);
+
         return true;
     }
 
@@ -96,13 +124,17 @@ class IronMqProvider extends QueueProvider
         try {
             $this->ironmq->deleteQueue($this->getNameWithPrefix());
         } catch( \Exception $e) {
-            if ($e->getMessage() != 'http error: 404 | {"msg":"Queue not found"}') {
+            if ($e->getMessage() == 'http error: 404 | {"msg":"Queue not found"}') {
+                $this->log(400, "Queue did not exist");
+            } else {
                 throw $e;
             }
         }
 
         $key = $this->getNameWithPrefix();
         $this->cache->delete($key);
+
+        $this->log(200, "Queue has been destroyed.");
 
         return true;
     }
@@ -116,6 +148,8 @@ class IronMqProvider extends QueueProvider
      */
     public function publish(array $message)
     {
+        $publishStart = microtime(true);
+
         if (!$this->queueExists()) {
             $this->create();
         }
@@ -129,8 +163,13 @@ class IronMqProvider extends QueueProvider
                 'expires_in'    => $this->options['message_expiration']
             ]
         );
+    
+        $context = [
+            'message_id'    => $result->id,
+            'publish_time'  => microtime(true) - $publishStart
+        ];
+        $this->log(200, "Message has been published.", $context);
 
-        error_log(json_encode($result));
         return $result->id;
     }
 
@@ -162,6 +201,8 @@ class IronMqProvider extends QueueProvider
             ];
 
             $message = new Message($id, $body, $metadata);
+
+            $this->log(200, "Message has been received.", ['message_id' => $result->id]);
         }
 
         return $messages;
@@ -177,6 +218,8 @@ class IronMqProvider extends QueueProvider
         }
 
         $result = $this->ironmq->deleteMessage($this->getNameWithPrefix(), $id);
+
+        $this->log(200, "Message has been deleted.", ['message_id' => $result->id]);
 
         return true;
     }
@@ -221,6 +264,12 @@ class IronMqProvider extends QueueProvider
             $event->getNotification()->getMetadata()->toArray()
         );
 
+        $this->log(
+            200,
+            "Message has been received from Push Notification.",
+            ['message_id' => $event->getNotification()->getId()]
+        );
+
         $messageEvent = new MessageEvent($this->name, $message);
         $event->getDispatcher()->dispatch(Events::Message($this->name), $messageEvent);
     }
@@ -235,7 +284,7 @@ class IronMqProvider extends QueueProvider
      *
      * @param MessageEvent $event The SQS Message Event
      */
-    public function onMessage(MessageEvent $event)
+    public function onMessageReceived(MessageEvent $event)
     {
         $metadata = $event->getMessage()->getMetadata();
 

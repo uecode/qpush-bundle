@@ -107,7 +107,7 @@ The options and their descriptions are listed below.
 Option | Description | Default
 ------ | ----------- | -------
 `push_notifications` | Whether or not to POST notifications to subscribers of a Queue | `false`
-`notification_retries` | How many attempts notifications are resent in case of errors | `3`
+`notification_retries` | How many attempts notifications are resent in case of errors - if supported | `3`
 `message_delay` | Time in seconds before a published Message is available to be read in a Queue | `0`
 `message_timeout` | Time in seconds that a worker has to delete a Message before its available to other workers | `30`
 `message_expiration` | Time in seconds that Messages may remain in the Queue before being removed | `604800`
