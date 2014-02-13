@@ -1,13 +1,33 @@
 <?php
 
+/**
+ * Copyright 2014 Underground Elephant
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @package     qpush-bundle
+ * @copyright   Underground Elephant 2014
+ * @license     Apache License, Version 2.0
+ */
+
 namespace Uecode\Bundle\QPushBundle\Provider;
 
 use Aws\Common\Aws;
 use Aws\Sqs\SqsClient;
+use Aws\Sns\SnsClient;
 
 use Doctrine\Common\Cache\Cache;
-
-use Uecode\Bundle\QPushBundle\Provider\QueueProvider;
+use Symfony\Bridge\Monolog\Logger;
 
 use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
@@ -15,7 +35,12 @@ use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
 
 use Uecode\Bundle\QPushBundle\Message\Message;
 
-class AwsProvider extends QueueProvider
+/**
+ * AwsProvider
+ *
+ * @author Keith Kirk <kkirk@undergroundelephant.com>
+ */
+class AwsProvider extends AbstractProvider
 {
     /**
      * Aws SQS Client
@@ -46,13 +71,14 @@ class AwsProvider extends QueueProvider
     private $topicArn;
 
 
-    public function __construct($name, array $options, Cache $cache, Aws $aws)
+    public function __construct($name, array $options, $client, Cache $cache, Logger $logger)
     {
         $this->name     = $name;
         $this->options  = $options;
+        $this->sqs      = $client->get('Sqs');
+        $this->sns      = $client->get('Sns');
         $this->cache    = $cache;
-        $this->sqs      = $aws->get('Sqs');
-        $this->sns      = $aws->get('Sns');
+        $this->logger   = $logger;
     }
 
 
@@ -112,6 +138,8 @@ class AwsProvider extends QueueProvider
 
             $key = $this->getNameWithPrefix() . '_url';
             $this->cache->delete($key);
+
+            $this->log(200,"SQS Queue removed", ['QueueUrl' => $this->queueUrl]);
         }
 
         // Delete the SNS Topic
@@ -122,6 +150,8 @@ class AwsProvider extends QueueProvider
 
             $key = $this->getNameWithPrefix() . '_arn';
             $this->cache->delete($key);
+
+            $this->log(200,"SNS Topic removed", ['TopicArn' => $this->topicArn]);
         }
 
         return true;
@@ -139,6 +169,8 @@ class AwsProvider extends QueueProvider
      */
     public function publish(array $message)
     {
+        $publishStart = microtime(true);
+
         // ensures that the SQS Queue and SNS Topic exist
         if(!$this->queueExists()) {
             $this->create();
@@ -159,6 +191,14 @@ class AwsProvider extends QueueProvider
                 'MessageStructure'  => 'json'
             ]);
 
+            $context = [
+                'TopicArn'              => $this->topicArn,
+                'MessageId'             => $result->get('MessageId'),
+                'push_notifications'    => $this->options['push_notifications'],
+                'publish_time'          => microtime(true) - $publishStart
+            ];
+            $this->log(200,"Message published to SNS", $context);
+
             return $result->get('MessageId');
         }
 
@@ -167,6 +207,14 @@ class AwsProvider extends QueueProvider
             'MessageBody'   => json_encode($message),
             'DelaySeconds'  => $this->options['message_delay'] 
         ]);
+
+        $context = [
+            'QueueUrl'              => $this->queueUrl,
+            'MessageId'             => $result->get('MessageId'),
+            'push_notifications'    => $this->options['push_notifications']
+        ];
+        $this->log(200,"Message published to SQS", $context);
+
 
         return $result->get('MessageId');
     }
@@ -208,6 +256,10 @@ class AwsProvider extends QueueProvider
             }
 
             $message = new Message($id, $body, $metadata);
+
+            $context = ['MessageId' => $id];
+            $this->log(200,"Message fetched from SQS Queue", $context);
+
         }
 
         return $messages;
@@ -226,6 +278,12 @@ class AwsProvider extends QueueProvider
             'QueueUrl'      => $this->queueUrl,
             'ReceiptHandle' => $id
         ]);
+
+        $context = [
+            'QueueUrl'      => $this->queueUrl,
+            'ReceiptHandle' => $id
+        ];
+        $this->log(200,"Message deleted from SQS Queue", $context);
 
         return true;
     }
@@ -266,13 +324,20 @@ class AwsProvider extends QueueProvider
     public function createQueue()
     {
         $result = $this->sqs->createQueue([
-            'QueueName' => $this->getNameWithPrefix()
+            'QueueName' => $this->getNameWithPrefix(),
+            'Attributes'    => [
+                'VisibilityTimeout'             => $this->options['message_timeout'],
+                'MessageRetentionPeriod'        => $this->options['message_expiration'], 
+                'ReceiveMessageWaitTimeSeconds' => $this->options['receive_wait_time']
+            ]
         ]);
 
         $this->queueUrl = $result->get('QueueUrl');
 
         $key = $this->getNameWithPrefix() . '_url';
         $this->cache->save($key, $this->queueUrl);
+
+        $this->log(200, "Created SQS Queue", ['QueueUrl' => $this->queueUrl]);
 
         if ($this->options['push_notifications']) {
 
@@ -281,12 +346,11 @@ class AwsProvider extends QueueProvider
             $this->sqs->setQueueAttributes([
                 'QueueUrl'      => $this->queueUrl,
                 'Attributes'    => [
-                    'Policy'                        => $policy,
-                    'VisibilityTimeout'             => $this->options['message_timeout'],
-                    'MessageRetentionPeriod'        => $this->options['message_expiration'], 
-                    'ReceiveMessageWaitTimeSeconds' => $this->options['receive_wait_time']
+                    'Policy'    => $policy,
                 ]
             ]);
+
+            $this->log(200, "Created Updated SQS Policy");
         }
     }
 
@@ -363,6 +427,8 @@ class AwsProvider extends QueueProvider
 
         $key = $this->getNameWithPrefix() . '_arn';
         $this->cache->save($key, $this->topicArn);
+
+        $this->log(200, "Created SNS Topic", ['TopicARN' => $this->topicArn]);
     }
 
     /**
@@ -406,7 +472,16 @@ class AwsProvider extends QueueProvider
             'Endpoint' => $endpoint
         ]);
 
-        return $result->get('SubscriptionArn');
+        $arn = $result->get('SubscriptionArn');
+
+        $context = [
+            'Endpoint' => $endpoint,
+            'Protocol' => $protocol,
+            'SubscriptionArn' => $arn
+        ];
+        $this->log(200, "Endpoint Subscribed to SNS Topic", $context);
+
+        return $arn;
     }
 
     /**
@@ -430,6 +505,13 @@ class AwsProvider extends QueueProvider
                 $result = $this->sns->unsubscribe([
                     'SubscriptionArn' => $subscription['SubscriptionArn']
                 ]);
+
+                $context = [
+                    'Endpoint' => $endpoint,
+                    'Protocol' => $protocol,
+                    'SubscriptionArn' => $arn
+                ];
+                $this->log(200,"Endpoint unsubscribed from SNS Topic", $context);
 
                 return true;
             }
@@ -461,11 +543,14 @@ class AwsProvider extends QueueProvider
                 'Token'     => $token
             ]);
 
+            $context = ['TopicArn' => $topicArn];
+            $this->log(200,"Subscription to SNS Confirmed", $context);
             return;
         }
 
         $messages = $this->receive();
         foreach ($messages as $message) {
+
             $messageEvent = new MessageEvent($this->name, $message);
             $event->getDispatcher()->dispatch(Events::Message($this->name), $messageEvent);
         }
@@ -481,7 +566,7 @@ class AwsProvider extends QueueProvider
      *
      * @param MessageEvent $event The SQS Message Event
      */
-    public function onMessage(MessageEvent $event)
+    public function onMessageReceived(MessageEvent $event)
     {
         $receiptHandle = $event
             ->getMessage()

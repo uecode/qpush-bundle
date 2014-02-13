@@ -1,8 +1,3 @@
-parameters:
-    uecode_qpush.registry.class: Uecode\Bundle\QPushBundle\Provider\QPushProviderRegistry
-    uecode_qpush.provider.ironmq: Uecode\Bundle\QPushBundle\Provider\IronMqProvider
-    uecode_qpush.provider.aws: Uecode\Bundle\QPushBundle\Provider\AwsProvider
-
 services:
 ### QPush Registry
     uecode_qpush.registry:
@@ -11,8 +6,19 @@ services:
         alias: uecode_qpush.registry
 
 ### QPush Event Listeners
-    uecode_qpush.controller_listener:
+    uecode_qpush.request_listener:
         class: Uecode\Bundle\QPushBundle\EventListener\RequestListener
-        arguments: [ @event_dispatcher ]
+        arguments: [ @event_dispatcher, @uecode_qpush.logger ]
         tags:
             - { name: kernel.event_listener, event: kernel.request, priority: 254 }
+
+### QPush Logger
+    uecode_qpush.logger:
+        class: Symfony\Bridge\Monolog\Logger
+        arguments: [qpush]
+        calls:
+             - [pushHandler, [@uecode_qpush.logger_handler]]
+
+    uecode_qpush.logger_handler:
+        class: Monolog\Handler\StreamHandler
+        arguments: [%kernel.logs_dir%/%kernel.environment%.qpush.log, 200]

@@ -1,7 +1,7 @@
 {
     "name":         "uecode/qpush-bundle",
     "type":         "library",
-    "description":  "Asynchronous processing for Symfony using Pub/Sub Message Queues",
+    "description":  "Asynchronous processing for Symfony using Push Queues",
     "keywords":     ["qpush", "pub-sub", "aws", "iron mq", "asynch", "push", "symfony", "bundle" ],
     "homepage":     "https://github.com/uecode/qpush-bundle",
     "license":      "MIT",
@@ -26,6 +26,7 @@
     },
     "require-dev": {
         "symfony/symfony": "dev-master",
+        "phpunit/phpunit": "3.7.*",
         "aws/aws-sdk-php": "~2.5.2",
         "iron-io/iron_mq": "~1.5.0"
     },

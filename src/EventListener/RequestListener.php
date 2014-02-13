@@ -1,7 +1,28 @@
 <?php
 
+/**
+ * Copyright 2014 Underground Elephant
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @package     qpush-bundle
+ * @copyright   Underground Elephant 2014
+ * @license     Apache License, Version 2.0
+ */
+
 namespace Uecode\Bundle\QPushBundle\EventListener;
 
+use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -13,6 +34,11 @@ use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
 
+/**
+ * RequestListener
+ *
+ * @author Keith Kirk <kkirk@undergroundelephant.com>
+ */
 class RequestListener
 {
     /**
@@ -23,13 +49,22 @@ class RequestListener
     private $dispatcher;
 
     /**
+     * Monolog Logger
+     *
+     * @var Logger
+     */
+    private $logger;
+
+    /**
      * Constructor.
      *
-     * @param EventDispatcherInterface $dispatcher A Symfony Event Dispatcher
+     * @param EventDispatcherInterface  $dispatcher A Symfony Event Dispatcher
+     * @param Logger                    $logger     A Monolog Logger
      */
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(EventDispatcherInterface $dispatcher, Logger $logger)
     {
-        $this->dispatcher = $dispatcher;
+        $this->dispatcher   = $dispatcher;
+        $this->logger       = $logger;
     }
 
     /**
@@ -44,18 +79,12 @@ class RequestListener
         }
 
         if ($event->getRequest()->headers->has('x-amz-sns-message-type')) {
-            try {
-                $this->handleSnsNotifications($event);
-
-                $event->setResponse(new Response("", 200));
-            } catch (\Exception $e) {
-                error_log($e->getTraceAsString());
-            }
+            $this->handleSnsNotifications($event);
+            $event->setResponse(new Response("", 200));
         }
 
         if ($event->getRequest()->headers->has('iron-message-id')) {
             $this->handleIronMqNotifications($event);
-
             $event->setResponse(new Response("", 200));
         }
     }
@@ -88,7 +117,6 @@ class RequestListener
             Events::Notification($queue),
             new NotificationEvent($queue, NotificationEvent::TYPE_MESSAGE, $notification)
         );
-
     }
 
     /**
