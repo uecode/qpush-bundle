@@ -35,7 +35,7 @@ The bundle should be installed through composer.
 
 ```json
 "require": {
-    "uecode/qpush-bundle": "~0.3",
+    "uecode/qpush-bundle": "~0.4",
 }
 ```
 
@@ -233,11 +233,11 @@ events from multiple queues.
 
 ######Example
 ```yaml
-    services:
-    	my_example_service:
-    		class: My\Example\ExampleService
-    		tags:
-    			- { name: uecode_qpush.event_listener, event: my_queue_name.message_received, method: onMessageReceived }
+services:
+    my_example_service:
+    	class: My\Example\ExampleService
+    	tags:
+    		- { name: uecode_qpush.event_listener, event: my_queue_name.message_received, method: onMessageReceived }
 ```
 
 The method listed in the tag must be publicly available in your service and should
