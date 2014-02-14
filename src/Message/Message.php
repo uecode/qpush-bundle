@@ -58,10 +58,10 @@ class Message
      * Sets the Message Id, Message Body, and any Message Metadata
      *
      * @param int|string    $id         The Message Id
-     * @param string\array  $body       The Message Message
+     * @param array         $body       The Message Message
      * @param array         $metadata   The Message Metadata
      */
-    public function __construct($id, $body, array $metadata)
+    public function __construct($id, array $body, array $metadata)
     {
         $this->id       = $id;
         $this->body     = $body;

@@ -58,10 +58,10 @@ class Notification
      * Sets the Notification Id, Notification Body, and any Notification Metadata
      *
      * @param int|string    $id         The Notification Id
-     * @param string\array  $body       The Notification Message
+     * @param array         $body       The Notification Message
      * @param array         $metadata   The Notification Metadata
      */
-    public function __construct($id, $body, array $metadata)
+    public function __construct($id, array $body, array $metadata)
     {
         $this->id       = $id;
         $this->body     = $body;

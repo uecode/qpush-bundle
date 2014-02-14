@@ -70,7 +70,6 @@ class AwsProvider extends AbstractProvider
      */
     private $topicArn;
 
-
     public function __construct($name, array $options, $client, Cache $cache, Logger $logger)
     {
         $this->name     = $name;
@@ -80,7 +79,6 @@ class AwsProvider extends AbstractProvider
         $this->cache    = $cache;
         $this->logger   = $logger;
     }
-
 
     public function getProvider()
     {

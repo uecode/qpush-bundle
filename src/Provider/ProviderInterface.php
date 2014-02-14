@@ -147,5 +147,5 @@ interface ProviderInterface
      *
      * @return bool Whether the record was logged
      */
-    public function log($level, $message, $context);
+    public function log($level, $message, array $context);
 }
