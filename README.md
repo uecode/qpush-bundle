@@ -1,5 +1,7 @@
-QPush Bundle
+QPush - Symfony2 Push Queue Bundle
 =======================
+
+[![Build Status](https://travis-ci.org/uecode/qpush-bundle.png?branch=master)](https://travis-ci.org/uecode/qpush-bundle)
 
 ##Overview
 
@@ -35,7 +37,7 @@ The bundle should be installed through composer.
 
 ```json
 "require": {
-    "uecode/qpush-bundle": "~0.4",
+    "uecode/qpush-bundle": "~1.0",
 }
 ```
 
