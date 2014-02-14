@@ -71,6 +71,13 @@ class NotificationEvent extends Event
      */
     public function __construct($queueName, $type, Notification $notification)
     {
+        if (!in_array($type, [self::TYPE_SUBSCRIPTION, self::TYPE_MESSAGE]))
+        {
+            throw new \InvalidArgumentException(
+                sprintf("Invalid notification type given! (%s)", $type)
+            );
+        }
+
         $this->queueName    = $queueName;
         $this->type         = $type;
         $this->notification = $notification;

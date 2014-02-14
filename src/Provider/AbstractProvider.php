@@ -106,7 +106,7 @@ abstract class AbstractProvider implements ProviderInterface
         return false;
     }
 
-    public function log($level, $message, $context = [])
+    public function log($level, $message, array $context = [])
     {
         if (!$this->options['logging_enabled']) {
             return false;
