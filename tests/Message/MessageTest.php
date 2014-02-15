@@ -47,9 +47,6 @@ class MessageTest extends BaseMessageTest
         $this->assertInstanceOf('Uecode\Bundle\QPushBundle\Message\Message', $message);
 
         $this->setExpectedException('PHPUnit_Framework_Error');
-        new Message(123, 'invalid argument', ['foo' => 'bar']);
-
-        $this->setExpectedException('PHPUnit_Framework_Error');
         new Message(123, ['foo' => 'bar'], 'invalid argument');
     }
 }

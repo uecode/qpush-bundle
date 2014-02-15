@@ -58,14 +58,20 @@ class Notification
      * Sets the Notification Id, Notification Body, and any Notification Metadata
      *
      * @param int|string    $id         The Notification Id
-     * @param array         $body       The Notification Message
+     * @param string|array  $body       The Notification Message
      * @param array         $metadata   The Notification Metadata
      */
-    public function __construct($id, array $body, array $metadata)
+    public function __construct($id, $body, array $metadata)
     {
         $this->id       = $id;
-        $this->body     = $body;
         $this->metadata = new ArrayCollection($metadata);
+
+        $message = is_string($body) ? json_decode($body, true) : $body;
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $message = $body;
+        }
+
+        $this->body = $message;
     }
 
     /**
