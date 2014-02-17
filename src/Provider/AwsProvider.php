@@ -129,28 +129,24 @@ class AwsProvider extends AbstractProvider
     public function destroy()
     {
         // Delete the SQS Queue
-        if ($this->queueExists()) {
-            $this->sqs->deleteQueue([
-                'QueueUrl' => $this->queueUrl
-            ]);
+        $result = $this->sqs->deleteQueue([
+            'QueueUrl' => $this->queueUrl
+        ]);
 
-            $key = $this->getNameWithPrefix() . '_url';
-            $this->cache->delete($key);
+        $key = $this->getNameWithPrefix() . '_url';
+        $this->cache->delete($key);
 
-            $this->log(200,"SQS Queue removed", ['QueueUrl' => $this->queueUrl]);
-        }
+        $this->log(200,"SQS Queue removed", ['QueueUrl' => $this->queueUrl]);
 
         // Delete the SNS Topic
-        if ($this->topicExists()) {
-            $this->sns->deleteTopic([
-                'TopicArn' => $this->topicArn
-            ]);
+        $result = $this->sns->deleteTopic([
+            'TopicArn' => $this->topicArn
+        ]);
 
-            $key = $this->getNameWithPrefix() . '_arn';
-            $this->cache->delete($key);
+        $key = $this->getNameWithPrefix() . '_arn';
+        $this->cache->delete($key);
 
-            $this->log(200,"SNS Topic removed", ['TopicArn' => $this->topicArn]);
-        }
+        $this->log(200,"SNS Topic removed", ['TopicArn' => $this->topicArn]);
 
         return true;
     }
@@ -249,7 +245,9 @@ class AwsProvider extends AbstractProvider
             ];
 
             // When using SNS, the SQS Body is the entire SNS Message
-            if(is_array($body = json_decode($message['Body'], true))) {
+            if(is_array($body = json_decode($message['Body'], true))
+                && isset($body['Message'])
+            ) {
                 $body = json_decode($body['Message'], true);
             }
 
@@ -507,7 +505,7 @@ class AwsProvider extends AbstractProvider
                 $context = [
                     'Endpoint' => $endpoint,
                     'Protocol' => $protocol,
-                    'SubscriptionArn' => $arn
+                    'SubscriptionArn' => $subscription['SubscriptionArn']
                 ];
                 $this->log(200,"Endpoint unsubscribed from SNS Topic", $context);
 

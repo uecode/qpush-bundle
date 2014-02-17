@@ -27,7 +27,11 @@ use Symfony\Bridge\Monolog\Logger;
 
 use Uecode\Bundle\QpushBundle\Provider\ProviderInterface;
 
-use Uecode\Bundle\QPushBundle\Message;
+use Uecode\Bundle\QPushBundle\Event\MessageEvent;
+use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
+
+use Uecode\Bundle\QPushBundle\Message\Message;
+use Uecode\Bundle\QPushBundle\Message\Notification;
 
 /**
  * AbstractProviderTest
@@ -109,5 +113,26 @@ class AbstractProviderTest extends \PHPUnit_Framework_TestCase
         $provider = $this->provider->getProvider();
 
         $this->assertEquals('TestProvider', $provider);
+    }
+
+    public function testOnNotification()
+    {
+        $result = $this->provider->onNotification(new NotificationEvent(
+            'test',
+            NotificationEvent::TYPE_SUBSCRIPTION,
+            new Notification(123, "test", [])
+        ));
+
+        $this->assertFalse($result);
+    }
+
+    public function testOnMessageReceived()
+    {
+        $result = $this->provider->onMessageReceived(new MessageEvent(
+            'test',
+            new Message(123, ['foo' => 'bar'], [])
+        ));
+
+        $this->assertFalse($result);
     }
 }

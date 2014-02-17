@@ -61,28 +61,28 @@ class TestProvider extends AbstractProvider
         return 'TestProvider';
     }
 
-    public function create()
-    {
-        return true;
-    }
+    /**
+     * @codeCoverageIgnore
+     */
+    public function create() { }
 
-    public function publish(array $message)
-    {
-        return 123;
-    }
+    /**
+     * @codeCoverageIgnore
+     */
+    public function publish(array $message) { }
 
-    public function receive()
-    {
-       return [new Message(123, ['foo' => 'bar'], ['meta' => 'data'])];
-    }
+    /**
+     * @codeCoverageIgnore
+     */
+    public function receive() { }
 
-    public function delete($id)
-    {
-        return true;
-    }
+    /**
+     * @codeCoverageIgnore
+     */
+    public function delete($id) { }
 
-    public function destroy()
-    {
-        return true;
-    }
+    /**
+     * @codeCoverageIgnore
+     */
+    public function destroy() { }
 }
