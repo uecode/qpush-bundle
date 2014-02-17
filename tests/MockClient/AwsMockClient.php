@@ -20,44 +20,33 @@
  * @license     Apache License, Version 2.0
  */
 
-namespace Uecode\Bundle\QPushBundle\Event;
+namespace Uecode\Bundle\QPushBundle\Tests\MockClient;
+
+use Uecode\Bundle\QPushBundle\Tests\MockClient\SqsMockClient;
+use Uecode\Bundle\QPushBundle\Tests\MockClient\SnsMockClient;
 
 /**
- * Events
+ * AwsMockClient
+ *
+ * @codeCoverageIgnore
  *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
-abstract class Events
+class AwsMockClient extends \Aws\Common\Aws
 {
-    const ON_NOTIFICATION  = 'on_notification';
-    const ON_MESSAGE       = 'message_received';
-
-    /**
-     * @codeCoverageIgnore
-     */
-    final private function __construct() { }
-
-    /**
-     * Returns a QPush Notification Event Name
-     *
-     * @param string $name The name of the Queue for this Event
-     *
-     * return string
-     */
-    public static function Notification($name)
+    public function get($name, $throwAway = false)
     {
-        return sprintf('%s.%s', $name, self::ON_NOTIFICATION);
+        if (!in_array($name, ['Sns', 'Sqs'])) {
+            throw new \InvalidArgumentException(
+                sprintf('Only supports Sns and Sqs as options, %s given.', $name)
+            );
+        }
+
+        if ($name == "Sns") {
+            return new SnsMockClient;
+        }
+
+        return new SqsMockClient;
     }
 
-    /**
-     * Returns a QPush Notification Event Name
-     *
-     * @param string $name The name of the Queue for this Event
-     *
-     * return string
-     */
-    public static function Message($name)
-    {
-        return sprintf('%s.%s', $name, self::ON_MESSAGE);
-    }
 }
