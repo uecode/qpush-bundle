@@ -308,3 +308,7 @@ Command | Description
 `uecode:qpush:destroy` | Destroys the queues and clears cache. Can take an optional queue name as an argument to destroy a single queue.
 `uecode:qpush:receive` | Polls messages from the queues. Can take an optional queue name as an argument to poll from a single queue.
 `uecode:qpush:publish` | Sends a message to a queue. Takes a queue name and a string message as required arguments.
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/uecode/qpush-bundle/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
