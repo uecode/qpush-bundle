@@ -40,11 +40,11 @@ interface ProviderInterface
     /**
      * Constructor for Provider classes
      *
-     * @param string    $name       Name of the Queue the provider is for
-     * @param array     $options    An array of configuration options for the Queue
-     * @param mixed     $client     A Queue Client for the provider
-     * @param Cache     $cache      An instance of Doctrine\Common\Cache\Cache
-     * @param Logger    $logger     An instance of Symfony\Bridge\Mongolog\Logger
+     * @param string $name    Name of the Queue the provider is for
+     * @param array  $options An array of configuration options for the Queue
+     * @param mixed  $client  A Queue Client for the provider
+     * @param Cache  $cache   An instance of Doctrine\Common\Cache\Cache
+     * @param Logger $logger  An instance of Symfony\Bridge\Mongolog\Logger
      */
     public function __construct($name, array $options, $client, Cache $cache, Logger $logger);
 
@@ -141,9 +141,9 @@ interface ProviderInterface
      * This method wraps the Logger to check if logging is enabled and adds
      * the Queue name and Provider automatically to the context
      *
-     * @param int       $level      The log level
-     * @param string    $message    The message to log
-     * @param array     $context    The log context
+     * @param int    $level   The log level
+     * @param string $message The message to log
+     * @param array  $context The log context
      *
      * @return bool Whether the record was logged
      */

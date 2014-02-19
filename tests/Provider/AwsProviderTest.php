@@ -22,9 +22,6 @@
 
 namespace Uecode\Bundle\QPushBundle\Tests\Provider;
 
-use Doctrine\Common\Cache\PhpFileCache;
-use Symfony\Bridge\Monolog\Logger;
-
 use Uecode\Bundle\QPushBundle\Provider\AwsProvider;
 
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
@@ -54,9 +51,6 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider = $this->getAwsProvider();
     }
 
-    /**
-     * @todo: Need to remove cache
-     */
     public function tearDown()
     {
         $this->provider = null;
@@ -84,16 +78,20 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
         $client = new AwsMockClient([
             'key'       => '123_this_is_a_key',
             'secret'    => '123_this_is_a_secret',
-            'region'    => 'ue-east-1'
+            'region'    => 'us-east-1'
         ]);
 
-        return new AwsProvider(
-            'test', 
-            $options,
-            $client,
-            new PhpFileCache('/tmp', mt_rand() . 'qpush.test.php'),
-            new Logger('qpush.test')
+        $cache = $this->getMock(
+            'Doctrine\Common\Cache\PhpFileCache',
+            [],
+            ['/tmp', 'qpush.aws.test.php']
         );
+
+        $logger = $this->getMock(
+            'Symfony\Bridge\Monolog\Logger', [], ['qpush.test']
+        );
+
+        return new AwsProvider('test', $options, $client, $cache, $logger);
     }
 
     public function testGetProvider()
@@ -156,6 +154,13 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
             'push_notifications' => false
         ]);
 
+        $stub = $provider->getCache();
+        $stub->expects($this->once())
+             ->method('contains')
+             ->will($this->returnValue(true));
+
+        $this->assertTrue($provider->queueExists());
+
         $provider->createQueue();
         $this->assertTrue($provider->queueExists());
 
@@ -189,14 +194,24 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
      * @covers Uecode\Bundle\QPushBundle\Provider\AwsProvider::createTopic
      * @covers Uecode\Bundle\QPushBundle\Provider\AwsProvider::topicExists
      */
-    public function testCreatePolicy()
+    public function testCreateTopic()
     {
         $provider = $this->getAwsProvider();
 
         $this->assertFalse($provider->topicExists());
 
+        $stub = $provider->getCache();
+        $stub->expects($this->once())
+             ->method('contains')
+             ->will($this->returnValue(true));
+
+        $this->assertTrue($provider->topicExists());
+
         $provider->createTopic();
         $this->assertTrue($provider->topicExists());
+
+        $provider = $this->getAwsProvider(['push_notifications' => false]);
+        $this->assertFalse($provider->createTopic());
     }
 
     public function testGetTopicSubscriptions()
@@ -214,7 +229,7 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $expected,
-            $subscriptions    
+            $subscriptions
         );
     }
 
@@ -231,22 +246,44 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testUnsubscribeFromTopic()
     {
-        $unsubscribed = $this->provider->unsubscribeFromTopic(
-            'long_topic_arn_string',
-            'http',
-            'http://long_url_string.com'
+        $this->assertTrue(
+            $this->provider->unsubscribeFromTopic(
+                'long_topic_arn_string',
+                'http',
+                'http://long_url_string.com'
+            )
         );
 
-        $this->assertTrue($unsubscribed);
+        $this->assertFalse(
+            $this->provider->unsubscribeFromTopic(
+                'long_topic_arn_string',
+                'http',
+                'http://bad_long_url_string.com'
+            )
+        );
     }
 
-    public function testOnNotification()
+    public function testOnNotificationSubscriptionEvent()
     {
         $this->provider->onNotification(new NotificationEvent(
             'test',
             NotificationEvent::TYPE_SUBSCRIPTION,
             new Notification(123, "test", [])
         ));
+    }
+
+    public function testOnNotificationMessageEvent()
+    {
+        $event = new NotificationEvent(
+            'test',
+            NotificationEvent::TYPE_MESSAGE,
+            new Notification(123, "test", [])
+        );
+        $event->setDispatcher(
+            $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface')
+        );
+
+        $this->provider->onNotification($event);
     }
 
     public function testOnMessageReceived()

@@ -57,7 +57,7 @@ class NotificationEventTest extends \PHPUnit_Framework_TestCase
             new Notification(123, ['foo' => 'bar'], ['bar' => 'baz'])
         );
         $this->assertInstanceOf('Uecode\Bundle\QPushBundle\Event\NotificationEvent', $event);
-    
+
         $event = new NotificationEvent(
             'test',
             NotificationEvent::TYPE_MESSAGE,

@@ -22,10 +22,7 @@
 
 namespace Uecode\Bundle\QPushBundle\Tests\Provider;
 
-use Doctrine\Common\Cache\PhpFileCache;
-use Symfony\Bridge\Monolog\Logger;
-
-use Uecode\Bundle\QpushBundle\Provider\ProviderInterface;
+use Uecode\Bundle\QPushBundle\Provider\ProviderInterface;
 
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
@@ -44,18 +41,49 @@ class AbstractProviderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->provider = new TestProvider(
-            'test', 
-            ['logging_enabled' => false],
-            new \stdClass,
-            new PhpFileCache('/tmp', 'qpush.test.php'),
-            new Logger('qpush.test')
-        );  
+        $this->provider = $this->getTestProvider();
     }
 
     public function tearDown()
     {
         $this->provider = null;
+    }
+
+    private function getTestProvider(array $options = [])
+    {
+
+        $options = array_merge(
+            [
+                'logging_enabled'       => false,
+                'push_notifications'    => true,
+                'notification_retries'  => 3,
+                'message_delay'         => 0,
+                'message_timeout'       => 30,
+                'message_expiration'    => 604800,
+                'messages_to_receive'   => 1,
+                'receive_wait_time'     => 3,
+                'subscribers'           => [
+                    [ 'protocol' => 'http', 'endpoint' => 'http://fake.com' ]
+                ]
+            ],
+            $options
+        );
+
+        return new TestProvider(
+            'test',
+            $options,
+            new \stdClass,
+            $this->getMock(
+                'Doctrine\Common\Cache\PhpFileCache',
+                [],
+                ['/tmp', 'qpush.aws.test.php']
+            ),
+            $this->getMock(
+                'Symfony\Bridge\Monolog\Logger',
+                [],
+                ['qpush.test']
+            )
+        );
     }
 
     public function testGetName()
@@ -77,7 +105,6 @@ class AbstractProviderTest extends \PHPUnit_Framework_TestCase
         $options = $this->provider->getOptions();
 
         $this->assertTrue(is_array($options));
-        $this->assertEquals(['logging_enabled' => false], $options);
     }
 
     public function testGetCache()
@@ -98,14 +125,9 @@ class AbstractProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->provider->log(100, 'test log', []));
 
-        $provider = new TestProvider(
-            'test', 
-            ['logging_enabled' => true],
-            new \stdClass,
-            new PhpFileCache('/tmp', 'qpush.test.php'),
-            new Logger('qpush.test')
-        );  
-        $this->assertTrue($provider->log(100, 'test log', []));
+        $provider = $this->getTestProvider(['logging_enabled' => true]);
+
+        $this->assertNull($provider->log(100, 'test log', []));
     }
 
     public function testGetProvider()

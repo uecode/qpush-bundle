@@ -46,7 +46,7 @@ class SqsMockClient
     public function sendMessage(array $args)
     {
         return new ArrayCollection([
-            'MessageId' => 123    
+            'MessageId' => 123
         ]);
     }
 
@@ -59,6 +59,12 @@ class SqsMockClient
                     'ReceiptHandle' => 'long_receipt_handle_string',
                     'MD5OfBody'     => 'long_md5_hash_string',
                     'Body'          => json_encode(['foo' => 'bar'])
+                ],
+                [
+                    'MessageId'     => 123,
+                    'ReceiptHandle' => 'long_receipt_handle_string',
+                    'MD5OfBody'     => 'long_md5_hash_string',
+                    'Body'          => json_encode(['Message' => json_encode(['foo' => 'bar'])])
                 ]
             ]
         ]);

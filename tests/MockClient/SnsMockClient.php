@@ -41,7 +41,7 @@ class SnsMockClient
     public function publish(array $args)
     {
         return new ArrayCollection([
-            'MessageId' => 123    
+            'MessageId' => 123
         ]);
     }
 
@@ -62,7 +62,7 @@ class SnsMockClient
                     'Protocol'          => 'http',
                     'Endpoint'          => 'http://long_url_string.com',
                     'TopicArn'          => 'long_topic_arn_string'
-                ] 
+                ]
             ]
         ]);
     }

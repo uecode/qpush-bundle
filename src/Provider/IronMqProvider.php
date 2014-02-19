@@ -63,7 +63,6 @@ class IronMqProvider extends AbstractProvider
         $this->logger   = $logger;
     }
 
-
     public function getProvider()
     {
         return "IronMQ";
@@ -89,8 +88,7 @@ class IronMqProvider extends AbstractProvider
                 'subscribers'   => []
             ];
 
-            foreach($this->options['subscribers'] as $subscriber)
-            {
+            foreach ($this->options['subscribers'] as $subscriber) {
                 if ($subscriber['protocol'] == "email") {
                     throw new \InvalidArgumentException(
                         'IronMQ only supports `http` or `https` subscribers!'
@@ -101,7 +99,7 @@ class IronMqProvider extends AbstractProvider
             }
 
         } else {
-            $params = ['push_type' => 'pull'];  
+            $params = ['push_type' => 'pull'];
         }
 
         $result = $this->ironmq->updateQueue($this->getNameWithPrefix(), $params);
@@ -123,7 +121,7 @@ class IronMqProvider extends AbstractProvider
         // Catch `queue not found` exceptions, throw the rest.
         try {
             $this->ironmq->deleteQueue($this->getNameWithPrefix());
-        } catch( \Exception $e) {
+        } catch ( \Exception $e) {
             if ($e->getMessage() == 'http error: 404 | {"msg":"Queue not found"}') {
                 $this->log(400, "Queue did not exist");
             } else {
@@ -153,7 +151,7 @@ class IronMqProvider extends AbstractProvider
         if (!$this->queueExists()) {
             $this->create();
         }
-    
+
         $result = $this->ironmq->postMessage(
             $this->getNameWithPrefix(),
             json_encode([$this->name => $message]),
@@ -163,7 +161,7 @@ class IronMqProvider extends AbstractProvider
                 'expires_in'    => $this->options['message_expiration']
             ]
         );
-    
+
         $context = [
             'message_id'    => $result->id,
             'publish_time'  => microtime(true) - $publishStart
@@ -191,7 +189,7 @@ class IronMqProvider extends AbstractProvider
         );
 
         // Convert to Message Class
-        foreach($messages as &$message) {
+        foreach ($messages as &$message) {
             $id         = $message->id;
             $body       = $message->body;
             $metadata   = [
@@ -202,7 +200,7 @@ class IronMqProvider extends AbstractProvider
 
             $message = new Message($id, $body, $metadata);
 
-            $this->log(200, "Message has been received.", ['message_id' => $result->id]);
+            $this->log(200, "Message has been received.", ['message_id' => $id]);
         }
 
         return $messages;
@@ -213,13 +211,16 @@ class IronMqProvider extends AbstractProvider
      */
     public function delete($id)
     {
-        if (!$this->queueExists()) {
-            return false;
+        try {
+            $result = $this->ironmq->deleteMessage($this->getNameWithPrefix(), $id);
+            $this->log(200, "Message has been deleted.", ['message_id' => $result->id]);
+        } catch ( \Exception $e) {
+            if ($e->getMessage() == 'http error: 404 | {"msg":"Queue not found"}') {
+                $this->log(400, "Queue did not exist");
+            } else {
+                throw $e;
+            }
         }
-
-        $result = $this->ironmq->deleteMessage($this->getNameWithPrefix(), $id);
-
-        $this->log(200, "Message has been deleted.", ['message_id' => $result->id]);
 
         return true;
     }

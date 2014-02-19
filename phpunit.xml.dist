@@ -10,6 +10,13 @@
          syntaxCheck="false"
          bootstrap="tests/bootstrap.php"
         >
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src/Provider</directory>
+            <directory suffix=".php">src/Message</directory>
+            <directory suffix=".php">src/Event</directory>
+        </whitelist>
+    </filter>
     <php>
     </php>
     <testsuites>

@@ -51,11 +51,6 @@ class TestProvider extends AbstractProvider
         $this->logger   = $logger;
     }
 
-    public function log($level, $message, array $context)
-    {
-        return $this->options['logging_enabled'];
-    }
-
     public function getProvider()
     {
         return 'TestProvider';

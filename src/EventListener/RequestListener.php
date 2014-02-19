@@ -31,7 +31,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Uecode\Bundle\QPushBundle\Message\Message;
 use Uecode\Bundle\QPushBundle\Message\Notification;
 use Uecode\Bundle\QPushBundle\Event\Events;
-use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
 
 /**
@@ -58,8 +57,8 @@ class RequestListener
     /**
      * Constructor.
      *
-     * @param EventDispatcherInterface  $dispatcher A Symfony Event Dispatcher
-     * @param Logger                    $logger     A Monolog Logger
+     * @param EventDispatcherInterface $dispatcher A Symfony Event Dispatcher
+     * @param Logger                   $logger     A Monolog Logger
      */
     public function __construct(EventDispatcherInterface $dispatcher, Logger $logger)
     {
@@ -79,13 +78,13 @@ class RequestListener
         }
 
         if ($event->getRequest()->headers->has('x-amz-sns-message-type')) {
-            $this->handleSnsNotifications($event);
-            $event->setResponse(new Response("", 200));
+            $result = $this->handleSnsNotifications($event);
+            $event->setResponse(new Response($result, 200));
         }
 
         if ($event->getRequest()->headers->has('iron-message-id')) {
-            $this->handleIronMqNotifications($event);
-            $event->setResponse(new Response("", 200));
+            $result = $this->handleIronMqNotifications($event);
+            $event->setResponse(new Response($result, 200));
         }
     }
 
@@ -106,7 +105,7 @@ class RequestListener
             'iron-subscriber-message-id'    => $headers->get('iron-subscriber-message-id'),
             'iron-subscriber-message-url'   => $headers->get('iron-subscriber-message-url')
         ];
-        
+
         $notification = new Notification(
             $messageId,
             $message[$queue],
@@ -117,6 +116,8 @@ class RequestListener
             Events::Notification($queue),
             new NotificationEvent($queue, NotificationEvent::TYPE_MESSAGE, $notification)
         );
+
+        return "IronMQ Notification Received.";
     }
 
     /**
@@ -153,30 +154,33 @@ class RequestListener
             );
 
             $this->dispatcher->dispatch(
-                Events::Notification($queue), 
+                Events::Notification($queue),
                 new NotificationEvent($queue, NotificationEvent::TYPE_MESSAGE, $notification)
             );
 
-        } else {
-            // For subscription notifications, we need to parse the Queue from 
-            // the Topic ARN
-            $arnParts           = explode(':', $notification['TopicArn']);
-            $last               = end($arnParts);
-            $queue              = str_replace('qpush_', '', $last);
-
-            // Get the token for the Subscription Confirmation
-            $metadata['Token']  = $notification['Token'];
-
-            $notification = new Notification(
-                $notification['MessageId'],
-                $notification['Message'],
-                $metadata
-            );
-
-            $this->dispatcher->dispatch(
-                Events::Notification($queue), 
-                new NotificationEvent($queue, NotificationEvent::TYPE_SUBSCRIPTION, $notification)
-            );
+            return "SNS Message Notification Received.";
         }
+
+        // For subscription notifications, we need to parse the Queue from
+        // the Topic ARN
+        $arnParts           = explode(':', $notification['TopicArn']);
+        $last               = end($arnParts);
+        $queue              = str_replace('qpush_', '', $last);
+
+        // Get the token for the Subscription Confirmation
+        $metadata['Token']  = $notification['Token'];
+
+        $notification = new Notification(
+            $notification['MessageId'],
+            $notification['Message'],
+            $metadata
+        );
+
+        $this->dispatcher->dispatch(
+            Events::Notification($queue),
+            new NotificationEvent($queue, NotificationEvent::TYPE_SUBSCRIPTION, $notification)
+        );
+
+        return "SNS Subscription Confirmation Received.";
     }
 }
