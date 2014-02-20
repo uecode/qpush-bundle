@@ -68,17 +68,16 @@ class QPushCustomExtension extends Extension
             $values['options']['logging_enabled'] = $config['logging_enabled'];
 
             $provider = $values['provider'];
-            switch($provider)
-            {
+            switch ($provider) {
                 case 'aws':
-                    $class  = $container->getParameter('uecode_qpush.provider.aws'); 
+                    $class  = $container->getParameter('uecode_qpush.provider.aws');
                     $client = $this->createAwsClient(
                         $config['providers'][$provider],
                         $container
                     );
                     break;
                 case 'ironmq':
-                    $class  = $container->getParameter('uecode_qpush.provider.ironmq'); 
+                    $class  = $container->getParameter('uecode_qpush.provider.ironmq');
                     $client = $this->createIronMQClient(
                         $config['providers'][$provider],
                         $container
@@ -117,8 +116,8 @@ class QPushCustomExtension extends Extension
     /**
      * Creates a definition for the AWS provider
      *
-     * @param array             $config     A Configuration array for the client
-     * @param ContainerBuilder  $container  The container
+     * @param array            $config    A Configuration array for the client
+     * @param ContainerBuilder $container The container
      *
      * return Definition
      */
@@ -163,8 +162,8 @@ class QPushCustomExtension extends Extension
     /**
      * Creates a definition for the IronMQ provider
      *
-     * @param array             $config     A Configuration array for the provider
-     * @param ContainerBuilder  $container  The container
+     * @param array            $config    A Configuration array for the provider
+     * @param ContainerBuilder $container The container
      *
      * return Definition
      */

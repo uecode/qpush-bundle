@@ -60,7 +60,7 @@ abstract class AbstractProvider implements ProviderInterface
 
     /**
      * Monolog Logger
-     * 
+     *
      * @var Logger
      */
     protected $logger;

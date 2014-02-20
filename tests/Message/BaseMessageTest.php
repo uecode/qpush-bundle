@@ -59,7 +59,7 @@ abstract class BaseMessageTest extends \PHPUnit_Framework_TestCase
 
         $this->assertContains(gettype($body), ['string', 'array']);
     }
-    
+
     /**
      * Test that the Message Metadata is an ArrayCollection
      */

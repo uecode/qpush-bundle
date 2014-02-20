@@ -65,14 +65,13 @@ class NotificationEvent extends Event
     /**
      * Constructor
      *
-     * @param string        $queueName      The Queue Name
-     * @param string        $type           The Notification Type
-     * @param Notification  $notification   The Notification
+     * @param string       $queueName    The Queue Name
+     * @param string       $type         The Notification Type
+     * @param Notification $notification The Notification
      */
     public function __construct($queueName, $type, Notification $notification)
     {
-        if (!in_array($type, [self::TYPE_SUBSCRIPTION, self::TYPE_MESSAGE]))
-        {
+        if (!in_array($type, [self::TYPE_SUBSCRIPTION, self::TYPE_MESSAGE])) {
             throw new \InvalidArgumentException(
                 sprintf("Invalid notification type given! (%s)", $type)
             );

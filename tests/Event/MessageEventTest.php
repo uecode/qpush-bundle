@@ -49,7 +49,7 @@ class MessageEventTest extends \PHPUnit_Framework_TestCase
     {
         $event = new MessageEvent('test', new Message(123, ['foo' => 'bar'], ['bar' => 'baz']));
         $this->assertInstanceOf('Uecode\Bundle\QPushBundle\Event\MessageEvent', $event);
-    
+
         $this->setExpectedException('PHPUnit_Framework_Error');
         $event = new MessageEvent('test', ['bad argument']);
     }

@@ -24,7 +24,6 @@ namespace Uecode\Bundle\QPushBundle\Provider;
 
 use Aws\Common\Aws;
 use Aws\Sqs\SqsClient;
-use Aws\Sns\SnsClient;
 
 use Doctrine\Common\Cache\Cache;
 use Symfony\Bridge\Monolog\Logger;
@@ -166,7 +165,7 @@ class AwsProvider extends AbstractProvider
         $publishStart = microtime(true);
 
         // ensures that the SQS Queue and SNS Topic exist
-        if(!$this->queueExists()) {
+        if (!$this->queueExists()) {
             $this->create();
         }
 
@@ -199,7 +198,7 @@ class AwsProvider extends AbstractProvider
         $result = $this->sqs->sendMessage([
             'QueueUrl'      => $this->queueUrl,
             'MessageBody'   => json_encode($message),
-            'DelaySeconds'  => $this->options['message_delay'] 
+            'DelaySeconds'  => $this->options['message_delay']
         ]);
 
         $context = [
@@ -208,7 +207,6 @@ class AwsProvider extends AbstractProvider
             'push_notifications'    => $this->options['push_notifications']
         ];
         $this->log(200,"Message published to SQS", $context);
-
 
         return $result->get('MessageId');
     }
@@ -237,7 +235,7 @@ class AwsProvider extends AbstractProvider
         $messages = $result->get('Messages') ?: [];
 
         // Convert to Message Class
-        foreach($messages as &$message) {
+        foreach ($messages as &$message) {
             $id = $message['MessageId'];
             $metadata = [
                 'ReceiptHandle' => $message['ReceiptHandle'],
@@ -323,7 +321,7 @@ class AwsProvider extends AbstractProvider
             'QueueName' => $this->getNameWithPrefix(),
             'Attributes'    => [
                 'VisibilityTimeout'             => $this->options['message_timeout'],
-                'MessageRetentionPeriod'        => $this->options['message_expiration'], 
+                'MessageRetentionPeriod'        => $this->options['message_expiration'],
                 'ReceiveMessageWaitTimeSeconds' => $this->options['receive_wait_time']
             ]
         ]);
@@ -522,15 +520,14 @@ class AwsProvider extends AbstractProvider
      * For Subscription notifications, this method will automatically confirm
      * the Subscription request
      *
-     * For Message notifications, this method polls the queue and dispatches 
+     * For Message notifications, this method polls the queue and dispatches
      * the `{queue}.message_received` event for each message retrieved
      *
      * @param NotificationEvent $event The Notification Event
      */
     public function onNotification(NotificationEvent $event)
     {
-        if (NotificationEvent::TYPE_SUBSCRIPTION == $event->getType())
-        {
+        if (NotificationEvent::TYPE_SUBSCRIPTION == $event->getType()) {
             $topicArn   = $event->getNotification()->getMetadata()->get('TopicArn');
             $token      = $event->getNotification()->getMetadata()->get('Token');
 
@@ -541,6 +538,7 @@ class AwsProvider extends AbstractProvider
 
             $context = ['TopicArn' => $topicArn];
             $this->log(200,"Subscription to SNS Confirmed", $context);
+
             return;
         }
 
