@@ -249,7 +249,7 @@ take a single argument, an instance of `Uecode\Bundle\QPushBundle\Event\MessageE
 ```php
 #src/My/Bundle/ExampleBundle/Service/MyService.php
 
-use Uecode\Bundle\QpushBundle\Event\MessageEvent;
+use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 
 // ...
 
@@ -280,7 +280,7 @@ the event propagation to avoid other services (including the Provider service) f
 ```php
 #src/My/Bundle/ExampleBundle/Service/MyService.php
 
-use Uecode\Bundle\QpushBundle\Event\MessageEvent;
+use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 
 // ...
 
