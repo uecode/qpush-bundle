@@ -127,25 +127,33 @@ class AwsProvider extends AbstractProvider
      */
     public function destroy()
     {
-        // Delete the SQS Queue
-        $result = $this->sqs->deleteQueue([
-            'QueueUrl' => $this->queueUrl
-        ]);
+        if ($this->queueExists()) {
+            // Delete the SQS Queue
+            $result = $this->sqs->deleteQueue([
+                'QueueUrl' => $this->queueUrl
+            ]);
 
-        $key = $this->getNameWithPrefix() . '_url';
-        $this->cache->delete($key);
+            $key = $this->getNameWithPrefix() . '_url';
+            $this->cache->delete($key);
 
-        $this->log(200,"SQS Queue removed", ['QueueUrl' => $this->queueUrl]);
+            $this->log(200,"SQS Queue removed", ['QueueUrl' => $this->queueUrl]);
+        }
 
-        // Delete the SNS Topic
-        $result = $this->sns->deleteTopic([
-            'TopicArn' => $this->topicArn
-        ]);
+        if ($this->topicExists() || !empty($this->queueUrl)) {
+            // Delete the SNS Topic
+            $topicArn = !empty($this->topicArn)
+                ? $this->topicArn
+                : str_replace('sqs', 'sns', $this->queueUrl);
 
-        $key = $this->getNameWithPrefix() . '_arn';
-        $this->cache->delete($key);
+            $result = $this->sns->deleteTopic([
+                'TopicArn' => $topicArn
+            ]);
 
-        $this->log(200,"SNS Topic removed", ['TopicArn' => $this->topicArn]);
+            $key = $this->getNameWithPrefix() . '_arn';
+            $this->cache->delete($key);
+
+            $this->log(200,"SNS Topic removed", ['TopicArn' => $topicArn]);
+        }
 
         return true;
     }
@@ -165,7 +173,9 @@ class AwsProvider extends AbstractProvider
         $publishStart = microtime(true);
 
         // ensures that the SQS Queue and SNS Topic exist
-        if (!$this->queueExists()) {
+        if (!$this->queueExists()
+            || ($this->options['push_notifications'] && !$this->topicExists()))
+        {
             $this->create();
         }
 
@@ -301,6 +311,14 @@ class AwsProvider extends AbstractProvider
         if ($this->cache->contains($key)) {
             $this->queueUrl = $this->cache->fetch($key);
 
+            return true;
+        }
+
+        $result = $this->sqs->getQueueUrl([
+            'QueueName' => $this->getName()
+        ]);
+
+        if($this->queueUrl = $result->get('QueueUrl')) {
             return true;
         }
 

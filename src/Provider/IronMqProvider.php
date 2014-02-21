@@ -122,7 +122,7 @@ class IronMqProvider extends AbstractProvider
         try {
             $this->ironmq->deleteQueue($this->getNameWithPrefix());
         } catch ( \Exception $e) {
-            if ($e->getMessage() == 'http error: 404 | {"msg":"Queue not found"}') {
+            if (false !== strpos($e->getMessage(), "Queue not found")) {
                 $this->log(400, "Queue did not exist");
             } else {
                 throw $e;
@@ -213,9 +213,9 @@ class IronMqProvider extends AbstractProvider
     {
         try {
             $result = $this->ironmq->deleteMessage($this->getNameWithPrefix(), $id);
-            $this->log(200, "Message has been deleted.", ['message_id' => $result->id]);
+            $this->log(200, "Message deleted.", ['message_id' => $result->id]);
         } catch ( \Exception $e) {
-            if ($e->getMessage() == 'http error: 404 | {"msg":"Queue not found"}') {
+            if (false !== strpos($e->getMessage(), "Queue not found")) {
                 $this->log(400, "Queue did not exist");
             } else {
                 throw $e;
@@ -272,7 +272,11 @@ class IronMqProvider extends AbstractProvider
         );
 
         $messageEvent = new MessageEvent($this->name, $message);
-        $event->getDispatcher()->dispatch(Events::Message($this->name), $messageEvent);
+
+        $event->getDispatcher()->dispatch(
+            Events::Message($this->name),
+            $messageEvent
+        );
     }
 
     /**

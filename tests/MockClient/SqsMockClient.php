@@ -38,6 +38,13 @@ class SqsMockClient
         return "long_queue_arn_string";
     }
 
+    public function getQueueUrl($name)
+    {
+        return new ArrayCollection([
+            'QueueUrl' => 'long_queue_url_string'
+        ]);
+    }
+
     public function deleteQueue(array $args)
     {
         return true;
