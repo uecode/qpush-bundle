@@ -31,11 +31,11 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
 
 /**
- * QPushCustomExtension
+ * UecodeQPushExtension
  *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
-class QPushCustomExtension extends Extension
+class UecodeQPushExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container)
     {

@@ -24,11 +24,9 @@ namespace Uecode\Bundle\QPushBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-
-use Uecode\Bundle\QPushBundle\DependencyInjection\QPushCustomExtension;
-use Uecode\Bundle\QPushBundle\DependencyInjection\Compiler\QPushCompilerPass;
-
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass;
+use Uecode\Bundle\QPushBundle\DependencyInjection\Compiler\QPushCompilerPass;
+use Uecode\Bundle\QPushBundle\DependencyInjection\UecodeQPushExtension;
 
 /**
  * UecodeQPushBundle
@@ -38,6 +36,15 @@ use Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass;
 class UecodeQPushBundle extends Bundle
 {
     /**
+     * {@inlineDoc}
+     */
+    public function __construct()
+    {
+        // Setting extension to bypass alias convention check
+        $this->extension = new UecodeQPushExtension();
+    }
+
+    /**
      * Adds the Compiler Passes for the QPushBundle
      *
      * @param ContainerBuilder $container
@@ -45,8 +52,6 @@ class UecodeQPushBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
-
-        $container->registerExtension(new QPushCustomExtension);
 
         $container->addCompilerPass(new QPushCompilerPass);
         $container->addCompilerPass(
