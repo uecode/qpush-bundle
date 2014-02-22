@@ -1,0 +1,246 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Configure the Bundle &mdash; QPush Bundle 1.1.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.1.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="QPush Bundle 1.1.3 documentation" href="index.html" />
+    <link rel="next" title="AWS Provider" href="aws-provider.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="aws-provider.html" title="AWS Provider"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">QPush Bundle 1.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="configure-the-bundle">
+<h1>Configure the Bundle<a class="headerlink" href="#configure-the-bundle" title="Permalink to this headline">¶</a></h1>
+<p>The bundle allows you to specify different Message Queue providers - however,
+Amazon AWS and IronMQ are the only ones currently supported.</p>
+<p>We are actively looking to add more and would be more than happy to accept contributions.</p>
+<div class="section" id="providers">
+<h2>Providers<a class="headerlink" href="#providers" title="Permalink to this headline">¶</a></h2>
+<p>This bundle allows you to configure and use multiple supported providers with in the same
+application. Each queue that you create is attached to one of your registered providers
+and can have its own configuration options.</p>
+<p>Providers may have their own dependencies that should be added to your <tt class="docutils literal"><span class="pre">composer.json</span></tt> file.</p>
+<p>For specific instructions on how to configure each provider, please view their documents.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="aws-provider.html">AWS Provider</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iron-mq-provider.html">IronMQ Provider</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="caching">
+<h2>Caching<a class="headerlink" href="#caching" title="Permalink to this headline">¶</a></h2>
+<p>Providers can leverage a caching layer to limit the amount of calls to the Message Queue
+for basic lookup functionality for things like the Queue ARN, etc.</p>
+<p>By default the library will attempt to use file cache, however you can pass your
+own cache service, as long as its an instance of <tt class="docutils literal"><span class="pre">Doctrine\Common\Cache\Cache</span></tt>.</p>
+<p>The configuration parameter <tt class="docutils literal"><span class="pre">cache_service</span></tt> expects the container service id of a registered
+Cache service. See below.</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="c1">#app/config.yml</span>
+
+<span class="l-Scalar-Plain">services</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">my_cache_service</span><span class="p-Indicator">:</span>
+        <span class="l-Scalar-Plain">class</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">My\Caching\CacheService</span>
+
+<span class="l-Scalar-Plain">uecode_qpush</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">cache_service</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">my_cache_service</span>
+</pre></div>
+</div>
+<p><strong>Note:</strong> <em>Though the Queue Providers will attempt to create queues if they do not exist when publishing or receiving messages,
+it is highly recommended that you run the included console command to build queues and warm cache from the CLI before hand.</em></p>
+</div>
+<div class="section" id="queue-options">
+<h2>Queue Options<a class="headerlink" href="#queue-options" title="Permalink to this headline">¶</a></h2>
+<p>Each queue can their have own options that determine how messages are published or receieved.
+The options and their descriptions are listed below.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="69%" />
+<col width="11%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+<th class="head">Default Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">push_notifications</span></tt></td>
+<td>Whether or not to POST notifications to subscribers of a Queue</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">notification_retries</span></tt></td>
+<td>How many attempts notifications are resent in case of errors - if supported</td>
+<td><tt class="docutils literal"><span class="pre">3</span></tt></td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">message_delay</span></tt></td>
+<td>Time in seconds before a published Message is available to be read in a Queue</td>
+<td><tt class="docutils literal"><span class="pre">0</span></tt></td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">message_timeout</span></tt></td>
+<td>Time in seconds a worker has to delete a Message before its available to other workers</td>
+<td><tt class="docutils literal"><span class="pre">30</span></tt></td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">message_expiration</span></tt></td>
+<td>Time in seconds that Messages may remain in the Queue before being removed</td>
+<td><tt class="docutils literal"><span class="pre">604800</span></tt></td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">messages_to_receive</span></tt></td>
+<td>Maximum amount of messages that can be received when polling the queue</td>
+<td><tt class="docutils literal"><span class="pre">1</span></tt></td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">receive_wait_time</span></tt></td>
+<td>If supported, time in seconds to leave the polling request open - for long polling</td>
+<td><tt class="docutils literal"><span class="pre">3</span></tt></td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">subscribers</span></tt></td>
+<td>An array of Subscribers, containing an <tt class="docutils literal"><span class="pre">endpoint</span></tt> and <tt class="docutils literal"><span class="pre">protocol</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">empty</span></tt></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="example-configuration">
+<h2>Example Configuration<a class="headerlink" href="#example-configuration" title="Permalink to this headline">¶</a></h2>
+<p>However, a working configuration would look like the following</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">uecode_qpush</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">cache_service</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">null</span>
+    <span class="l-Scalar-Plain">logging_enabled</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">true</span>
+    <span class="l-Scalar-Plain">providers</span><span class="p-Indicator">:</span>
+        <span class="l-Scalar-Plain">aws</span><span class="p-Indicator">:</span>
+            <span class="l-Scalar-Plain">key</span><span class="p-Indicator">:</span>
+            <span class="l-Scalar-Plain">secret</span><span class="p-Indicator">:</span>
+            <span class="l-Scalar-Plain">region</span><span class="p-Indicator">:</span>
+        <span class="l-Scalar-Plain">ironmq</span><span class="p-Indicator">:</span>
+            <span class="l-Scalar-Plain">token</span><span class="p-Indicator">:</span>
+            <span class="l-Scalar-Plain">project_id</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">queues</span><span class="p-Indicator">:</span>
+        <span class="l-Scalar-Plain">default</span><span class="p-Indicator">:</span>
+            <span class="l-Scalar-Plain">provider</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">aws</span> <span class="c1">#or ironmq</span>
+            <span class="l-Scalar-Plain">options</span><span class="p-Indicator">:</span>
+                <span class="l-Scalar-Plain">push_notifications</span><span class="p-Indicator">:</span>     <span class="l-Scalar-Plain">true</span>
+                <span class="l-Scalar-Plain">notification_retries</span><span class="p-Indicator">:</span>   <span class="l-Scalar-Plain">3</span>
+                <span class="l-Scalar-Plain">message_delay</span><span class="p-Indicator">:</span>          <span class="l-Scalar-Plain">0</span>
+                <span class="l-Scalar-Plain">message_timeout</span><span class="p-Indicator">:</span>        <span class="l-Scalar-Plain">30</span>
+                <span class="l-Scalar-Plain">message_expiration</span><span class="p-Indicator">:</span>     <span class="l-Scalar-Plain">604800</span>
+                <span class="l-Scalar-Plain">messages_to_receive</span><span class="p-Indicator">:</span>    <span class="l-Scalar-Plain">1</span>
+                <span class="l-Scalar-Plain">receive_wait_time</span><span class="p-Indicator">:</span>      <span class="l-Scalar-Plain">3</span>
+                <span class="l-Scalar-Plain">subscribers</span><span class="p-Indicator">:</span>
+                    <span class="p-Indicator">-</span> <span class="p-Indicator">{</span> <span class="nv">endpoint</span><span class="p-Indicator">:</span> <span class="nv">http</span><span class="p-Indicator">:</span><span class="nv">//example1.com/qpush</span><span class="p-Indicator">,</span> <span class="nv">protocol</span><span class="p-Indicator">:</span> <span class="nv">http</span> <span class="p-Indicator">}</span>
+                    <span class="p-Indicator">-</span> <span class="p-Indicator">{</span> <span class="nv">endpoint</span><span class="p-Indicator">:</span> <span class="nv">http</span><span class="p-Indicator">:</span><span class="nv">//example2.com/qpush</span><span class="p-Indicator">,</span> <span class="nv">protocol</span><span class="p-Indicator">:</span> <span class="nv">http</span> <span class="p-Indicator">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Configure the Bundle</a><ul>
+<li><a class="reference internal" href="#providers">Providers</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#caching">Caching</a></li>
+<li><a class="reference internal" href="#queue-options">Queue Options</a></li>
+<li><a class="reference internal" href="#example-configuration">Example Configuration</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="previous chapter">Installation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="aws-provider.html"
+                        title="next chapter">AWS Provider</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/configuration.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="aws-provider.html" title="AWS Provider"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             >previous</a> |</li>
+        <li><a href="index.html">QPush Bundle 1.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Keith Kirk.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

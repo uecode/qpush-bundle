@@ -25,7 +25,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="QPush Bundle 1.1.3 documentation" href="#" /> 
+    <link rel="top" title="QPush Bundle 1.1.3 documentation" href="#" />
+    <link rel="next" title="Installation" href="installation.html" /> 
   </head>
   <body>
     <div class="related">
@@ -34,6 +35,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             accesskey="N">next</a> |</li>
         <li><a href="#">QPush Bundle 1.1.3 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,453 +57,41 @@ cluster of workers.</p>
 services and relying on Symfony&#8217;s event dispatching - without needing to run a daemon or background
 process to continuously poll your queue.</p>
 </div>
-<div class="section" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>The bundle should be installed through composer.</p>
-<p><strong>Add the bundle to composer</strong></p>
-<div class="highlight-js"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s2">&quot;require&quot;</span><span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;uecode/qpush-bundle&quot;</span><span class="o">:</span> <span class="s2">&quot;~1.1.0&quot;</span><span class="p">,</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p><strong>Update AppKernel.php of your Symfony Application</strong></p>
-<p>Add the <tt class="docutils literal"><span class="pre">UecodeQPushBundle</span></tt> to your kernel bootstrap sequence, in the <tt class="docutils literal"><span class="pre">$bundles</span></tt> array</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">public function registerBundles()</span>
-<span class="x">{</span>
-<span class="x">    $bundles = array(</span>
-<span class="x">        // ...</span>
-<span class="x">        new Uecode\Bundle\QPushBundle\UecodeQPushBundle(),</span>
-<span class="x">    );</span>
-
-<span class="x">    return $bundles;</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="configure-the-bundle">
-<h1>Configure the Bundle<a class="headerlink" href="#configure-the-bundle" title="Permalink to this headline">¶</a></h1>
-<p>The bundle allows you to specify different Message Queue providers - however,
-Amazon AWS and IronMQ are the only ones currently supported.</p>
-<p>We are actively looking to add more and would be more than happy to accept contributions.</p>
-<div class="section" id="providers">
-<h2>Providers<a class="headerlink" href="#providers" title="Permalink to this headline">¶</a></h2>
-<p>This bundle allows you to configure and use multiple supported providers with in the same
-application. Each queue that you create is attached to one of your registered providers
-and can have its own configuration options.</p>
-<p>Providers may have their own dependencies that should be added to your <tt class="docutils literal"><span class="pre">composer.json</span></tt> file.</p>
-<p>For specific instructions on how to configure each provider, please view their descriptions below:</p>
-<div class="section" id="aws-provider">
-<h3>AWS Provider<a class="headerlink" href="#aws-provider" title="Permalink to this headline">¶</a></h3>
-<p>The AWS Provider uses SQS &amp; SNS to create a Push Queue model.  SNS is optional with
-this provider and its possible to use just SQS by utilizing the provided Console
-Command (<tt class="docutils literal"><span class="pre">uecode:qpush:receive</span></tt>) to poll the queue.</p>
-<p><strong>Configuration</strong></p>
-<p>This provider relies on the <a class="reference external" href="https://github.com/aws/aws-sdk-php">AWS SDK PHP v2</a>, which
-needs to be required in your <tt class="docutils literal"><span class="pre">composer.json</span></tt> file.</p>
-<div class="highlight-js"><div class="highlight"><pre><span class="p">{</span>
-    <span class="nx">require</span><span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;aws/aws-sdk-php&quot;</span><span class="o">:</span> <span class="o">:</span> <span class="s2">&quot;2.*&quot;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>From there, the rest of the configuration is simple. You need to provide your
-credentials in your configuration.</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span class="c1">#app/config.yml</span>
-
-<span class="l-Scalar-Plain">uecode_qpush</span><span class="p-Indicator">:</span>
-    <span class="l-Scalar-Plain">providers</span><span class="p-Indicator">:</span>
-        <span class="l-Scalar-Plain">aws</span><span class="p-Indicator">:</span>
-            <span class="l-Scalar-Plain">key</span><span class="p-Indicator">:</span>    <span class="l-Scalar-Plain">&lt;aws key&gt;</span>
-            <span class="l-Scalar-Plain">secret</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">&lt;aws secret&gt;</span>
-            <span class="l-Scalar-Plain">region</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">us-east-1</span>
-    <span class="l-Scalar-Plain">queues</span><span class="p-Indicator">:</span>
-        <span class="l-Scalar-Plain">my_queue_name</span><span class="p-Indicator">:</span>
-            <span class="l-Scalar-Plain">provider</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">aws</span>
-            <span class="l-Scalar-Plain">options</span><span class="p-Indicator">:</span>
-                <span class="l-Scalar-Plain">push_notifications</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">true</span>
-                <span class="l-Scalar-Plain">subscribers</span><span class="p-Indicator">:</span>
-                    <span class="p-Indicator">-</span> <span class="p-Indicator">{</span> <span class="nv">endpoint</span><span class="p-Indicator">:</span> <span class="nv">http</span><span class="p-Indicator">:</span><span class="nv">//example.com/qpush</span><span class="p-Indicator">,</span> <span class="nv">protocol</span><span class="p-Indicator">:</span> <span class="nv">http</span> <span class="p-Indicator">}</span>
-</pre></div>
-</div>
-<p><strong>Using SNS</strong></p>
-<p>If you set <tt class="docutils literal"><span class="pre">push_notifications</span></tt> to <tt class="docutils literal"><span class="pre">true</span></tt> in your queue config, this provider
-will automatically create the SNS Topic, subscribe your SQS queue to it, as well
-as loop over your list of <tt class="docutils literal"><span class="pre">subscribers</span></tt>, adding them to your Topic.</p>
-<p>This provider automatically handles Subscription Confirmations sent from SNS, as
-long as the HTTP endpoint you&#8217;ve listed is externally accessible.</p>
-</div>
-<div class="section" id="ironmq-provider">
-<h3>IronMQ Provider<a class="headerlink" href="#ironmq-provider" title="Permalink to this headline">¶</a></h3>
-<p>The IronMQ Provider uses its Push Queues to notify subscribers of new queued
-messages with out needing to continually poll the queue.</p>
-<p>Using a Push Queue is optional with this provider and its possible to use simple
-Pull queues by utilizing the provided Console Command (<tt class="docutils literal"><span class="pre">uecode:qpush::receive</span></tt>)
-to poll the queue.</p>
-<p><strong>Configuration</strong></p>
-<p>This provider relies on the <a class="reference external" href="https://github.com/iron-io/iron_mq_php">Iron MQ</a> classes
-and needs to have the library included in your <tt class="docutils literal"><span class="pre">composer.json</span></tt> file.</p>
-<div class="highlight-js"><div class="highlight"><pre><span class="p">{</span>
-    <span class="nx">require</span><span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;iron-io/iron_mq_php&quot;</span><span class="o">:</span> <span class="o">:</span> <span class="s2">&quot;2.*&quot;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Configuring the provider is very easy. It requires that you have already created
-an account and have a project id.</p>
-<p><a class="reference external" href="http://www.iron.io/">Iron.io</a> provides free accounts for Development, which makes
-testing and using this service extremely easy.</p>
-<p>Just include your OAuth <cite>token</cite> and <cite>project_id</cite> in the configuration and set your
-queue to use the <cite>ironmq</cite> provider.</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span class="c1">#app/config.yml</span>
-
-<span class="l-Scalar-Plain">uecode_qpush</span><span class="p-Indicator">:</span>
-    <span class="l-Scalar-Plain">providers</span><span class="p-Indicator">:</span>
-        <span class="l-Scalar-Plain">ironmq</span><span class="p-Indicator">:</span>
-            <span class="l-Scalar-Plain">token</span><span class="p-Indicator">:</span>
-            <span class="l-Scalar-Plain">project_id</span><span class="p-Indicator">:</span>
-    <span class="l-Scalar-Plain">queues</span><span class="p-Indicator">:</span>
-        <span class="l-Scalar-Plain">my_queue_name</span><span class="p-Indicator">:</span>
-            <span class="l-Scalar-Plain">provider</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">ironmq</span>
-            <span class="l-Scalar-Plain">options</span><span class="p-Indicator">:</span>
-                <span class="l-Scalar-Plain">push_notifications</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">true</span>
-                <span class="l-Scalar-Plain">subscribers</span><span class="p-Indicator">:</span>
-                    <span class="p-Indicator">-</span> <span class="p-Indicator">{</span> <span class="nv">endpoint</span><span class="p-Indicator">:</span> <span class="nv">http</span><span class="p-Indicator">:</span><span class="nv">//example.com/qpush</span><span class="p-Indicator">,</span> <span class="nv">protocol</span><span class="p-Indicator">:</span> <span class="nv">http</span> <span class="p-Indicator">}</span>
-</pre></div>
-</div>
-<p><strong>IronMQ Push Queues</strong></p>
-<p>If you set <tt class="docutils literal"><span class="pre">push_notifications</span></tt> to <tt class="docutils literal"><span class="pre">true</span></tt> in your queue config, this provider
-will automatically create your Queue as a Push Queue and loop over your list of <tt class="docutils literal"><span class="pre">subscribers</span></tt>,
-adding them to your Queue.</p>
-<p>This provider only supports <tt class="docutils literal"><span class="pre">http</span></tt> and <tt class="docutils literal"><span class="pre">https</span></tt> subscribers. This provider also uses the
-<tt class="docutils literal"><span class="pre">multicast</span></tt> setting for its Push Queues, meaning that all <tt class="docutils literal"><span class="pre">subscribers</span></tt> are notified of
-the same new messages.</p>
-<p>You can chose to have your IronMQ queues work as a Pull Queue by setting <tt class="docutils literal"><span class="pre">push_notifications</span></tt> to <tt class="docutils literal"><span class="pre">false</span></tt>.
-This would require you to use the <tt class="docutils literal"><span class="pre">uecode:qpush:receive</span></tt> Console Command to poll the queue.</p>
-</div>
-</div>
-<div class="section" id="caching">
-<h2>Caching<a class="headerlink" href="#caching" title="Permalink to this headline">¶</a></h2>
-<p>Providers can leverage a caching layer to limit the amount of calls to the Message Queue
-for basic lookup functionality for things like the Queue ARN, etc.</p>
-<p>By default the library will attempt to use file cache, however you can pass your
-own cache service, as long as its an instance of <tt class="docutils literal"><span class="pre">Doctrine\Common\Cache\Cache</span></tt>.</p>
-<p>The configuration parameter <tt class="docutils literal"><span class="pre">cache_service</span></tt> expects the container service id of a registered
-Cache service. See below.</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span class="c1">#app/config.yml</span>
-
-<span class="l-Scalar-Plain">services</span><span class="p-Indicator">:</span>
-    <span class="l-Scalar-Plain">my_cache_service</span><span class="p-Indicator">:</span>
-        <span class="l-Scalar-Plain">class</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">My\Caching\CacheService</span>
-
-<span class="l-Scalar-Plain">uecode_qpush</span><span class="p-Indicator">:</span>
-    <span class="l-Scalar-Plain">cache_service</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">my_cache_service</span>
-</pre></div>
-</div>
-<p><strong>Note:</strong> <em>Though the Queue Providers will attempt to create queues if they do not exist when publishing or receiving messages,
-it is highly recommended that you run the included console command to build queues and warm cache from the CLI before hand.</em></p>
-</div>
-<div class="section" id="queue-options">
-<h2>Queue Options<a class="headerlink" href="#queue-options" title="Permalink to this headline">¶</a></h2>
-<p>Each queue can their have own options that determine how messages are published or receieved.
-The options and their descriptions are listed below.</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="20%" />
-<col width="69%" />
-<col width="11%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Option</th>
-<th class="head">Description</th>
-<th class="head">Default Value</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">push_notifications</span></tt></td>
-<td>Whether or not to POST notifications to subscribers of a Queue</td>
-<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
-</tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">notification_retries</span></tt></td>
-<td>How many attempts notifications are resent in case of errors - if supported</td>
-<td><tt class="docutils literal"><span class="pre">3</span></tt></td>
-</tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">message_delay</span></tt></td>
-<td>Time in seconds before a published Message is available to be read in a Queue</td>
-<td><tt class="docutils literal"><span class="pre">0</span></tt></td>
-</tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">message_timeout</span></tt></td>
-<td>Time in seconds a worker has to delete a Message before its available to other workers</td>
-<td><tt class="docutils literal"><span class="pre">30</span></tt></td>
-</tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">message_expiration</span></tt></td>
-<td>Time in seconds that Messages may remain in the Queue before being removed</td>
-<td><tt class="docutils literal"><span class="pre">604800</span></tt></td>
-</tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">messages_to_receive</span></tt></td>
-<td>Maximum amount of messages that can be received when polling the queue</td>
-<td><tt class="docutils literal"><span class="pre">1</span></tt></td>
-</tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">receive_wait_time</span></tt></td>
-<td>If supported, time in seconds to leave the polling request open - for long polling</td>
-<td><tt class="docutils literal"><span class="pre">3</span></tt></td>
-</tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">subscribers</span></tt></td>
-<td>An array of Subscribers, containing an <tt class="docutils literal"><span class="pre">endpoint</span></tt> and <tt class="docutils literal"><span class="pre">protocol</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">empty</span></tt></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section" id="example-configuration">
-<h2>Example Configuration<a class="headerlink" href="#example-configuration" title="Permalink to this headline">¶</a></h2>
-<p>However, a working configuration would look like the following</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">uecode_qpush</span><span class="p-Indicator">:</span>
-    <span class="l-Scalar-Plain">cache_service</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">null</span>
-    <span class="l-Scalar-Plain">logging_enabled</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">true</span>
-    <span class="l-Scalar-Plain">providers</span><span class="p-Indicator">:</span>
-        <span class="l-Scalar-Plain">aws</span><span class="p-Indicator">:</span>
-            <span class="l-Scalar-Plain">key</span><span class="p-Indicator">:</span>
-            <span class="l-Scalar-Plain">secret</span><span class="p-Indicator">:</span>
-            <span class="l-Scalar-Plain">region</span><span class="p-Indicator">:</span>
-        <span class="l-Scalar-Plain">ironmq</span><span class="p-Indicator">:</span>
-            <span class="l-Scalar-Plain">token</span><span class="p-Indicator">:</span>
-            <span class="l-Scalar-Plain">project_id</span><span class="p-Indicator">:</span>
-    <span class="l-Scalar-Plain">queues</span><span class="p-Indicator">:</span>
-        <span class="l-Scalar-Plain">default</span><span class="p-Indicator">:</span>
-            <span class="l-Scalar-Plain">provider</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">aws</span> <span class="c1">#or ironmq</span>
-            <span class="l-Scalar-Plain">options</span><span class="p-Indicator">:</span>
-                <span class="l-Scalar-Plain">push_notifications</span><span class="p-Indicator">:</span>     <span class="l-Scalar-Plain">true</span>
-                <span class="l-Scalar-Plain">notification_retries</span><span class="p-Indicator">:</span>   <span class="l-Scalar-Plain">3</span>
-                <span class="l-Scalar-Plain">message_delay</span><span class="p-Indicator">:</span>          <span class="l-Scalar-Plain">0</span>
-                <span class="l-Scalar-Plain">message_timeout</span><span class="p-Indicator">:</span>        <span class="l-Scalar-Plain">30</span>
-                <span class="l-Scalar-Plain">message_expiration</span><span class="p-Indicator">:</span>     <span class="l-Scalar-Plain">604800</span>
-                <span class="l-Scalar-Plain">messages_to_receive</span><span class="p-Indicator">:</span>    <span class="l-Scalar-Plain">1</span>
-                <span class="l-Scalar-Plain">receive_wait_time</span><span class="p-Indicator">:</span>      <span class="l-Scalar-Plain">3</span>
-                <span class="l-Scalar-Plain">subscribers</span><span class="p-Indicator">:</span>
-                    <span class="p-Indicator">-</span> <span class="p-Indicator">{</span> <span class="nv">endpoint</span><span class="p-Indicator">:</span> <span class="nv">http</span><span class="p-Indicator">:</span><span class="nv">//example1.com/qpush</span><span class="p-Indicator">,</span> <span class="nv">protocol</span><span class="p-Indicator">:</span> <span class="nv">http</span> <span class="p-Indicator">}</span>
-                    <span class="p-Indicator">-</span> <span class="p-Indicator">{</span> <span class="nv">endpoint</span><span class="p-Indicator">:</span> <span class="nv">http</span><span class="p-Indicator">:</span><span class="nv">//example2.com/qpush</span><span class="p-Indicator">,</span> <span class="nv">protocol</span><span class="p-Indicator">:</span> <span class="nv">http</span> <span class="p-Indicator">}</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="usage">
-<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
-<p>Once configured, you can create messages and publish them to the queue. You may also
-create services that will automatically be fired as messages are pushed to your application.</p>
-<p>For your convenience, a custom <tt class="docutils literal"><span class="pre">Provider</span></tt> service will be created and registered
-in the Container for each of your defined Queues. The container service id will be
-in the format of <tt class="docutils literal"><span class="pre">uecode_qpush.{your</span> <span class="pre">queue</span> <span class="pre">name}</span></tt>.</p>
-<div class="section" id="publishing-messages-to-your-queue">
-<h2>Publishing messages to your Queue<a class="headerlink" href="#publishing-messages-to-your-queue" title="Permalink to this headline">¶</a></h2>
-<p>Publishing messages is simple - fetch your <tt class="docutils literal"><span class="pre">Provider</span></tt> service from the container and
-call the <tt class="docutils literal"><span class="pre">publish</span></tt> method, which accepts an array.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">#src/My/Bundle/ExampleBundle/Controller/MyController.php</span>
-
-<span class="x">public function publishAction()</span>
-<span class="x">{</span>
-<span class="x">    $message = [</span>
-<span class="x">        &#39;messages should be an array&#39;.</span>
-<span class="x">        &#39;they can be flat arrays&#39; =&gt; [</span>
-<span class="x">            &#39;or multidimensional&#39;</span>
-<span class="x">        ]</span>
-<span class="x">    ];</span>
-
-<span class="x">    $this-&gt;get(&#39;uecode_qpush.my_queue_name&#39;)-&gt;publish($message);</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="working-with-messages-from-your-queue">
-<h2>Working with messages from your Queue<a class="headerlink" href="#working-with-messages-from-your-queue" title="Permalink to this headline">¶</a></h2>
-<p>Messages are either automatically received by your application and events dispatched
-(setting <tt class="docutils literal"><span class="pre">push_notification</span></tt> to <tt class="docutils literal"><span class="pre">true</span></tt>), or can be picked up by Cron jobs through an included
-command if you are not using a Message Queue provider that supports Push notifications.</p>
-<p>When the notifications or messages are Pushed to your application, the QPush Bundle automatically
-catches the request and dispatches an event which can be easily hooked into.</p>
-<div class="section" id="messageevents">
-<h3>MessageEvents<a class="headerlink" href="#messageevents" title="Permalink to this headline">¶</a></h3>
-<p>Once a message is received via POST from your Message Queue, a <tt class="docutils literal"><span class="pre">MessageEvent</span></tt> is dispatched
-which can be handled by your services. Each <tt class="docutils literal"><span class="pre">MessageEvent</span></tt> contains the name of the queue
-and a <tt class="docutils literal"><span class="pre">Uecode\Bundle\QPushBundle\Message\Message</span></tt> object, accessible through getters.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">#src/My/Bundle/ExampleBundle/Service/ExampleService.php</span>
-
-<span class="x">use Uecode\Bundle\QPushBundle\Event\MessageEvent</span>
-
-<span class="x">public function onMessageReceived(MessageEvent $event)</span>
-<span class="x">{</span>
-<span class="x">    $queue_name = $event-&gt;getQueueName();</span>
-<span class="x">    $message    = $event-&gt;getMessage();</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-<p>The <tt class="docutils literal"><span class="pre">Message</span></tt> objects contain the provider specific message id, a message body,
-and a collection of provider specific metadata.</p>
-<p>These properties are accessible through simple getters.</p>
-<p>The message <tt class="docutils literal"><span class="pre">body</span></tt> is an array matching your original message. The <tt class="docutils literal"><span class="pre">metadata</span></tt> property is an
-<tt class="docutils literal"><span class="pre">ArrayCollection</span></tt> of varying fields sent with your message from your Queue Provider.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">#src/My/Bundle/ExampleBundle/Service/ExampleService.php</span>
-
-<span class="x">use Uecode\Bundle\QPushBundle\Event\MessageEvent;</span>
-<span class="x">use Uecode\Bundle\QPushBundle\Message\Message;</span>
-
-<span class="x">public function onMessageReceived(MessageEvent $event)</span>
-<span class="x">{</span>
-<span class="x">    $id         = $event-&gt;getMessage()-&gt;getId();</span>
-<span class="x">    $body       = $event-&gt;getMessage()-&gt;getBody();</span>
-<span class="x">    $metadata   = $event-&gt;getMessage()-&gt;getMetadata();</span>
-
-<span class="x">    // do some processing</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="tagging-your-services">
-<h3>Tagging Your Services<a class="headerlink" href="#tagging-your-services" title="Permalink to this headline">¶</a></h3>
-<p>For your Services to be called on QPush events, they  must be tagged with the name
-<tt class="docutils literal"><span class="pre">uecode_qpush.event_listener</span></tt>. A complete tag is made up of the following properties:</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="9%" />
-<col width="24%" />
-<col width="67%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Tag Property</th>
-<th class="head">Example</th>
-<th class="head">Description</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">name</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">uecode_qpush.event_listener</span></tt></td>
-<td>The Qpush Event Listener Tag</td>
-</tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">event</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">{queue</span> <span class="pre">name}.message_received</span></tt></td>
-<td>The <cite>message_received</cite> event, prefixed with the Queue name</td>
-</tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">method</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">onMessageReceived</span></tt></td>
-<td>A publicly accessbile method on your service</td>
-</tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">priority</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">100</span></tt></td>
-<td>Priority, <tt class="docutils literal"><span class="pre">1</span></tt>-<tt class="docutils literal"><span class="pre">100</span></tt> to control order of services. Higher priorities are called earlier</td>
-</tr>
-</tbody>
-</table>
-<p>The <tt class="docutils literal"><span class="pre">priority</span></tt> is useful to chain services, ensuring that they fire in a certain order - the higher priorities fire earlier.</p>
-<p>Each event fired by the Qpush Bundle is prefixed with the name of your queue, ex: <tt class="docutils literal"><span class="pre">my_queue_name.message_received</span></tt>.</p>
-<p>This allows you to assign services to fire only on certain queues, based on the queue name.
-However, you may also have multiple tags on a single service, so that one service can handle
-events from multiple queues.</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">services</span><span class="p-Indicator">:</span>
-    <span class="l-Scalar-Plain">my_example_service</span><span class="p-Indicator">:</span>
-    <span class="l-Scalar-Plain">class</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">My\Example\ExampleService</span>
-    <span class="l-Scalar-Plain">tags</span><span class="p-Indicator">:</span>
-        <span class="p-Indicator">-</span> <span class="p-Indicator">{</span> <span class="nv">name</span><span class="p-Indicator">:</span> <span class="nv">uecode_qpush.event_listener</span><span class="p-Indicator">,</span> <span class="nv">event</span><span class="p-Indicator">:</span> <span class="nv">my_queue_name.message_received</span><span class="p-Indicator">,</span> <span class="nv">method</span><span class="p-Indicator">:</span> <span class="nv">onMessageReceived</span> <span class="p-Indicator">}</span>
-</pre></div>
-</div>
-<p>The method listed in the tag must be publicly available in your service and should
-take a single argument, an instance of <tt class="docutils literal"><span class="pre">Uecode\Bundle\QPushBundle\Event\MessageEvent</span></tt>.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">#src/My/Bundle/ExampleBundle/Service/MyService.php</span>
-
-<span class="x">use Uecode\Bundle\QPushBundle\Event\MessageEvent;</span>
-
-<span class="x">// ...</span>
-
-<span class="x">public function onMessageReceived(MessageEvent $event)</span>
-<span class="x">{</span>
-<span class="x">    $queueName  = $event-&gt;getQueueName();</span>
-<span class="x">    $message    = $event-&gt;getMessage();</span>
-<span class="x">    $metadata   = $event-&gt;Message()-&gt;getMetadata();</span>
-
-<span class="x">    // Process ...</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="cleaning-up-the-queue">
-<h2>Cleaning Up the Queue<a class="headerlink" href="#cleaning-up-the-queue" title="Permalink to this headline">¶</a></h2>
-<p>Once all other Event Listeners have been invoked on a <tt class="docutils literal"><span class="pre">MessageEvent</span></tt>, the QPush Bundle
-will automatically attempt to remove the Message from your Queue for you.</p>
-<p>If an error or exception is thrown, or event propagation is stopped earlier in the chain,
-the Message will not be removed automatically and may be picked up by other workers.</p>
-<p>If you would like to remove the message inside your service, you can do so by calling the <tt class="docutils literal"><span class="pre">delete</span></tt>
-method on your provider and passing it the message <tt class="docutils literal"><span class="pre">id</span></tt>.  However, you must also stop
-the event propagation to avoid other services (including the Provider service) from firing on that
-<tt class="docutils literal"><span class="pre">MessageEvent</span></tt>.</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="x">#src/My/Bundle/ExampleBundle/Service/MyService.php</span>
-
-<span class="x">use Uecode\Bundle\QPushBundle\Event\MessageEvent;</span>
-
-<span class="x">// ...</span>
-
-<span class="x">public function onMessageReceived(MessageEvent $event)</span>
-<span class="x">{</span>
-<span class="x">    $id = $event-&gt;getMessage()-&gt;getId();</span>
-<span class="x">    // Removes the message from the queue</span>
-<span class="x">    $awsProvider-&gt;delete($id);</span>
-
-<span class="x">    // Stops the event from propagating</span>
-<span class="x">    $event-&gt;stopPropagation();</span>
-<span class="x">}</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="push-queues-in-development">
-<h2>Push Queues in Development<a class="headerlink" href="#push-queues-in-development" title="Permalink to this headline">¶</a></h2>
-<p>It is recommended to use your <tt class="docutils literal"><span class="pre">config_dev.yml</span></tt> file to disable the
-<tt class="docutils literal"><span class="pre">push_notifications</span></tt> settings on your queues. This will make the queue a simple
-Pull queue. You can then use the <tt class="docutils literal"><span class="pre">uecode:qpush:receive</span></tt> Console Command to receive
-messages from your Queue.</p>
-<p>If you need to test the Push Queue functionality from a local stack or internal
-machine, it possible to use <a class="reference external" href="https://ngrok.com/">ngrok</a> to tunnel to your development
-environment, so its reachable by your Queue Provider.</p>
-<p>You would need to update your <cite>config_dev.yml</cite> configuration to use the <cite>ngrok</cite> url for
-your subscriber(s).</p>
-</div>
-</div>
-<div class="section" id="console-commands">
-<h1>Console Commands<a class="headerlink" href="#console-commands" title="Permalink to this headline">¶</a></h1>
-<p>This bundle includes some Console Commands which can be used to for building, destroying and polling your queues
-as well as sending simple messages.</p>
-<div class="section" id="build-command">
-<h2>Build Command<a class="headerlink" href="#build-command" title="Permalink to this headline">¶</a></h2>
-<p>You can use the <tt class="docutils literal"><span class="pre">uecode:qpush:build</span></tt> command to create the queues on your providers. You can specify the name of a queue
-as an argument to build a single queue. This command will also warm cache which reduces the need to query the provider&#8217;s API
-to ensure that the queue exists. Most queue providers create commands are idempotent, so running this multiple times is not an issue.:</p>
-<div class="highlight-python"><pre>$ php app/console uecode:qpush:build my_queue_name</pre>
-</div>
-<p><strong>Note:</strong> <em>By default, this bundle uses File Cache.  If you clear cache, it is highly recommended you re-run the build command to warm cache!</em></p>
-</div>
-<div class="section" id="destroy-command">
-<h2>Destroy Command<a class="headerlink" href="#destroy-command" title="Permalink to this headline">¶</a></h2>
-<p>You can use the <tt class="docutils literal"><span class="pre">uecode:qpush:destroy</span></tt> command to completely remove queues. You can specify the name of a queue as an argument to destroy
-a single queue. If you do not specify an argument, this will destroy all queues after confirmation.:</p>
-<div class="highlight-python"><pre>$ php app/console uecode:qpush:destroy my_queue_name</pre>
-</div>
-<p><strong>Note:</strong> <em>This will remove queues, even if there are still unreceived messages in the queue!</em></p>
-</div>
-<div class="section" id="receive-command">
-<h2>Receive Command<a class="headerlink" href="#receive-command" title="Permalink to this headline">¶</a></h2>
-<p>You can use the <tt class="docutils literal"><span class="pre">uecode:qpush:receive</span></tt> command to poll the specified queue. This command takes the name of a queue as an argument.
-Messages received from this command are dispatched through the <tt class="docutils literal"><span class="pre">EventDispatcher</span></tt> and can be handled by your tagged services the same
-as Push Notifications would be.:</p>
-<div class="highlight-python"><pre>$ php app/console uecode:qpush:receive my_queue_name</pre>
-</div>
-</div>
-<div class="section" id="publish-command">
-<h2>Publish Command<a class="headerlink" href="#publish-command" title="Permalink to this headline">¶</a></h2>
-<p>You can use the <tt class="docutils literal"><span class="pre">uecode:qpush:publish</span></tt> command to send messages to your queue from the CLI. This command takes two arguments, the name of
-the queue and the message to publish. The message needs to be a json encoded string.:</p>
-<div class="highlight-python"><pre>$ php app/console uecode:qpush:publish my_queue_name '{"foo": "bar"}'</pre>
-</div>
+<div class="section" id="content">
+<h1>Content<a class="headerlink" href="#content" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configure the Bundle</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#providers">Providers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aws-provider.html">AWS Provider</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iron-mq-provider.html">IronMQ Provider</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#caching">Caching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#queue-options">Queue Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#example-configuration">Example Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#publishing-messages-to-your-queue">Publishing messages to your Queue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#working-with-messages-from-your-queue">Working with messages from your Queue</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="usage.html#messageevents">MessageEvents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="usage.html#tagging-your-services">Tagging Your Services</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#cleaning-up-the-queue">Cleaning Up the Queue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#push-queues-in-development">Push Queues in Development</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="console-commands.html">Console Commands</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="console-commands.html#build-command">Build Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="console-commands.html#destroy-command">Destroy Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="console-commands.html#receive-command">Receive Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="console-commands.html#publish-command">Publish Command</a></li>
+</ul>
+</li>
+</ul>
 </div>
 </div>
 
@@ -512,38 +104,14 @@ the queue and the message to publish. The message needs to be a json encoded str
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Overview</a></li>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#configure-the-bundle">Configure the Bundle</a><ul>
-<li><a class="reference internal" href="#providers">Providers</a><ul>
-<li><a class="reference internal" href="#aws-provider">AWS Provider</a></li>
-<li><a class="reference internal" href="#ironmq-provider">IronMQ Provider</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#caching">Caching</a></li>
-<li><a class="reference internal" href="#queue-options">Queue Options</a></li>
-<li><a class="reference internal" href="#example-configuration">Example Configuration</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#usage">Usage</a><ul>
-<li><a class="reference internal" href="#publishing-messages-to-your-queue">Publishing messages to your Queue</a></li>
-<li><a class="reference internal" href="#working-with-messages-from-your-queue">Working with messages from your Queue</a><ul>
-<li><a class="reference internal" href="#messageevents">MessageEvents</a></li>
-<li><a class="reference internal" href="#tagging-your-services">Tagging Your Services</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#cleaning-up-the-queue">Cleaning Up the Queue</a></li>
-<li><a class="reference internal" href="#push-queues-in-development">Push Queues in Development</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#console-commands">Console Commands</a><ul>
-<li><a class="reference internal" href="#build-command">Build Command</a></li>
-<li><a class="reference internal" href="#destroy-command">Destroy Command</a></li>
-<li><a class="reference internal" href="#receive-command">Receive Command</a></li>
-<li><a class="reference internal" href="#publish-command">Publish Command</a></li>
+<li><a class="reference internal" href="#content">Content</a><ul>
 </ul>
 </li>
 </ul>
 
+  <h4>Next topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="next chapter">Installation</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/index.txt"
@@ -572,6 +140,9 @@ the queue and the message to publish. The message needs to be a json encoded str
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             >next</a> |</li>
         <li><a href="#">QPush Bundle 1.1.3 documentation</a> &raquo;</li> 
       </ul>
     </div>

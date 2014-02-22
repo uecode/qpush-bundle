@@ -1,0 +1,147 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Console Commands &mdash; QPush Bundle 1.1.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.1.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="QPush Bundle 1.1.3 documentation" href="index.html" />
+    <link rel="prev" title="Usage" href="usage.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="usage.html" title="Usage"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">QPush Bundle 1.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="console-commands">
+<h1>Console Commands<a class="headerlink" href="#console-commands" title="Permalink to this headline">¶</a></h1>
+<p>This bundle includes some Console Commands which can be used to for building, destroying and polling your queues
+as well as sending simple messages.</p>
+<div class="section" id="build-command">
+<h2>Build Command<a class="headerlink" href="#build-command" title="Permalink to this headline">¶</a></h2>
+<p>You can use the <tt class="docutils literal"><span class="pre">uecode:qpush:build</span></tt> command to create the queues on your providers. You can specify the name of a queue
+as an argument to build a single queue. This command will also warm cache which reduces the need to query the provider&#8217;s API
+to ensure that the queue exists. Most queue providers create commands are idempotent, so running this multiple times is not an issue.:</p>
+<div class="highlight-python"><pre>$ php app/console uecode:qpush:build my_queue_name</pre>
+</div>
+<p><strong>Note:</strong> <em>By default, this bundle uses File Cache.  If you clear cache, it is highly recommended you re-run the build command to warm cache!</em></p>
+</div>
+<div class="section" id="destroy-command">
+<h2>Destroy Command<a class="headerlink" href="#destroy-command" title="Permalink to this headline">¶</a></h2>
+<p>You can use the <tt class="docutils literal"><span class="pre">uecode:qpush:destroy</span></tt> command to completely remove queues. You can specify the name of a queue as an argument to destroy
+a single queue. If you do not specify an argument, this will destroy all queues after confirmation.:</p>
+<div class="highlight-python"><pre>$ php app/console uecode:qpush:destroy my_queue_name</pre>
+</div>
+<p><strong>Note:</strong> <em>This will remove queues, even if there are still unreceived messages in the queue!</em></p>
+</div>
+<div class="section" id="receive-command">
+<h2>Receive Command<a class="headerlink" href="#receive-command" title="Permalink to this headline">¶</a></h2>
+<p>You can use the <tt class="docutils literal"><span class="pre">uecode:qpush:receive</span></tt> command to poll the specified queue. This command takes the name of a queue as an argument.
+Messages received from this command are dispatched through the <tt class="docutils literal"><span class="pre">EventDispatcher</span></tt> and can be handled by your tagged services the same
+as Push Notifications would be.:</p>
+<div class="highlight-python"><pre>$ php app/console uecode:qpush:receive my_queue_name</pre>
+</div>
+</div>
+<div class="section" id="publish-command">
+<h2>Publish Command<a class="headerlink" href="#publish-command" title="Permalink to this headline">¶</a></h2>
+<p>You can use the <tt class="docutils literal"><span class="pre">uecode:qpush:publish</span></tt> command to send messages to your queue from the CLI. This command takes two arguments, the name of
+the queue and the message to publish. The message needs to be a json encoded string.:</p>
+<div class="highlight-python"><pre>$ php app/console uecode:qpush:publish my_queue_name '{"foo": "bar"}'</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Console Commands</a><ul>
+<li><a class="reference internal" href="#build-command">Build Command</a></li>
+<li><a class="reference internal" href="#destroy-command">Destroy Command</a></li>
+<li><a class="reference internal" href="#receive-command">Receive Command</a></li>
+<li><a class="reference internal" href="#publish-command">Publish Command</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="usage.html"
+                        title="previous chapter">Usage</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/console-commands.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="usage.html" title="Usage"
+             >previous</a> |</li>
+        <li><a href="index.html">QPush Bundle 1.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Keith Kirk.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
