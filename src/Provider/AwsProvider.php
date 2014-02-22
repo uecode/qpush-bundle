@@ -173,13 +173,16 @@ class AwsProvider extends AbstractProvider
         $publishStart = microtime(true);
 
         // ensures that the SQS Queue and SNS Topic exist
-        if (!$this->queueExists()
-            || ($this->options['push_notifications'] && !$this->topicExists()))
-        {
+        if (!$this->queueExists()) {
             $this->create();
         }
 
-        if ($this->options['push_notifications'] && $this->topicExists()) {
+        if ($this->options['push_notifications']) {
+
+            if ($this->topicExists()) {
+                $this->create();
+            }
+
             $message    = [
                 'default'   => $this->getNameWithPrefix(),
                 'sqs'       => json_encode($message),
@@ -315,7 +318,7 @@ class AwsProvider extends AbstractProvider
         }
 
         $result = $this->sqs->getQueueUrl([
-            'QueueName' => $this->getName()
+            'QueueName' => $this->getNameWithPrefix()
         ]);
 
         if($this->queueUrl = $result->get('QueueUrl')) {
