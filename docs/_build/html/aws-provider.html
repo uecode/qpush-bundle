@@ -1,0 +1,154 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>AWS Provider &mdash; QPush Bundle 1.1.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.1.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="QPush Bundle 1.1.3 documentation" href="index.html" />
+    <link rel="up" title="Configure the Bundle" href="configuration.html" />
+    <link rel="next" title="IronMQ Provider" href="iron-mq-provider.html" />
+    <link rel="prev" title="Configure the Bundle" href="configuration.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="iron-mq-provider.html" title="IronMQ Provider"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="configuration.html" title="Configure the Bundle"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">QPush Bundle 1.1.3 documentation</a> &raquo;</li>
+          <li><a href="configuration.html" accesskey="U">Configure the Bundle</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="aws-provider">
+<h1>AWS Provider<a class="headerlink" href="#aws-provider" title="Permalink to this headline">¶</a></h1>
+<p>The AWS Provider uses SQS &amp; SNS to create a Push Queue model.  SNS is optional with
+this provider and its possible to use just SQS by utilizing the provided Console
+Command (<tt class="docutils literal"><span class="pre">uecode:qpush:receive</span></tt>) to poll the queue.</p>
+<p><strong>Configuration</strong></p>
+<p>This provider relies on the <a class="reference external" href="https://github.com/aws/aws-sdk-php">AWS SDK PHP v2</a>, which
+needs to be required in your <tt class="docutils literal"><span class="pre">composer.json</span></tt> file.</p>
+<div class="highlight-js"><div class="highlight"><pre><span class="p">{</span>
+    <span class="nx">require</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;aws/aws-sdk-php&quot;</span><span class="o">:</span> <span class="o">:</span> <span class="s2">&quot;2.*&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>From there, the rest of the configuration is simple. You need to provide your
+credentials in your configuration.</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="c1">#app/config.yml</span>
+
+<span class="l-Scalar-Plain">uecode_qpush</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">providers</span><span class="p-Indicator">:</span>
+        <span class="l-Scalar-Plain">aws</span><span class="p-Indicator">:</span>
+            <span class="l-Scalar-Plain">key</span><span class="p-Indicator">:</span>    <span class="l-Scalar-Plain">&lt;aws key&gt;</span>
+            <span class="l-Scalar-Plain">secret</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">&lt;aws secret&gt;</span>
+            <span class="l-Scalar-Plain">region</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">us-east-1</span>
+    <span class="l-Scalar-Plain">queues</span><span class="p-Indicator">:</span>
+        <span class="l-Scalar-Plain">my_queue_name</span><span class="p-Indicator">:</span>
+            <span class="l-Scalar-Plain">provider</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">aws</span>
+            <span class="l-Scalar-Plain">options</span><span class="p-Indicator">:</span>
+                <span class="l-Scalar-Plain">push_notifications</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">true</span>
+                <span class="l-Scalar-Plain">subscribers</span><span class="p-Indicator">:</span>
+                    <span class="p-Indicator">-</span> <span class="p-Indicator">{</span> <span class="nv">endpoint</span><span class="p-Indicator">:</span> <span class="nv">http</span><span class="p-Indicator">:</span><span class="nv">//example.com/qpush</span><span class="p-Indicator">,</span> <span class="nv">protocol</span><span class="p-Indicator">:</span> <span class="nv">http</span> <span class="p-Indicator">}</span>
+</pre></div>
+</div>
+<p><strong>Using SNS</strong></p>
+<p>If you set <tt class="docutils literal"><span class="pre">push_notifications</span></tt> to <tt class="docutils literal"><span class="pre">true</span></tt> in your queue config, this provider
+will automatically create the SNS Topic, subscribe your SQS queue to it, as well
+as loop over your list of <tt class="docutils literal"><span class="pre">subscribers</span></tt>, adding them to your Topic.</p>
+<p>This provider automatically handles Subscription Confirmations sent from SNS, as
+long as the HTTP endpoint you&#8217;ve listed is externally accessible and has the QPush Bundle
+properly installed and configured.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="configuration.html"
+                        title="previous chapter">Configure the Bundle</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="iron-mq-provider.html"
+                        title="next chapter">IronMQ Provider</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/aws-provider.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="iron-mq-provider.html" title="IronMQ Provider"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="configuration.html" title="Configure the Bundle"
+             >previous</a> |</li>
+        <li><a href="index.html">QPush Bundle 1.1.3 documentation</a> &raquo;</li>
+          <li><a href="configuration.html" >Configure the Bundle</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Keith Kirk.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

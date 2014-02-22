@@ -1,0 +1,303 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Usage &mdash; QPush Bundle 1.1.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.1.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="QPush Bundle 1.1.3 documentation" href="index.html" />
+    <link rel="next" title="Console Commands" href="console-commands.html" />
+    <link rel="prev" title="IronMQ Provider" href="iron-mq-provider.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="console-commands.html" title="Console Commands"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="iron-mq-provider.html" title="IronMQ Provider"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">QPush Bundle 1.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<p>Once configured, you can create messages and publish them to the queue. You may also
+create services that will automatically be fired as messages are pushed to your application.</p>
+<p>For your convenience, a custom <tt class="docutils literal"><span class="pre">Provider</span></tt> service will be created and registered
+in the Container for each of your defined Queues. The container service id will be
+in the format of <tt class="docutils literal"><span class="pre">uecode_qpush.{your</span> <span class="pre">queue</span> <span class="pre">name}</span></tt>.</p>
+<div class="section" id="publishing-messages-to-your-queue">
+<h2>Publishing messages to your Queue<a class="headerlink" href="#publishing-messages-to-your-queue" title="Permalink to this headline">¶</a></h2>
+<p>Publishing messages is simple - fetch your <tt class="docutils literal"><span class="pre">Provider</span></tt> service from the container and
+call the <tt class="docutils literal"><span class="pre">publish</span></tt> method, which accepts an array.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">#src/My/Bundle/ExampleBundle/Controller/MyController.php</span>
+
+<span class="x">public function publishAction()</span>
+<span class="x">{</span>
+<span class="x">    $message = [</span>
+<span class="x">        &#39;messages should be an array&#39;.</span>
+<span class="x">        &#39;they can be flat arrays&#39; =&gt; [</span>
+<span class="x">            &#39;or multidimensional&#39;</span>
+<span class="x">        ]</span>
+<span class="x">    ];</span>
+
+<span class="x">    $this-&gt;get(&#39;uecode_qpush.my_queue_name&#39;)-&gt;publish($message);</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="working-with-messages-from-your-queue">
+<h2>Working with messages from your Queue<a class="headerlink" href="#working-with-messages-from-your-queue" title="Permalink to this headline">¶</a></h2>
+<p>Messages are either automatically received by your application and events dispatched
+(setting <tt class="docutils literal"><span class="pre">push_notification</span></tt> to <tt class="docutils literal"><span class="pre">true</span></tt>), or can be picked up by Cron jobs through an included
+command if you are not using a Message Queue provider that supports Push notifications.</p>
+<p>When the notifications or messages are Pushed to your application, the QPush Bundle automatically
+catches the request and dispatches an event which can be easily hooked into.</p>
+<div class="section" id="messageevents">
+<h3>MessageEvents<a class="headerlink" href="#messageevents" title="Permalink to this headline">¶</a></h3>
+<p>Once a message is received via POST from your Message Queue, a <tt class="docutils literal"><span class="pre">MessageEvent</span></tt> is dispatched
+which can be handled by your services. Each <tt class="docutils literal"><span class="pre">MessageEvent</span></tt> contains the name of the queue
+and a <tt class="docutils literal"><span class="pre">Uecode\Bundle\QPushBundle\Message\Message</span></tt> object, accessible through getters.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">#src/My/Bundle/ExampleBundle/Service/ExampleService.php</span>
+
+<span class="x">use Uecode\Bundle\QPushBundle\Event\MessageEvent</span>
+
+<span class="x">public function onMessageReceived(MessageEvent $event)</span>
+<span class="x">{</span>
+<span class="x">    $queue_name = $event-&gt;getQueueName();</span>
+<span class="x">    $message    = $event-&gt;getMessage();</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">Message</span></tt> objects contain the provider specific message id, a message body,
+and a collection of provider specific metadata.</p>
+<p>These properties are accessible through simple getters.</p>
+<p>The message <tt class="docutils literal"><span class="pre">body</span></tt> is an array matching your original message. The <tt class="docutils literal"><span class="pre">metadata</span></tt> property is an
+<tt class="docutils literal"><span class="pre">ArrayCollection</span></tt> of varying fields sent with your message from your Queue Provider.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">#src/My/Bundle/ExampleBundle/Service/ExampleService.php</span>
+
+<span class="x">use Uecode\Bundle\QPushBundle\Event\MessageEvent;</span>
+<span class="x">use Uecode\Bundle\QPushBundle\Message\Message;</span>
+
+<span class="x">public function onMessageReceived(MessageEvent $event)</span>
+<span class="x">{</span>
+<span class="x">    $id         = $event-&gt;getMessage()-&gt;getId();</span>
+<span class="x">    $body       = $event-&gt;getMessage()-&gt;getBody();</span>
+<span class="x">    $metadata   = $event-&gt;getMessage()-&gt;getMetadata();</span>
+
+<span class="x">    // do some processing</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="tagging-your-services">
+<h3>Tagging Your Services<a class="headerlink" href="#tagging-your-services" title="Permalink to this headline">¶</a></h3>
+<p>For your Services to be called on QPush events, they  must be tagged with the name
+<tt class="docutils literal"><span class="pre">uecode_qpush.event_listener</span></tt>. A complete tag is made up of the following properties:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="24%" />
+<col width="67%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Tag Property</th>
+<th class="head">Example</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">name</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">uecode_qpush.event_listener</span></tt></td>
+<td>The Qpush Event Listener Tag</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">event</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">{queue</span> <span class="pre">name}.message_received</span></tt></td>
+<td>The <cite>message_received</cite> event, prefixed with the Queue name</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">method</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">onMessageReceived</span></tt></td>
+<td>A publicly accessbile method on your service</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">priority</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">100</span></tt></td>
+<td>Priority, <tt class="docutils literal"><span class="pre">1</span></tt>-<tt class="docutils literal"><span class="pre">100</span></tt> to control order of services. Higher priorities are called earlier</td>
+</tr>
+</tbody>
+</table>
+<p>The <tt class="docutils literal"><span class="pre">priority</span></tt> is useful to chain services, ensuring that they fire in a certain order - the higher priorities fire earlier.</p>
+<p>Each event fired by the Qpush Bundle is prefixed with the name of your queue, ex: <tt class="docutils literal"><span class="pre">my_queue_name.message_received</span></tt>.</p>
+<p>This allows you to assign services to fire only on certain queues, based on the queue name.
+However, you may also have multiple tags on a single service, so that one service can handle
+events from multiple queues.</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">services</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">my_example_service</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">class</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">My\Example\ExampleService</span>
+    <span class="l-Scalar-Plain">tags</span><span class="p-Indicator">:</span>
+        <span class="p-Indicator">-</span> <span class="p-Indicator">{</span> <span class="nv">name</span><span class="p-Indicator">:</span> <span class="nv">uecode_qpush.event_listener</span><span class="p-Indicator">,</span> <span class="nv">event</span><span class="p-Indicator">:</span> <span class="nv">my_queue_name.message_received</span><span class="p-Indicator">,</span> <span class="nv">method</span><span class="p-Indicator">:</span> <span class="nv">onMessageReceived</span> <span class="p-Indicator">}</span>
+</pre></div>
+</div>
+<p>The method listed in the tag must be publicly available in your service and should
+take a single argument, an instance of <tt class="docutils literal"><span class="pre">Uecode\Bundle\QPushBundle\Event\MessageEvent</span></tt>.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">#src/My/Bundle/ExampleBundle/Service/MyService.php</span>
+
+<span class="x">use Uecode\Bundle\QPushBundle\Event\MessageEvent;</span>
+
+<span class="x">// ...</span>
+
+<span class="x">public function onMessageReceived(MessageEvent $event)</span>
+<span class="x">{</span>
+<span class="x">    $queueName  = $event-&gt;getQueueName();</span>
+<span class="x">    $message    = $event-&gt;getMessage();</span>
+<span class="x">    $metadata   = $event-&gt;Message()-&gt;getMetadata();</span>
+
+<span class="x">    // Process ...</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="cleaning-up-the-queue">
+<h2>Cleaning Up the Queue<a class="headerlink" href="#cleaning-up-the-queue" title="Permalink to this headline">¶</a></h2>
+<p>Once all other Event Listeners have been invoked on a <tt class="docutils literal"><span class="pre">MessageEvent</span></tt>, the QPush Bundle
+will automatically attempt to remove the Message from your Queue for you.</p>
+<p>If an error or exception is thrown, or event propagation is stopped earlier in the chain,
+the Message will not be removed automatically and may be picked up by other workers.</p>
+<p>If you would like to remove the message inside your service, you can do so by calling the <tt class="docutils literal"><span class="pre">delete</span></tt>
+method on your provider and passing it the message <tt class="docutils literal"><span class="pre">id</span></tt>.  However, you must also stop
+the event propagation to avoid other services (including the Provider service) from firing on that
+<tt class="docutils literal"><span class="pre">MessageEvent</span></tt>.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="x">#src/My/Bundle/ExampleBundle/Service/MyService.php</span>
+
+<span class="x">use Uecode\Bundle\QPushBundle\Event\MessageEvent;</span>
+
+<span class="x">// ...</span>
+
+<span class="x">public function onMessageReceived(MessageEvent $event)</span>
+<span class="x">{</span>
+<span class="x">    $id = $event-&gt;getMessage()-&gt;getId();</span>
+<span class="x">    // Removes the message from the queue</span>
+<span class="x">    $awsProvider-&gt;delete($id);</span>
+
+<span class="x">    // Stops the event from propagating</span>
+<span class="x">    $event-&gt;stopPropagation();</span>
+<span class="x">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="push-queues-in-development">
+<h2>Push Queues in Development<a class="headerlink" href="#push-queues-in-development" title="Permalink to this headline">¶</a></h2>
+<p>It is recommended to use your <tt class="docutils literal"><span class="pre">config_dev.yml</span></tt> file to disable the
+<tt class="docutils literal"><span class="pre">push_notifications</span></tt> settings on your queues. This will make the queue a simple
+Pull queue. You can then use the <tt class="docutils literal"><span class="pre">uecode:qpush:receive</span></tt> Console Command to receive
+messages from your Queue.</p>
+<p>If you need to test the Push Queue functionality from a local stack or internal
+machine, it possible to use <a class="reference external" href="https://ngrok.com/">ngrok</a> to tunnel to your development
+environment, so its reachable by your Queue Provider.</p>
+<p>You would need to update your <cite>config_dev.yml</cite> configuration to use the <cite>ngrok</cite> url for
+your subscriber(s).</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Usage</a><ul>
+<li><a class="reference internal" href="#publishing-messages-to-your-queue">Publishing messages to your Queue</a></li>
+<li><a class="reference internal" href="#working-with-messages-from-your-queue">Working with messages from your Queue</a><ul>
+<li><a class="reference internal" href="#messageevents">MessageEvents</a></li>
+<li><a class="reference internal" href="#tagging-your-services">Tagging Your Services</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cleaning-up-the-queue">Cleaning Up the Queue</a></li>
+<li><a class="reference internal" href="#push-queues-in-development">Push Queues in Development</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="iron-mq-provider.html"
+                        title="previous chapter">IronMQ Provider</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="console-commands.html"
+                        title="next chapter">Console Commands</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/usage.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="console-commands.html" title="Console Commands"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="iron-mq-provider.html" title="IronMQ Provider"
+             >previous</a> |</li>
+        <li><a href="index.html">QPush Bundle 1.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Keith Kirk.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
