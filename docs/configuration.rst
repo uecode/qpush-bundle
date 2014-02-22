@@ -18,7 +18,7 @@ Providers may have their own dependencies that should be added to your ``compose
 For specific instructions on how to configure each provider, please view their documents.
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
 
     aws-provider
     iron-mq-provider

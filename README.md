@@ -8,23 +8,26 @@ This bundle allows you to easily consume messages from Push Queues by simply
 tagging your services and relying on Symfony's event dispatching - without
 needing to run a daemon or background process to continuously poll your queue.
 
-**You can find the full documentation at [qpush-bundle.readthedocs.org](http://qpush-bundle.rtfd.org)**
+**Full Documentation:** [qpush-bundle.readthedocs.org](http://qpush-bundle.rtfd.org)
 
 ##Installation
 
 The bundle should be installed through composer.
 
-####Add the bundle to your `composer.json` file
+####Add the bundle to your composer.json file
 
 ```json
-"require": {
-    "uecode/qpush-bundle": "~1.1.0",
+{
+    "require": {
+        "uecode/qpush-bundle": "~1.1",
+    }
 }
 ```
 
 ####Update AppKernel.php of your Symfony Application
 
-Add the `UecodeQPushBundle` to your kernel bootstrap sequence, in the `$bundles` array.
+Add the `UecodeQPushBundle` to your kernel bootstrap sequence, in the `$bundles`
+array.
 
 ```php
 public function registerBundles()
@@ -41,8 +44,8 @@ public function registerBundles()
 ##Basic Configuration:
 
 Here is a basic configuration that would create a push queue called 
-`my_queue_name` using AWS. You can read about the supported providers and
-provider options in the full documentation.
+`my_queue_name` using AWS or IronMQ. You can read about the supported providers
+and provider options in the full documentation.
 
 ######Example
 
@@ -55,9 +58,12 @@ uecode_qpush:
             key:    <aws api key>
             secret: <aws secret>
             region: us-east-1
+        ironmq:
+            token:      <iron mq oauth token>
+            project_id: <iron mq project id>
     queues:
         my_queue_name:
-            provider: aws
+            provider: aws #or ironmq
             options:
                 push_notifications: true
                 subscribers:
@@ -121,7 +127,7 @@ public function onMessageReceived(MessageEvent $event)
 ```
 
 The `Message` objects contain the provider specific message id, a message body,
-and a collection of provider specific `metadata`.
+and a collection of provider specific metadata.
 
 These properties are accessible through simple getters. 
 
