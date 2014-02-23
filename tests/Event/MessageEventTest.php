@@ -27,8 +27,6 @@ use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Message\Message;
 
 /**
- * MessageEventTest
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class MessageEventTest extends \PHPUnit_Framework_TestCase

@@ -31,8 +31,6 @@ use Uecode\Bundle\QPushBundle\Message\Message;
 use Uecode\Bundle\QPushBundle\Message\Notification;
 
 /**
- * AbstractProviderTest
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class AbstractProviderTest extends \PHPUnit_Framework_TestCase

@@ -33,8 +33,6 @@ use Uecode\Bundle\QPushBundle\Message\Notification;
 use Uecode\Bundle\QPushBundle\Tests\MockClient\AwsMockClient;
 
 /**
- * AwsProviderTest
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class AwsProviderTest extends \PHPUnit_Framework_TestCase

@@ -25,8 +25,6 @@ namespace Uecode\Bundle\QPushBundle\Tests\Provider;
 use Uecode\Bundle\QPushBundle\Provider\ProviderRegistry;
 
 /**
- * ProviderRegistryTest
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class ProviderRegistryTest extends \PHPUnit_Framework_TestCase

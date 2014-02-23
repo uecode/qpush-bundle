@@ -28,12 +28,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * QueueDestroyCommand
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class QueueDestroyCommand extends ContainerAwareCommand
 {
+    protected $output;
+
     protected function configure()
     {
         $this
@@ -44,7 +44,8 @@ class QueueDestroyCommand extends ContainerAwareCommand
                 InputArgument::OPTIONAL,
                 'Name of a specific queue to destroy',
                 null
-            );
+            )
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -66,7 +67,7 @@ class QueueDestroyCommand extends ContainerAwareCommand
             );
 
             if (!$response) {
-                return;
+                return 0;
             }
 
             return $this->destroyQueue($registry, $name);
@@ -79,19 +80,20 @@ class QueueDestroyCommand extends ContainerAwareCommand
         );
 
         if (!$response) {
-                return;
+            return 0;
         }
 
         foreach ($registry->all() as $queue) {
             $this->destroyQueue($registry, $queue->getName());
         }
 
+        return 0;
     }
 
     private function destroyQueue($registry, $name)
     {
         if (!$registry->has($name)) {
-            return $output->writeln(
+            return $this->output->writeln(
                 sprintf("The [%s] queue you have specified does not exists!", $name)
             );
         }

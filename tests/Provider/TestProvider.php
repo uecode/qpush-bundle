@@ -29,8 +29,6 @@ use Uecode\Bundle\QPushBundle\Provider\AbstractProvider;
 use Uecode\Bundle\QPushBundle\Message\Message;
 
 /**
- * TestProvider
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class TestProvider extends AbstractProvider

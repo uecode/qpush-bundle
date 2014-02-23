@@ -33,8 +33,6 @@ use Uecode\Bundle\QPushBundle\Message\Notification;
 use Uecode\Bundle\QPushBundle\Tests\MockClient\IronMqMockClient;
 
 /**
- * IronMqProviderTest
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class IronMqProviderTest extends \PHPUnit_Framework_TestCase
