@@ -1,13 +1,13 @@
 AWS Provider
 ^^^^^^^^^^^^
 
-The AWS Provider uses SQS & SNS to create a Push Queue model.  SNS is optional with
+The AWS Provider uses SQS & SNS to create a Push Queue model. SNS is optional with
 this provider and its possible to use just SQS by utilizing the provided Console
 Command (``uecode:qpush:receive``) to poll the queue.
 
 **Configuration**
 
-This provider relies on the `AWS SDK PHP v2 <https://github.com/aws/aws-sdk-php>`_, which
+This provider relies on the `AWS SDK PHP v2 <https://github.com/aws/aws-sdk-php>`_ library, which
 needs to be required in your ``composer.json`` file.
 
 .. code-block:: js

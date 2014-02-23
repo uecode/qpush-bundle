@@ -47,12 +47,12 @@ Cache service. See below.
         cache_service: my_cache_service
 
 **Note:** *Though the Queue Providers will attempt to create queues if they do not exist when publishing or receiving messages,
-it is highly recommended that you run the included console command to build queues and warm cache from the CLI before hand.*
+it is highly recommended that you run the included console command to build queues and warm cache from the CLI beforehand.*
 
 Queue Options
 -------------
 
-Each queue can their have own options that determine how messages are published or receieved. 
+Each queue can have their own options that determine how messages are published or received.
 The options and their descriptions are listed below.
 
 +--------------------------+-------------------------------------------------------------------------------------------+---------------+
@@ -64,7 +64,7 @@ The options and their descriptions are listed below.
 +--------------------------+-------------------------------------------------------------------------------------------+---------------+
 | ``message_delay``        | Time in seconds before a published Message is available to be read in a Queue             | ``0``         |
 +--------------------------+-------------------------------------------------------------------------------------------+---------------+
-| ``message_timeout``      | Time in seconds a worker has to delete a Message before its available to other workers    | ``30``        |
+| ``message_timeout``      | Time in seconds a worker has to delete a Message before it is available to other workers  | ``30``        |
 +--------------------------+-------------------------------------------------------------------------------------------+---------------+
 | ``message_expiration``   | Time in seconds that Messages may remain in the Queue before being removed                | ``604800``    |
 +--------------------------+-------------------------------------------------------------------------------------------+---------------+
@@ -91,8 +91,8 @@ toggle this behavior by setting ``logging_enabled`` to ``false``.
 Logs will output to your Symfony log directory and to a file in the format of
 ``{env}.qpush.log``.::
 
-    #production
-    /app/log/prod.qpush.log
+    #development
+    /app/log/dev.qpush.log
     
     #development
     /app/log/prod.qpush.log
@@ -109,12 +109,12 @@ However, a working configuration would look like the following
         logging_enabled: true
         providers:
             aws:
-                key:
-                secret:
-                region:
+                key: YOUR_AWS_KEY_HERE
+                secret: YOUR_AWS_SECRET_HERE
+                region: YOUR_AWS_REGION_HERE
             ironmq:
-                token:
-                project_id:
+                token: YOUR_IRONMQ_TOKEN_HERE
+                project_id: YOUR_IRONMQ_PROJECT_ID_HERE
         queues:
             default:
                 provider: aws #or ironmq
@@ -129,5 +129,3 @@ However, a working configuration would look like the following
                     subscribers:
                         - { endpoint: http://example1.com/qpush, protocol: http }
                         - { endpoint: http://example2.com/qpush, protocol: http }
-
-
