@@ -143,6 +143,24 @@ The options and their descriptions are listed below.</p>
 </tbody>
 </table>
 </div>
+<div class="section" id="symfony-application-as-a-subscriber">
+<h2>Symfony Application as a Subscriber<a class="headerlink" href="#symfony-application-as-a-subscriber" title="Permalink to this headline">¶</a></h2>
+<p>The QPush Bundle uses a Request Listener which will capture and dispatch notifications from your queue providers for you. The specific route you use does not matter.</p>
+<p>In most cases, it is recommended to just list the host or domain for your Symfony application as the <tt class="docutils literal"><span class="pre">endpoint</span></tt> of your subscriber.</p>
+</div>
+<div class="section" id="logging-with-monolog">
+<h2>Logging with Monolog<a class="headerlink" href="#logging-with-monolog" title="Permalink to this headline">¶</a></h2>
+<p>By default, logging is enabled in the QPush Bundle and uses Monolog. You can
+toggle this behavior by setting <tt class="docutils literal"><span class="pre">logging_enabled</span></tt> to <tt class="docutils literal"><span class="pre">false</span></tt>.</p>
+<p>Logs will output to your Symfony log directory and to a file in the format of
+<tt class="docutils literal"><span class="pre">{env}.qpush.log</span></tt>.:</p>
+<div class="highlight-python"><pre>#production
+/app/log/prod.qpush.log
+
+#development
+/app/log/prod.qpush.log</pre>
+</div>
+</div>
 <div class="section" id="example-configuration">
 <h2>Example Configuration<a class="headerlink" href="#example-configuration" title="Permalink to this headline">¶</a></h2>
 <p>However, a working configuration would look like the following</p>
@@ -190,6 +208,8 @@ The options and their descriptions are listed below.</p>
 </li>
 <li><a class="reference internal" href="#caching">Caching</a></li>
 <li><a class="reference internal" href="#queue-options">Queue Options</a></li>
+<li><a class="reference internal" href="#symfony-application-as-a-subscriber">Symfony Application as a Subscriber</a></li>
+<li><a class="reference internal" href="#logging-with-monolog">Logging with Monolog</a></li>
 <li><a class="reference internal" href="#example-configuration">Example Configuration</a></li>
 </ul>
 </li>
