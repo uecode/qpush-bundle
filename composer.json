@@ -4,7 +4,7 @@
     "description":  "Asynchronous processing for Symfony using Push Queues",
     "keywords":     ["qpush", "pub-sub", "aws", "iron mq", "asynch", "push", "symfony", "bundle" ],
     "homepage":     "https://github.com/uecode/qpush-bundle",
-    "license":      "MIT",
+    "license":      "Apache 2.0",
     "authors":      [
         {
             "name":     "Keith Kirk",
@@ -18,18 +18,18 @@
     },
     "require": {
         "php": ">=5.4.0",
-        "doctrine/common": ">2.4.0"
+        "doctrine/common": "~2.4"
+    },
+    "require-dev": {
+        "symfony/symfony": "dev-master",
+        "monolog/monolog": "~1.7",
+        "phpunit/phpunit": "~3.7",
+        "aws/aws-sdk-php": "~2.5",
+        "iron-io/iron_mq": "~1.5"
     },
     "suggest": {
         "aws/aws-sdk-php": "Required to use AWS as a Queue Provider",
         "iron-io/iron_mq": "Required to use IronMQ as a Queue Provider"
-    },
-    "require-dev": {
-        "symfony/symfony": "dev-master",
-        "monolog/monolog": "~1.7.0",
-        "phpunit/phpunit": "3.7.*",
-        "aws/aws-sdk-php": "~2.5.2",
-        "iron-io/iron_mq": "~1.5.0"
     },
     "minimum-stability": "alpha",
     "autoload": {
