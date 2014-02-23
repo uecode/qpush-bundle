@@ -23,8 +23,6 @@
 namespace Uecode\Bundle\QPushBundle\Event;
 
 /**
- * Events
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 abstract class Events
@@ -42,7 +40,7 @@ abstract class Events
      *
      * @param string $name The name of the Queue for this Event
      *
-     * return string
+     * @return string
      */
     public static function Notification($name)
     {
@@ -54,7 +52,7 @@ abstract class Events
      *
      * @param string $name The name of the Queue for this Event
      *
-     * return string
+     * @return string
      */
     public static function Message($name)
     {

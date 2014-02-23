@@ -31,8 +31,6 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
 
 /**
- * UecodeQPushExtension
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class UecodeQPushExtension extends Extension

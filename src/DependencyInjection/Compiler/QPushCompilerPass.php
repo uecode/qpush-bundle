@@ -28,8 +28,6 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
- * QPushCompilerPass
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class QPushCompilerPass implements CompilerPassInterface
@@ -66,6 +64,7 @@ class QPushCompilerPass implements CompilerPassInterface
      * @param string           $cache     Optional Cache Service Id
      * @param ContainerBuilder $container Container from Symfony
      *
+     * @throws \InvalidArgumentException
      * @return Reference|Definition
      */
     private function getCache($cache, ContainerBuilder $container)

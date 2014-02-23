@@ -32,6 +32,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class QueueBuildCommand extends ContainerAwareCommand
 {
+    protected $output;
+
     protected function configure()
     {
         $this
@@ -67,7 +69,7 @@ class QueueBuildCommand extends ContainerAwareCommand
     private function buildQueue($registry, $name)
     {
         if (!$registry->has($name)) {
-            return $output->writeln(
+            return $this->output->writeln(
                 sprintf("The [%s] queue you have specified does not exists!", $name)
             );
         }

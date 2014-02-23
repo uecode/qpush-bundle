@@ -28,12 +28,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * QueuePublishCommand
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class QueuePublishCommand extends ContainerAwareCommand
 {
+    protected $output;
+
     protected function configure()
     {
         $this
@@ -48,7 +48,8 @@ class QueuePublishCommand extends ContainerAwareCommand
                 'message',
                 InputArgument::REQUIRED,
                 'A JSON encoded Message to send to the Queue'
-            );
+            )
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -65,7 +66,7 @@ class QueuePublishCommand extends ContainerAwareCommand
     private function sendMessage($registry, $name, $message)
     {
         if (!$registry->has($name)) {
-            return $output->writeln(
+            return $this->output->writeln(
                 sprintf("The [%s] queue you have specified does not exists!", $name)
             );
         }

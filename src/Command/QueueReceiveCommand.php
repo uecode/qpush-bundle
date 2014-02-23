@@ -31,8 +31,6 @@ use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 
 /**
- * QueueReceiveCommand
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class QueueReceiveCommand extends ContainerAwareCommand
@@ -47,7 +45,8 @@ class QueueReceiveCommand extends ContainerAwareCommand
                 InputArgument::OPTIONAL,
                 'Name of a specific queue to poll',
                 null
-            );
+            )
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -65,6 +64,7 @@ class QueueReceiveCommand extends ContainerAwareCommand
             $this->pollQueue($registry, $queue->getName());
         }
 
+        return 0;
     }
 
     private function pollQueue($registry, $name)

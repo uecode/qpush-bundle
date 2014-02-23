@@ -26,8 +26,6 @@ use Symfony\Component\EventDispatcher\Event;
 use Uecode\Bundle\QPushBundle\Message\Notification;
 
 /**
- * NotificaitonEvent
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class NotificationEvent extends Event

@@ -25,8 +25,6 @@ namespace Uecode\Bundle\QPushBundle\Message;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Message
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class Message

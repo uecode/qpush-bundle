@@ -26,8 +26,6 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
- * Configuration
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class Configuration implements ConfigurationInterface
@@ -48,7 +46,8 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->append($this->getProvidersNode())
                 ->append($this->getQueuesNode())
-            ->end();
+            ->end()
+        ;
 
         return $treeBuilder;
     }
@@ -75,7 +74,8 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('project_id')->end()
                     ->end()
                 ->end()
-            ->end();
+            ->end()
+        ;
 
         return $node;
     }
@@ -134,7 +134,8 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-            ->end();
+            ->end()
+        ;
 
         return $node;
     }
@@ -157,7 +158,8 @@ class Configuration implements ConfigurationInterface
                         ->example('http')
                     ->end()
                 ->end()
-            ->end();
+            ->end()
+        ;
 
         return $node;
     }

@@ -26,8 +26,6 @@ use Symfony\Component\EventDispatcher\Event;
 use Uecode\Bundle\QpushBundle\Message\Message;
 
 /**
- * MessageEvent
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class MessageEvent extends Event

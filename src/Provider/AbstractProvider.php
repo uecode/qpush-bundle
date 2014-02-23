@@ -31,8 +31,6 @@ use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
 
 /**
- * AbstractProvider
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 abstract class AbstractProvider implements ProviderInterface

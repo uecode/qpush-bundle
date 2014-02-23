@@ -35,8 +35,6 @@ use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
 use Uecode\Bundle\QPushBundle\Message\Message;
 
 /**
- * AwsProvider
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class AwsProvider extends AbstractProvider
@@ -509,7 +507,7 @@ class AwsProvider extends AbstractProvider
      * @param string $protocol The protocol of the Endpoint
      * @param string $endpoint The Endpoint of the Subscriber
      *
-     * @return boolean
+     * @return Boolean
      */
     public function unsubscribeFromTopic($topicArn, $protocol, $endpoint)
     {

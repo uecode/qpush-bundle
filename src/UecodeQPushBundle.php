@@ -29,8 +29,6 @@ use Uecode\Bundle\QPushBundle\DependencyInjection\Compiler\QPushCompilerPass;
 use Uecode\Bundle\QPushBundle\DependencyInjection\UecodeQPushExtension;
 
 /**
- * UecodeQPushBundle
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class UecodeQPushBundle extends Bundle

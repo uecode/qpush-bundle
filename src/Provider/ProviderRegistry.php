@@ -22,11 +22,7 @@
 
 namespace Uecode\Bundle\QPushBundle\Provider;
 
-use Uecode\Bundle\QPushBundle\Provider\ProviderInterface;
-
 /**
- * ProviderRegistry
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class ProviderRegistry
@@ -49,7 +45,7 @@ class ProviderRegistry
      * Adds a Listener to the chain based on priority
      *
      * @param string                 $name    The name of the Queue
-     * @param QueueProviderInterface $service The QueueProvider
+     * @param ProviderInterface $service The QueueProvider
      */
     public function addProvider($name, ProviderInterface $service)
     {
@@ -59,7 +55,7 @@ class ProviderRegistry
     /**
      * Returns the Queues
      *
-     * @return array|QPushClientService[]
+     * @return array
      */
     public function all()
     {
@@ -71,7 +67,7 @@ class ProviderRegistry
      *
      * @param string $name The name of the Queue to check for
      *
-     * @return boolean
+     * @return Boolean
      */
     public function has($name)
     {
@@ -81,7 +77,11 @@ class ProviderRegistry
     /**
      * Returns a Single QueueProvider by Queue Name
      *
-     * @return QueueProviderInterface
+     * @param string $name
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return ProviderInterface
      */
     public function get($name)
     {
@@ -91,5 +91,4 @@ class ProviderRegistry
 
         return $this->queues[$name];
     }
-
 }

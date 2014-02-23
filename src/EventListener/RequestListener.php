@@ -34,8 +34,6 @@ use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
 
 /**
- * RequestListener
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class RequestListener

@@ -34,8 +34,6 @@ use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
 use Uecode\Bundle\QPushBundle\Message\Message;
 
 /**
- * IronMqProvider
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class IronMqProvider extends AbstractProvider
