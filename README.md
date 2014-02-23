@@ -85,7 +85,7 @@ an array, typically associative.
 
 public function publishAction()
 {
-    $message = ['foo' => bar'];
+    $message = ['foo' => 'bar'];
     
     // fetch your provider service from the container
     $this->get('uecode_qpush')->get('my_queue_name')->publish($message);
