@@ -75,6 +75,28 @@ The options and their descriptions are listed below.
 | ``subscribers``          | An array of Subscribers, containing an ``endpoint`` and ``protocol``                      | ``empty``     |
 +--------------------------+-------------------------------------------------------------------------------------------+---------------+
 
+Symfony Application as a Subscriber
+-----------------------------------
+
+The QPush Bundle uses a Request Listener which will capture and dispatch notifications from your queue providers for you. The specific route you use does not matter.
+
+In most cases, it is recommended to just list the host or domain for your Symfony application as the ``endpoint`` of your subscriber.
+
+Logging with Monolog
+--------------------
+
+By default, logging is enabled in the QPush Bundle and uses Monolog. You can 
+toggle this behavior by setting ``logging_enabled`` to ``false``.
+
+Logs will output to your Symfony log directory and to a file in the format of
+``{env}.qpush.log``.::
+
+    #production
+    /app/log/prod.qpush.log
+    
+    #development
+    /app/log/prod.qpush.log
+
 Example Configuration
 ---------------------
 
