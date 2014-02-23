@@ -5,7 +5,7 @@ QPush - Symfony2 Push Queue Bundle
 
 ##Overview
 This bundle allows you to easily consume messages from Push Queues by simply
-tagging your services and relying on Symfony's event dispatching - without
+tagging your services and relying on Symfony's event dispatcher - without
 needing to run a daemon or background process to continuously poll your queue.
 
 **Full Documentation:** [qpush-bundle.readthedocs.org](http://qpush-bundle.rtfd.org)
@@ -45,7 +45,7 @@ public function registerBundles()
 
 Here is a basic configuration that would create a push queue called 
 `my_queue_name` using AWS or IronMQ. You can read about the supported providers
-and provider options in the full documentation.
+and provider options in the [full documentation](http://qpush-bundle.rtfd.org).
 
 ######Example
 
@@ -73,7 +73,7 @@ uecode_qpush:
 ##Publishing messages to your Queue
 
 Publishing messages is simple - fetch the registered Provider service from the
-container and call the `publish` method.
+container and call the `publish` method on the respective queue.
 
 This bundle stores your messages as a json object and the publish method expects
 an array, typically associative.
@@ -129,7 +129,7 @@ public function onMessageReceived(MessageEvent $event)
 The `Message` objects contain the provider specific message id, a message body,
 and a collection of provider specific metadata.
 
-These properties are accessible through simple getters. 
+These properties are accessible through simple getters from the message object.
 
 ######Example
 ```php
