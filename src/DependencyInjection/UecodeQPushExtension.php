@@ -31,8 +31,6 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
 
 /**
- * UecodeQPushExtension
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class UecodeQPushExtension extends Extension
@@ -68,6 +66,8 @@ class UecodeQPushExtension extends Extension
             $values['options']['logging_enabled'] = $config['logging_enabled'];
 
             $provider = $values['provider'];
+            $class = null;
+            $client = null;
             switch ($provider) {
                 case 'aws':
                     $class  = $container->getParameter('uecode_qpush.provider.aws');
@@ -90,7 +90,8 @@ class UecodeQPushExtension extends Extension
             );
 
             $name = sprintf('uecode_qpush.%s', $queue);
-            $service = $container->setDefinition($name, $definition)
+
+            $container->setDefinition($name, $definition)
                 ->addTag('monolog.logger', ['channel' => 'qpush'])
                 ->addTag(
                     'uecode_qpush.event_listener',
@@ -107,7 +108,8 @@ class UecodeQPushExtension extends Extension
                         'method' => "onMessageReceived",
                         'priority' => -255
                     ]
-                );
+                )
+            ;
 
             $registry->addMethodCall('addProvider', [$queue, new Reference($name)]);
         }

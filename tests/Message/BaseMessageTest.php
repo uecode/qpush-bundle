@@ -25,8 +25,6 @@ namespace Uecode\Bundle\QpushBundle\Tests\Message;
 use Uecode\Bundle\QPushBundle\Message;
 
 /**
- * BaseMessageTest
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 abstract class BaseMessageTest extends \PHPUnit_Framework_TestCase

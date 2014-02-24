@@ -24,19 +24,14 @@ namespace Uecode\Bundle\QPushBundle\Provider;
 
 use Aws\Common\Aws;
 use Aws\Sqs\SqsClient;
-
 use Doctrine\Common\Cache\Cache;
 use Symfony\Bridge\Monolog\Logger;
-
 use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
-
 use Uecode\Bundle\QPushBundle\Message\Message;
 
 /**
- * AwsProvider
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class AwsProvider extends AbstractProvider
@@ -44,12 +39,18 @@ class AwsProvider extends AbstractProvider
     /**
      * Aws SQS Client
      *
+     * @method void deleteTopic(array $topic)
+     * @method publish(array $message)
+     *
      * @var SqsClient
      */
     private $sqs;
 
     /**
      * Aws SQS Client
+     *
+     * @method void deleteTopic(array $topic)
+     * @method object createTopic(array $topic)
      *
      * @var SqsClient
      */
@@ -123,13 +124,13 @@ class AwsProvider extends AbstractProvider
     }
 
     /**
-     * @return bool
+     * @return Boolean
      */
     public function destroy()
     {
         if ($this->queueExists()) {
             // Delete the SQS Queue
-            $result = $this->sqs->deleteQueue([
+            $this->sqs->deleteQueue([
                 'QueueUrl' => $this->queueUrl
             ]);
 
@@ -143,9 +144,10 @@ class AwsProvider extends AbstractProvider
             // Delete the SNS Topic
             $topicArn = !empty($this->topicArn)
                 ? $this->topicArn
-                : str_replace('sqs', 'sns', $this->queueUrl);
+                : str_replace('sqs', 'sns', $this->queueUrl)
+            ;
 
-            $result = $this->sns->deleteTopic([
+            $this->sns->deleteTopic([
                 'TopicArn' => $topicArn
             ]);
 
@@ -281,7 +283,7 @@ class AwsProvider extends AbstractProvider
             return false;
         }
 
-        $result = $this->sqs->deleteMessage([
+        $this->sqs->deleteMessage([
             'QueueUrl'      => $this->queueUrl,
             'ReceiptHandle' => $id
         ]);
@@ -302,7 +304,7 @@ class AwsProvider extends AbstractProvider
      * to reduce the need to needlessly call the create method on an existing
      * Queue.
      *
-     * @return string
+     * @return boolean
      */
     public function queueExists()
     {
@@ -400,7 +402,7 @@ class AwsProvider extends AbstractProvider
      * to reduce the need to needlessly call the create method on an existing
      * Topic.
      *
-     * @return string
+     * @return boolean
      */
     public function topicExists()
     {
@@ -424,9 +426,8 @@ class AwsProvider extends AbstractProvider
      * The create method for the SNS Topics is idempotent - if the topic already
      * exists, this method will return the Topic ARN of the existing Topic.
      *
-     * @param string $name The name of the Queue to be used as a Topic Name
      *
-     * @return string
+     * @return false|null
      */
     public function createTopic()
     {
@@ -509,7 +510,7 @@ class AwsProvider extends AbstractProvider
      * @param string $protocol The protocol of the Endpoint
      * @param string $endpoint The Endpoint of the Subscriber
      *
-     * @return boolean
+     * @return Boolean
      */
     public function unsubscribeFromTopic($topicArn, $protocol, $endpoint)
     {

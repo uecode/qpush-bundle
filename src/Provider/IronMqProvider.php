@@ -23,19 +23,14 @@
 namespace Uecode\Bundle\QPushBundle\Provider;
 
 use IronMQ;
-
 use Doctrine\Common\Cache\Cache;
 use Symfony\Bridge\Monolog\Logger;
-
 use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
-
 use Uecode\Bundle\QPushBundle\Message\Message;
 
 /**
- * IronMqProvider
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class IronMqProvider extends AbstractProvider
@@ -77,7 +72,7 @@ class IronMqProvider extends AbstractProvider
      * All Create methods are idempotent, if the resource exists, the current ARN
      * will be returned
      *
-     * @return bool
+     * @return Boolean
      */
     public function create()
     {
@@ -114,7 +109,7 @@ class IronMqProvider extends AbstractProvider
     }
 
     /**
-     * @return bool
+     * @return Boolean
      */
     public function destroy()
     {
@@ -207,7 +202,7 @@ class IronMqProvider extends AbstractProvider
     }
 
     /**
-     * @return bool
+     * @return Boolean
      */
     public function delete($id)
     {
@@ -232,7 +227,7 @@ class IronMqProvider extends AbstractProvider
      * to reduce the need to needlessly call the create method on an existing
      * Queue.
      *
-     * @return string
+     * @return Boolean
      */
     public function queueExists()
     {

@@ -25,8 +25,6 @@ namespace Uecode\Bundle\QpushBundle\Tests\Message;
 use Uecode\Bundle\QPushBundle\Message\Message;
 
 /**
- * MessageTest
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class MessageTest extends BaseMessageTest

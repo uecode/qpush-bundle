@@ -25,8 +25,6 @@ namespace Uecode\Bundle\QPushBundle\Message;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Message
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class Message
@@ -97,7 +95,7 @@ class Message
     /**
      * Returns the Message Metadata
      *
-     * @return array
+     * @return ArrayCollection
      */
     public function getMetadata()
     {

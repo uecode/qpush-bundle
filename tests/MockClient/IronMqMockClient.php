@@ -23,8 +23,6 @@
 namespace Uecode\Bundle\QPushBundle\Tests\MockClient;
 
 /**
- * IronMqMockClient
- *
  * @codeCoverageIgnore
  *
  * @author Keith Kirk <kkirk@undergroundelephant.com>

@@ -5,14 +5,14 @@ Once configured, you can create messages and publish them to the queue. You may 
 create services that will automatically be fired as messages are pushed to your application.
 
 For your convenience, a custom ``Provider`` service will be created and registered 
-in the Container for each of your defined Queues. The container service id will be 
+in the Container for each of your defined Queues. The container queue service id will be
 in the format of ``uecode_qpush.{your queue name}``.
 
 Publishing messages to your Queue
 ---------------------------------
 
 Publishing messages is simple - fetch your ``Provider`` service from the container and
-call the ``publish`` method, which accepts an array.
+call the ``publish`` method on the respective queue, which accepts an array.
 
 .. code-block:: php
 
@@ -86,7 +86,7 @@ The message ``body`` is an array matching your original message. The ``metadata`
 Tagging Your Services
 ^^^^^^^^^^^^^^^^^^^^^
 
-For your Services to be called on QPush events, they  must be tagged with the name
+For your Services to be called on QPush events, they must be tagged with the name
 ``uecode_qpush.event_listener``. A complete tag is made up of the following properties:
 
 ============    =================================       ==========================================================================================
@@ -94,7 +94,7 @@ Tag Property    Example                                 Description
 ============    =================================       ==========================================================================================
 ``name``        ``uecode_qpush.event_listener``         The Qpush Event Listener Tag
 ``event``       ``{queue name}.message_received``       The `message_received` event, prefixed with the Queue name
-``method``      ``onMessageReceived``                   A publicly accessbile method on your service
+``method``      ``onMessageReceived``                   A publicly accessible method on your service
 ``priority``    ``100``                                 Priority, ``1``-``100`` to control order of services. Higher priorities are called earlier
 ============    =================================       ==========================================================================================
 
@@ -129,7 +129,7 @@ take a single argument, an instance of ``Uecode\Bundle\QPushBundle\Event\Message
     {
         $queueName  = $event->getQueueName();
         $message    = $event->getMessage();
-        $metadata   = $event->Message()->getMetadata();
+        $metadata   = $message()->getMetadata();
         
         // Process ...
     }
@@ -180,5 +180,3 @@ environment, so its reachable by your Queue Provider.
 
 You would need to update your `config_dev.yml` configuration to use the `ngrok` url for
 your subscriber(s).
-
-

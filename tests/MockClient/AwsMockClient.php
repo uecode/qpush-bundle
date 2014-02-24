@@ -22,12 +22,7 @@
 
 namespace Uecode\Bundle\QPushBundle\Tests\MockClient;
 
-use Uecode\Bundle\QPushBundle\Tests\MockClient\SqsMockClient;
-use Uecode\Bundle\QPushBundle\Tests\MockClient\SnsMockClient;
-
 /**
- * AwsMockClient
- *
  * @codeCoverageIgnore
  *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
@@ -48,5 +43,4 @@ class AwsMockClient extends \Aws\Common\Aws
 
         return new SqsMockClient;
     }
-
 }

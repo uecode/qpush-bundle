@@ -25,8 +25,6 @@ namespace Uecode\Bundle\QpushBundle\Tests\Message;
 use Uecode\Bundle\QPushBundle\Message\Notification;
 
 /**
- * NotificationTest
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class NotificationTest extends BaseMessageTest

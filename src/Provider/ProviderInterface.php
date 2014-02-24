@@ -26,8 +26,6 @@ use Doctrine\Common\Cache\Cache;
 use Symfony\Bridge\Monolog\Logger;
 
 /**
- * ProviderInterface
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 interface ProviderInterface

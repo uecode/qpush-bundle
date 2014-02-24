@@ -27,15 +27,12 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Uecode\Bundle\QPushBundle\Message\Message;
 use Uecode\Bundle\QPushBundle\Message\Notification;
 use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
 
 /**
- * RequestListener
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class RequestListener
@@ -127,7 +124,7 @@ class RequestListener
      */
     private function handleSnsNotifications(GetResponseEvent $event)
     {
-        $notification = json_decode($event->getRequest()->getContent(), true);
+        $notification = json_decode((string)$event->getRequest()->getContent(), true);
 
         if (false === strpos($notification['TopicArn'], 'qpush_')) {
             return;

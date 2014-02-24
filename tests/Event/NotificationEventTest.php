@@ -27,8 +27,6 @@ use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
 use Uecode\Bundle\QPushBundle\Message\Notification;
 
 /**
- * NotificationEventTest
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class NotificationEventTest extends \PHPUnit_Framework_TestCase

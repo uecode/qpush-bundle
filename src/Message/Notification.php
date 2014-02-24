@@ -25,8 +25,6 @@ namespace Uecode\Bundle\QPushBundle\Message;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Notification
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class Notification
@@ -97,7 +95,7 @@ class Notification
     /**
      * Returns the Notification Metadata
      *
-     * @return array
+     * @return ArrayCollection
      */
     public function getMetadata()
     {

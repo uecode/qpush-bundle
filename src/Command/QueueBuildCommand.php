@@ -28,12 +28,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * QueueBuildCommand
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class QueueBuildCommand extends ContainerAwareCommand
 {
+    protected $output;
+
     protected function configure()
     {
         $this
@@ -44,7 +44,8 @@ class QueueBuildCommand extends ContainerAwareCommand
                 InputArgument::OPTIONAL,
                 'Name of a specific queue to build',
                 null
-            );
+            )
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -62,12 +63,13 @@ class QueueBuildCommand extends ContainerAwareCommand
             $this->buildQueue($registry, $queue->getName());
         }
 
+        return 0;
     }
 
     private function buildQueue($registry, $name)
     {
         if (!$registry->has($name)) {
-            return $output->writeln(
+            return $this->output->writeln(
                 sprintf("The [%s] queue you have specified does not exists!", $name)
             );
         }

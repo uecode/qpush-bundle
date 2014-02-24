@@ -24,13 +24,11 @@ namespace Uecode\Bundle\QPushBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass;
+use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Uecode\Bundle\QPushBundle\DependencyInjection\Compiler\QPushCompilerPass;
 use Uecode\Bundle\QPushBundle\DependencyInjection\UecodeQPushExtension;
 
 /**
- * UecodeQPushBundle
- *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class UecodeQPushBundle extends Bundle

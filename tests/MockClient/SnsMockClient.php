@@ -25,8 +25,6 @@ namespace Uecode\Bundle\QPushBundle\Tests\MockClient;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * SnsMockClient
- *
  * @codeCoverageIgnore
  *
  * @author Keith Kirk <kkirk@undergroundelephant.com>
