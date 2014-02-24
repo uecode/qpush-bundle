@@ -7,7 +7,7 @@ immediate flow of your application and delegate them to another part of your app
 cluster of workers.
 
 This bundle allows you to easily consume and process messages by simply tagging your service or
-services and relying on Symfony's event dispatching - without needing to run a daemon or background
+services and relying on Symfony's event dispatcher - without needing to run a daemon or background
 process to continuously poll your queue.
 
 Content

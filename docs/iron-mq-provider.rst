@@ -2,7 +2,7 @@ IronMQ Provider
 ^^^^^^^^^^^^^^^
 
 The IronMQ Provider uses its Push Queues to notify subscribers of new queued
-messages with out needing to continually poll the queue.
+messages without needing to continually poll the queue.
 
 Using a Push Queue is optional with this provider and its possible to use simple
 Pull queues by utilizing the provided Console Command (``uecode:qpush::receive``) 
@@ -17,7 +17,7 @@ and needs to have the library included in your ``composer.json`` file.
 
     {
         require: {
-            "iron-io/iron_mq_php": : "2.*"
+            "iron-io/iron_mq_php": "~1.5"
         }
     }
 
@@ -38,8 +38,8 @@ queue to use the `ironmq` provider.
     uecode_qpush:
         providers:
             ironmq:
-                token:
-                project_id:
+                token: YOUR_TOKEN_HERE
+                project_id: YOUR_PROJECT_ID_HERE
         queues:
             my_queue_name:
                 provider: ironmq

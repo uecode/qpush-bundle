@@ -1,19 +1,19 @@
 Console Commands
 ================
 
-This bundle includes some Console Commands which can be used to for building, destroying and polling your queues
+This bundle includes some Console Commands which can be used for building, destroying and polling your queues
 as well as sending simple messages.
 
 Build Command
 -------------
 
 You can use the ``uecode:qpush:build`` command to create the queues on your providers. You can specify the name of a queue
-as an argument to build a single queue. This command will also warm cache which reduces the need to query the provider's API
+as an argument to build a single queue. This command will also warm cache which avoids the need to query the provider's API
 to ensure that the queue exists. Most queue providers create commands are idempotent, so running this multiple times is not an issue.::
 
     $ php app/console uecode:qpush:build my_queue_name
 
-**Note:** *By default, this bundle uses File Cache.  If you clear cache, it is highly recommended you re-run the build command to warm cache!*
+**Note:** *By default, this bundle uses File Cache.  If you clear cache, it is highly recommended you re-run the build command to warm the cache!*
 
 Destroy Command
 ---------------
