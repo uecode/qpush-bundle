@@ -125,7 +125,7 @@ class RequestListener
      */
     private function handleSnsNotifications(GetResponseEvent $event)
     {
-        $notification = json_decode($event->getRequest()->getContent(), true);
+        $notification = json_decode((string)$event->getRequest()->getContent(), true);
 
         if (false === strpos($notification['TopicArn'], 'qpush_')) {
             return;

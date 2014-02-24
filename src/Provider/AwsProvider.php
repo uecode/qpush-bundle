@@ -42,12 +42,18 @@ class AwsProvider extends AbstractProvider
     /**
      * Aws SQS Client
      *
+     * @method void deleteTopic(array $topic)
+     * @method publish(array $message)
+     *
      * @var SqsClient
      */
     private $sqs;
 
     /**
      * Aws SQS Client
+     *
+     * @method void deleteTopic(array $topic)
+     * @method object createTopic(array $topic)
      *
      * @var SqsClient
      */
@@ -121,13 +127,13 @@ class AwsProvider extends AbstractProvider
     }
 
     /**
-     * @return bool
+     * @return Boolean
      */
     public function destroy()
     {
         if ($this->queueExists()) {
             // Delete the SQS Queue
-            $result = $this->sqs->deleteQueue([
+            $this->sqs->deleteQueue([
                 'QueueUrl' => $this->queueUrl
             ]);
 
@@ -141,9 +147,10 @@ class AwsProvider extends AbstractProvider
             // Delete the SNS Topic
             $topicArn = !empty($this->topicArn)
                 ? $this->topicArn
-                : str_replace('sqs', 'sns', $this->queueUrl);
+                : str_replace('sqs', 'sns', $this->queueUrl)
+            ;
 
-            $result = $this->sns->deleteTopic([
+            $this->sns->deleteTopic([
                 'TopicArn' => $topicArn
             ]);
 
@@ -279,7 +286,7 @@ class AwsProvider extends AbstractProvider
             return false;
         }
 
-        $result = $this->sqs->deleteMessage([
+        $this->sqs->deleteMessage([
             'QueueUrl'      => $this->queueUrl,
             'ReceiptHandle' => $id
         ]);
