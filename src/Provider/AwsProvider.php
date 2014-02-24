@@ -39,20 +39,14 @@ class AwsProvider extends AbstractProvider
     /**
      * Aws SQS Client
      *
-     * @method void deleteTopic(array $topic)
-     * @method publish(array $message)
-     *
      * @var SqsClient
      */
     private $sqs;
 
     /**
-     * Aws SQS Client
+     * Aws SNS Client
      *
-     * @method void deleteTopic(array $topic)
-     * @method object createTopic(array $topic)
-     *
-     * @var SqsClient
+     * @var SnsClient
      */
     private $sns;
 
