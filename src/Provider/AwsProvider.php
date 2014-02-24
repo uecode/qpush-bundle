@@ -24,14 +24,11 @@ namespace Uecode\Bundle\QPushBundle\Provider;
 
 use Aws\Common\Aws;
 use Aws\Sqs\SqsClient;
-
 use Doctrine\Common\Cache\Cache;
 use Symfony\Bridge\Monolog\Logger;
-
 use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
-
 use Uecode\Bundle\QPushBundle\Message\Message;
 
 /**
@@ -307,7 +304,7 @@ class AwsProvider extends AbstractProvider
      * to reduce the need to needlessly call the create method on an existing
      * Queue.
      *
-     * @return string
+     * @return boolean
      */
     public function queueExists()
     {
@@ -405,7 +402,7 @@ class AwsProvider extends AbstractProvider
      * to reduce the need to needlessly call the create method on an existing
      * Topic.
      *
-     * @return string
+     * @return boolean
      */
     public function topicExists()
     {
@@ -429,9 +426,8 @@ class AwsProvider extends AbstractProvider
      * The create method for the SNS Topics is idempotent - if the topic already
      * exists, this method will return the Topic ARN of the existing Topic.
      *
-     * @param string $name The name of the Queue to be used as a Topic Name
      *
-     * @return string
+     * @return false|null
      */
     public function createTopic()
     {

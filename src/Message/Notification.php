@@ -95,7 +95,7 @@ class Notification
     /**
      * Returns the Notification Metadata
      *
-     * @return array
+     * @return ArrayCollection
      */
     public function getMetadata()
     {

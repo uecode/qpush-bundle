@@ -95,7 +95,7 @@ class Message
     /**
      * Returns the Message Metadata
      *
-     * @return array
+     * @return ArrayCollection
      */
     public function getMetadata()
     {
