@@ -21,7 +21,7 @@
         "doctrine/common": "~2.4"
     },
     "require-dev": {
-        "symfony/symfony": "dev-master",
+        "symfony/symfony": "~2.3",
         "monolog/monolog": "~1.7",
         "phpunit/phpunit": "~3.7",
         "aws/aws-sdk-php": "~2.5",
