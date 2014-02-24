@@ -35,6 +35,8 @@ use Uecode\Bundle\QPushBundle\Event\MessageEvent;
  */
 class QueueReceiveCommand extends ContainerAwareCommand
 {
+    protected $output;
+
     protected function configure()
     {
         $this
