@@ -55,12 +55,12 @@ and provider options in the [full documentation](http://qpush-bundle.rtfd.org).
 uecode_qpush:
     providers:
         aws:
-            key:    <aws api key>
-            secret: <aws secret>
-            region: us-east-1
+            key:    YOUR_AWS_KEY_HERE
+            secret: YOUR_AWS_SECRET_HERE
+            region: YOUR_AWS_REGION_HERE
         ironmq:
-            token:      <iron mq oauth token>
-            project_id: <iron mq project id>
+            token:      YOUR_IRON_MQ_TOKEN_HERE
+            project_id: YOUR_IRON_MQ_PROJECT_ID_HERE
     queues:
         my_queue_name:
             provider: aws #or ironmq
