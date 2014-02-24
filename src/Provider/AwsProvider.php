@@ -512,7 +512,7 @@ class AwsProvider extends AbstractProvider
         $subscriptions = $this->getTopicSubscriptions($topicArn);
         foreach ($subscriptions as $subscription) {
             if ($endpoint === $subscription['Endpoint']) {
-                $result = $this->sns->unsubscribe([
+                $this->sns->unsubscribe([
                     'SubscriptionArn' => $subscription['SubscriptionArn']
                 ]);
 
