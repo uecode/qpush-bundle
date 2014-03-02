@@ -59,7 +59,6 @@ class UecodeQPushExtension extends Extension
         $registry   = $container->getDefinition('uecode_qpush.registry');
 
         foreach ($config['queues'] as $queue => $values) {
-
             // Adds logging property to queue options
             $values['options']['logging_enabled'] = $config['logging_enabled'];
 
@@ -81,6 +80,11 @@ class UecodeQPushExtension extends Extension
                         $container
                     );
                     break;
+                case 'rabbitmq':
+                    $class  = $container->getParameter('uecode_qpush.provider.rabbitmq');
+//                    $client = $this->x(
+//
+//                    )
             }
 
             $definition = new Definition(
