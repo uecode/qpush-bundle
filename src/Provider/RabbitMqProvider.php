@@ -279,7 +279,7 @@ class RabbitMqProvider extends AbstractProvider
     /**
      * Removes the message from queue after all other listeners have fired
      *
-     * If an earlier listener has errored or stopped propigation, this method
+     * If an earlier listener has failed or stopped propagation, this method
      * will not fire and the Queued Message should become visible in queue again.
      *
      * Stops Event Propagation after removing the Message
