@@ -22,8 +22,6 @@
 
 namespace Uecode\Bundle\QPushBundle;
 
-use Matthias\SymfonyServiceDefinitionValidator\Compiler\ValidateServiceDefinitionsPass;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass;
@@ -60,11 +58,6 @@ class UecodeQPushBundle extends Bundle
                 'uecode_qpush.event_listener',
                 'uecode_qpush.event_subscriber'
             )
-        );
-
-        $container->addCompilerPass(
-            new ValidateServiceDefinitionsPass(),
-            PassConfig::TYPE_AFTER_REMOVING
         );
     }
 }
