@@ -26,46 +26,46 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Uecode\Bundle\QPushBundle\Event\Events;
+use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 
 /**
- * @author Keith Kirk <kkirk@undergroundelephant.com>
+ * @author Luis Cordova <cordoval@gmail.com>
  */
-class QueuePublishCommand extends ContainerAwareCommand
+class QueueStatusCommand
 {
-    protected $output;
-
     protected function configure()
     {
         $this
-            ->setName('uecode:qpush:publish')
-            ->setDescription('Sends a Message to a Queue')
+            ->setName('uecode:qpush:status')
+            ->setDescription('Check the status(es) of the queue(s)')
             ->addArgument(
                 'name',
-                InputArgument::REQUIRED,
-                'Name of the Queue'
-            )
-            ->addArgument(
-                'message',
-                InputArgument::REQUIRED,
-                'A JSON encoded Message to send to the Queue'
+                InputArgument::OPTIONAL,
+                'Name of a specific queue to check',
+                null
             )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->output = $output;
         $registry = $this->getContainer()->get('uecode_qpush');
 
         $name = $input->getArgument('name');
-        $message = $input->getArgument('message');
 
-        $this->sendMessage($registry, $name, $message);
+        if (null !== $name) {
+            return $this->getStatus($registry, $name);
+        }
+
+        foreach ($registry->all() as $queue) {
+            $this->getStatus($registry, $queue->getName());
+        }
 
         return 0;
     }
 
-    private function sendMessage($registry, $name, $message)
+    private function getStatus($registry, $name)
     {
         if (!$registry->has($name)) {
             $this->output->writeln(
@@ -75,9 +75,10 @@ class QueuePublishCommand extends ContainerAwareCommand
             return 1;
         }
 
-        $registry->get($name)->publish(json_decode($message, true));
+        $status = $registry->get($name)->ge();
 
-        $this->output->writeln("<info>The message has been sent.</info>");
+        $msg = "<info>Finished checking status for %s Queue: %s.</info>";
+        $this->output->writeln(sprintf($msg, $name, $status));
 
         return 0;
     }

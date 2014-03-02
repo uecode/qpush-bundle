@@ -94,7 +94,7 @@ class QueueDestroyCommand extends ContainerAwareCommand
     {
         if (!$registry->has($name)) {
             $this->output->writeln(
-                sprintf("The [%s] queue you have specified does not exists!", $name)
+                sprintf("The [%s] queue you have specified does not exist!", $name)
             );
 
             return 1;
