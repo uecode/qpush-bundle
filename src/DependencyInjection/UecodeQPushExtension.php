@@ -48,7 +48,6 @@ class UecodeQPushExtension extends Extension
         $loader->load('parameters.yml');
         $loader->load('services.yml');
 
-        $container->setParameter('uecode_qpush.route', $config['route']);
         $container->setParameter('uecode_qpush.queues', $config['queues']);
         $container->setParameter('uecode_qpush.providers', $config['providers']);
 
