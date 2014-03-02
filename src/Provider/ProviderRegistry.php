@@ -44,10 +44,10 @@ class ProviderRegistry
     /**
      * Adds a Listener to the chain based on priority
      *
-     * @param string                 $name    The name of the Queue
-     * @param ProviderInterface $service The QueueProvider
+     * @param string      $name    The name of the Queue
+     * @param Provider    $service The QueueProvider
      */
-    public function addProvider($name, ProviderInterface $service)
+    public function addProvider($name, Provider $service)
     {
         $this->queues[$name] = $service;
     }
@@ -81,7 +81,7 @@ class ProviderRegistry
      *
      * @throws \InvalidArgumentException
      *
-     * @return ProviderInterface
+     * @return Provider
      */
     public function get($name)
     {

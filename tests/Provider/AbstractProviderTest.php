@@ -22,7 +22,7 @@
 
 namespace Uecode\Bundle\QPushBundle\Tests\Provider;
 
-use Uecode\Bundle\QPushBundle\Provider\ProviderInterface;
+use Uecode\Bundle\QPushBundle\Provider\Provider;
 
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
@@ -95,7 +95,7 @@ class AbstractProviderTest extends \PHPUnit_Framework_TestCase
     {
         $name = $this->provider->getNameWithPrefix();
 
-        $this->assertEquals(sprintf('%s_%s', ProviderInterface::QPUSH_PREFIX, 'test'), $name);
+        $this->assertEquals(sprintf('%s_%s', Provider::QPUSH_PREFIX, 'test'), $name);
     }
 
     public function testGetOptions()

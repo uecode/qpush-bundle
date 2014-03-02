@@ -24,14 +24,13 @@ namespace Uecode\Bundle\QPushBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
 use Symfony\Bridge\Monolog\Logger;
-use Uecode\Bundle\QPushBundle\Provider\ProviderInterface;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
 
 /**
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
-abstract class AbstractProvider implements ProviderInterface
+abstract class AbstractProvider implements Provider
 {
     /**
      * QPush Queue Name

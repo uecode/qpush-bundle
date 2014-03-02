@@ -32,7 +32,7 @@ class ProviderRegistryTest extends \PHPUnit_Framework_TestCase
     public function testRegistry()
     {
         $registry   = new ProviderRegistry();
-        $interface  = 'Uecode\Bundle\QPushBundle\Provider\ProviderInterface';
+        $interface  = 'Uecode\Bundle\QPushBundle\Provider\Provider';
 
         $registry->addProvider('test', $this->getMock($interface));
 
