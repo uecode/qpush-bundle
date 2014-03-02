@@ -1,3 +1,8 @@
+parameters:
+    uecode_qpush.registry.class:    Uecode\Bundle\QPushBundle\Provider\ProviderRegistry
+    uecode_qpush.provider.aws:      Uecode\Bundle\QPushBundle\Provider\AwsProvider
+    uecode_qpush.provider.ironmq:   Uecode\Bundle\QPushBundle\Provider\IronMqProvider
+
 services:
     ### QPush Registry
     uecode_qpush.registry:

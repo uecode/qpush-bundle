@@ -60,7 +60,7 @@ class IronMqProvider extends AbstractProvider
 
     public function getProvider()
     {
-        return "IronMQ";
+        return 'IronMQ';
     }
 
     /**

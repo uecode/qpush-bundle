@@ -52,7 +52,6 @@ class UecodeQPushExtension extends Extension
             new FileLocator(__DIR__.'/../Resources/config')
         );
 
-        $loader->load('parameters.yml');
         $loader->load('services.yml');
 
         $cache      = $container->getDefinition('uecode_qpush.file_cache');

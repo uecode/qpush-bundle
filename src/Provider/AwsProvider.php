@@ -269,7 +269,8 @@ class AwsProvider extends AbstractProvider
     }
 
     /**
-     * @return bool
+     * @param mixed $id
+     * @return Boolean
      */
     public function delete($id)
     {
@@ -298,7 +299,7 @@ class AwsProvider extends AbstractProvider
      * to reduce the need to needlessly call the create method on an existing
      * Queue.
      *
-     * @return boolean
+     * @return Boolean
      */
     public function queueExists()
     {
@@ -396,7 +397,7 @@ class AwsProvider extends AbstractProvider
      * to reduce the need to needlessly call the create method on an existing
      * Topic.
      *
-     * @return boolean
+     * @return Boolean
      */
     public function topicExists()
     {

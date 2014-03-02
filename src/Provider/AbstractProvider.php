@@ -86,7 +86,8 @@ abstract class AbstractProvider implements Provider
     }
 
     /**
-     * @return bool
+     * @param NotificationEvent $event
+     * @return Boolean
      */
     public function onNotification(NotificationEvent $event)
     {
@@ -94,7 +95,8 @@ abstract class AbstractProvider implements Provider
     }
 
     /**
-     * @return bool
+     * @param MessageEvent $event
+     * @return Boolean
      */
     public function onMessageReceived(MessageEvent $event)
     {
