@@ -6,6 +6,7 @@ QPush - Symfony2 Push Queue Bundle
 [![Code Coverage](https://scrutinizer-ci.com/g/uecode/qpush-bundle/badges/coverage.png?s=372bcf1c9656b514075b29e4e39f8506772a7a16)](https://scrutinizer-ci.com/g/uecode/qpush-bundle/)
 
 ##Overview
+
 This bundle allows you to easily consume messages from Push Queues by simply
 tagging your services and relying on Symfony's event dispatcher - without
 needing to run a daemon or background process to continuously poll your queue.
@@ -105,6 +106,7 @@ which can be handled by your services. You need to tag your services to handle
 these events.
 
 ######Example
+
 ```yaml
 services:
     my_example_service:
@@ -114,6 +116,7 @@ services:
 ```
 
 ######Example
+
 ```php
 #src/My/Bundle/ExampleBundle/Service/ExampleService.php
 
@@ -134,6 +137,7 @@ and a collection of provider specific metadata.
 These properties are accessible through simple getters from the message object.
 
 ######Example
+
 ```php
 #src/My/Bundle/ExampleBundle/Service/ExampleService.php
 

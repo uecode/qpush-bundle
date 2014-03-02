@@ -23,10 +23,8 @@
 namespace Uecode\Bundle\QPushBundle\Tests\Provider;
 
 use Uecode\Bundle\QPushBundle\Provider\Provider;
-
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
-
 use Uecode\Bundle\QPushBundle\Message\Message;
 use Uecode\Bundle\QPushBundle\Message\Notification;
 
