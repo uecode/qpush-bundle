@@ -60,18 +60,23 @@ class QueuePublishCommand extends ContainerAwareCommand
         $name = $input->getArgument('name');
         $message = $input->getArgument('message');
 
-        return $this->sendMessage($registry, $name, $message);
+        $this->sendMessage($registry, $name, $message);
+
+        return 0;
     }
 
     private function sendMessage($registry, $name, $message)
     {
         if (!$registry->has($name)) {
-            return $this->output->writeln(
+            $this->output->writeln(
                 sprintf("The [%s] queue you have specified does not exists!", $name)
             );
+
+            return 1;
         }
 
         $registry->get($name)->publish(json_decode($message, true));
+
         $this->output->writeln("<info>The message has been sent.</info>");
 
         return 0;

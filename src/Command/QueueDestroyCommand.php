@@ -80,7 +80,7 @@ class QueueDestroyCommand extends ContainerAwareCommand
         );
 
         if (!$response) {
-            return 0;
+            return 1;
         }
 
         foreach ($registry->all() as $queue) {
@@ -93,12 +93,15 @@ class QueueDestroyCommand extends ContainerAwareCommand
     private function destroyQueue($registry, $name)
     {
         if (!$registry->has($name)) {
-            return $this->output->writeln(
+            $this->output->writeln(
                 sprintf("The [%s] queue you have specified does not exists!", $name)
             );
+
+            return 1;
         }
 
         $registry->get($name)->destroy();
+
         $this->output->writeln(sprintf("The %s queue has been successfully destroyed.", $name));
 
         return 0;

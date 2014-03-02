@@ -35,6 +35,7 @@ use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 class QueueReceiveCommand extends ContainerAwareCommand
 {
     protected $output;
+    protected $dispatcher;
 
     protected function configure()
     {
@@ -53,6 +54,7 @@ class QueueReceiveCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->output = $output;
+        $this->dispatcher = $this->getContainer()->get('event_dispatcher');
         $registry = $this->getContainer()->get('uecode_qpush');
 
         $name = $input->getArgument('name');
@@ -71,24 +73,24 @@ class QueueReceiveCommand extends ContainerAwareCommand
     private function pollQueue($registry, $name)
     {
         if (!$registry->has($name)) {
-            return $this->output->writeln(
+            $this->output->writeln(
                 sprintf("The [%s] queue you have specified does not exists!", $name)
+            );
+
+            return 1;
+        }
+
+        $messages   = $registry->get($name)->receive();
+
+        foreach ($messages as $message) {
+            $this->dispatcher->dispatch(
+                Events::Message($name),
+                new MessageEvent($name, $message)
             );
         }
 
-        $provider   = $registry->get($name);
-        $messages   = $provider->receive();
-        $count      = sizeof($messages);
-        foreach ($messages as $message) {
-
-            $messageEvent   = new MessageEvent($name, $message);
-            $dispatcher     = $this->getContainer()->get('event_dispatcher');
-
-            $dispatcher->dispatch(Events::Message($name), $messageEvent);
-        }
-
         $msg = "<info>Finished polling %s Queue, %d messages fetched.</info>";
-        $this->output->writeln(sprintf($msg, $name, $count));
+        $this->output->writeln(sprintf($msg, $name, sizeof($messages)));
 
         return 0;
     }
