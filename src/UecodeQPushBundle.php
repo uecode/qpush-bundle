@@ -59,5 +59,10 @@ class UecodeQPushBundle extends Bundle
                 'uecode_qpush.event_subscriber'
             )
         );
+
+        $container->addCompilerPass(
+            new ValidateServiceDefinitionsPass(),
+            PassConfig::TYPE_AFTER_REMOVING
+        );
     }
 }
