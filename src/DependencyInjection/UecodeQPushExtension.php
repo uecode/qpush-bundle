@@ -22,7 +22,6 @@
 
 namespace Uecode\Bundle\QPushBundle\DependencyInjection;
 
-use Uecode\Bundle\QPushBundle\DependencyInjection\Configuration;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -121,7 +120,9 @@ class UecodeQPushExtension extends Extension
      * @param array            $config    A Configuration array for the client
      * @param ContainerBuilder $container The container
      *
-     * return Definition
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     * @return Definition
      */
     private function createAwsClient($config, ContainerBuilder $container)
     {
@@ -167,7 +168,9 @@ class UecodeQPushExtension extends Extension
      * @param array            $config    A Configuration array for the provider
      * @param ContainerBuilder $container The container
      *
-     * return Definition
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     * @return Definition
      */
     private function createIronMQClient($config, ContainerBuilder $container)
     {
