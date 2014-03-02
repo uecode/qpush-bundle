@@ -5,13 +5,6 @@ services:
     uecode_qpush:
         alias: uecode_qpush.registry
 
-    ### QPush Event Listeners
-    uecode_qpush.request_listener:
-        class: Uecode\Bundle\QPushBundle\EventListener\RequestListener
-        arguments: [ @event_dispatcher, @uecode_qpush.logger ]
-        tags:
-            - { name: kernel.event_listener, event: kernel.request, priority: 254 }
-
     ### QPush Logger
     uecode_qpush.logger:
         class: Symfony\Bridge\Monolog\Logger
@@ -22,3 +15,20 @@ services:
     uecode_qpush.logger_handler:
         class: Monolog\Handler\StreamHandler
         arguments: [%kernel.logs_dir%/%kernel.environment%.qpush.log, 200]
+
+    ### QPush File Cache
+    uecode_qpush.file_cache:
+        class: Doctrine\Common\Cache\PhpFileCache
+        arguments: [%kernel.cache_dir%/qpush, qpush.php]
+        public: false
+
+    ### QPush Event Listeners
+    uecode_qpush.request_listener:
+        class: Uecode\Bundle\QPushBundle\EventListener\RequestListener
+        arguments:
+            - @event_dispatcher
+            - @uecode_qpush.logger
+            - %uecode_qpush.route%
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, priority: 254 }
+
