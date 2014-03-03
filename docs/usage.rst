@@ -2,7 +2,7 @@ Usage
 =====
 
 Once configured, you can create messages and publish them to the queue. You may also
-create services that will automatically be fired as messages are pushed to your application.
+create services that will automatically fire messages to be pushed back to your application.
 
 For your convenience, a custom ``Provider`` service will be created and registered 
 in the Container for each of your defined Queues. The container queue service id will be
