@@ -45,7 +45,7 @@ class IronMqProvider extends AbstractProvider
     /**
      * IronMQ Queue
      *
-     * @var stdObject
+     * @var object
      */
     private $queue;
 
@@ -72,6 +72,7 @@ class IronMqProvider extends AbstractProvider
      * All Create methods are idempotent, if the resource exists, the current ARN
      * will be returned
      *
+     * @throws \InvalidArgumentException
      * @return Boolean
      */
     public function create()
@@ -97,10 +98,8 @@ class IronMqProvider extends AbstractProvider
             $params = ['push_type' => 'pull'];
         }
 
-        $result = $this->ironmq->updateQueue($this->getNameWithPrefix(), $params);
-        $this->queue = $result;
-
         $key = $this->getNameWithPrefix();
+        $this->queue = $this->ironmq->updateQueue($key, $params);
         $this->cache->save($key, json_encode($this->queue));
 
         $this->log(200, "Queue has been created.", $params);
@@ -109,6 +108,7 @@ class IronMqProvider extends AbstractProvider
     }
 
     /**
+     * @throws \Exception
      * @return Boolean
      */
     public function destroy()
@@ -137,7 +137,7 @@ class IronMqProvider extends AbstractProvider
      *
      * @param array $message The message to queue
      *
-     * @return int
+     * @return integer
      */
     public function publish(array $message)
     {
@@ -202,6 +202,8 @@ class IronMqProvider extends AbstractProvider
     }
 
     /**
+     * @param mixed $id
+     * @throws \Exception
      * @return Boolean
      */
     public function delete($id)
@@ -251,6 +253,7 @@ class IronMqProvider extends AbstractProvider
      * Dispatches the `{queue}.message_received` event
      *
      * @param NotificationEvent $event The Notification Event
+     * @return Boolean
      */
     public function onNotification(NotificationEvent $event)
     {
@@ -272,6 +275,8 @@ class IronMqProvider extends AbstractProvider
             Events::Message($this->name),
             $messageEvent
         );
+
+        return true;
     }
 
     /**
@@ -283,6 +288,7 @@ class IronMqProvider extends AbstractProvider
      * Stops Event Propagation after removing the Message
      *
      * @param MessageEvent $event The SQS Message Event
+     * @return Boolean
      */
     public function onMessageReceived(MessageEvent $event)
     {
@@ -294,5 +300,7 @@ class IronMqProvider extends AbstractProvider
         }
 
         $event->stopPropagation();
+
+        return true;
     }
 }

@@ -82,9 +82,11 @@ class UecodeQPushExtension extends Extension
                     break;
                 case 'rabbitmq':
                     $class  = $container->getParameter('uecode_qpush.provider.rabbitmq');
-//                    $client = $this->x(
-//
-//                    )
+                    $client = $this->createRabbitMQClient(
+                        $config['providers'][$provider],
+                        $container
+                    );
+                    break;
             }
 
             $definition = new Definition(
@@ -208,6 +210,39 @@ class UecodeQPushExtension extends Extension
         }
 
         return $ironmq;
+    }
+
+
+    /**
+     * Creates a definition for the RabbitMQ provider
+     *
+     * @param array            $config    A Configuration array for the provider
+     * @param ContainerBuilder $container The container
+     *
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     * @return Definition
+     */
+    private function createRabbitMQClient($config, ContainerBuilder $container)
+    {
+        if (!$container->hasDefinition('uecode_qpush.provider.rabbitmq')) {
+
+            $rabbitMq = new Definition('RabbitMQ');
+            $rabbitMq->setArguments([
+                [
+                    'x'    => $config['x']
+                ]
+            ]);
+
+            $container->setDefinition('uecode_qpush.provider.rabbitmq', $rabbitMq)
+                ->setPublic(false)
+            ;
+
+        } else {
+            $rabbitMq = $container->getDefinition('uecode_qpush.provider.rabbitmq');
+        }
+
+        return $rabbitMq;
     }
 
     /**

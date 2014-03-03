@@ -52,7 +52,7 @@ class RabbitMqProvider extends AbstractProvider
     {
         $this->name     = $name;
         $this->options  = $options;
-        $this->ironmq   = $client;
+        $this->rabbitMq = $client;
         $this->cache    = $cache;
         $this->logger   = $logger;
     }
@@ -68,9 +68,10 @@ class RabbitMqProvider extends AbstractProvider
      * If a Queue name is passed and configured, this method will build only that
      * Queue.
      *
-     * All Create methods are idempotent, if the resource exists, the current ARN
+     * All Create methods are idempotent, if the resource exists, the current resource name
      * will be returned
      *
+     * @throws \InvalidArgumentException
      * @return Boolean
      */
     public function create()
@@ -96,10 +97,8 @@ class RabbitMqProvider extends AbstractProvider
             $params = ['push_type' => 'pull'];
         }
 
-        $result = $this->rabbitMq->updateQueue($this->getNameWithPrefix(), $params);
-        $this->queue = $result;
-
         $key = $this->getNameWithPrefix();
+        $this->queue = $this->rabbitMq->updateQueue($key, $params);
         $this->cache->save($key, json_encode($this->queue));
 
         $this->log(200, "Queue has been created.", $params);
@@ -108,6 +107,7 @@ class RabbitMqProvider extends AbstractProvider
     }
 
     /**
+     * @throws \Exception
      * @return Boolean
      */
     public function destroy()
@@ -136,7 +136,7 @@ class RabbitMqProvider extends AbstractProvider
      *
      * @param array $message The message to queue
      *
-     * @return int
+     * @return integer
      */
     public function publish(array $message)
     {
