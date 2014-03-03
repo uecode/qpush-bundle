@@ -22,7 +22,6 @@
 
 namespace Uecode\Bundle\QPushBundle\Provider;
 
-use IronMQ;
 use Doctrine\Common\Cache\Cache;
 use Symfony\Bridge\Monolog\Logger;
 use Uecode\Bundle\QPushBundle\Event\Events;
@@ -31,21 +30,21 @@ use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
 use Uecode\Bundle\QPushBundle\Message\Message;
 
 /**
- * @author Keith Kirk <kkirk@undergroundelephant.com>
+ * @author Luis Cordova <cordoval@gmail.com>
  */
-class IronMqProvider extends AbstractProvider
+class RabbitMqProvider extends AbstractProvider
 {
     /**
-     * IronMQ Client
+     * RabbitMQ Client
      *
-     * @var IronMQ
+     * @var RabbitMQ
      */
-    private $ironmq;
+    private $rabbitMq;
 
     /**
-     * IronMQ Queue
+     * RabbitMQ Queue
      *
-     * @var object
+     * @var \stdObject
      */
     private $queue;
 
@@ -53,14 +52,14 @@ class IronMqProvider extends AbstractProvider
     {
         $this->name     = $name;
         $this->options  = $options;
-        $this->ironmq   = $client;
+        $this->rabbitMq = $client;
         $this->cache    = $cache;
         $this->logger   = $logger;
     }
 
     public function getProvider()
     {
-        return 'IronMQ';
+        return 'RabbitMQ';
     }
 
     /**
@@ -69,7 +68,7 @@ class IronMqProvider extends AbstractProvider
      * If a Queue name is passed and configured, this method will build only that
      * Queue.
      *
-     * All Create methods are idempotent, if the resource exists, the current ARN
+     * All Create methods are idempotent, if the resource exists, the current resource name
      * will be returned
      *
      * @throws \InvalidArgumentException
@@ -87,7 +86,7 @@ class IronMqProvider extends AbstractProvider
             foreach ($this->options['subscribers'] as $subscriber) {
                 if ($subscriber['protocol'] == "email") {
                     throw new \InvalidArgumentException(
-                        'IronMQ only supports `http` or `https` subscribers!'
+                        'RabbitMQ only supports `http` or `https` subscribers!'
                     );
                 }
 
@@ -99,7 +98,7 @@ class IronMqProvider extends AbstractProvider
         }
 
         $key = $this->getNameWithPrefix();
-        $this->queue = $this->ironmq->updateQueue($key, $params);
+        $this->queue = $this->rabbitMq->updateQueue($key, $params);
         $this->cache->save($key, json_encode($this->queue));
 
         $this->log(200, "Queue has been created.", $params);
@@ -115,7 +114,7 @@ class IronMqProvider extends AbstractProvider
     {
         // Catch `queue not found` exceptions, throw the rest.
         try {
-            $this->ironmq->deleteQueue($this->getNameWithPrefix());
+            $this->rabbitMq->deleteQueue($this->getNameWithPrefix());
         } catch ( \Exception $e) {
             if (false !== strpos($e->getMessage(), "Queue not found")) {
                 $this->log(400, "Queue did not exist");
@@ -147,7 +146,7 @@ class IronMqProvider extends AbstractProvider
             $this->create();
         }
 
-        $result = $this->ironmq->postMessage(
+        $result = $this->rabbitMq->postMessage(
             $this->getNameWithPrefix(),
             json_encode([$this->name => $message]),
             [
@@ -177,7 +176,7 @@ class IronMqProvider extends AbstractProvider
             $this->create();
         }
 
-        $messages = $this->ironmq->getMessages(
+        $messages = $this->rabbitMq->getMessages(
             $this->getNameWithPrefix(),
             $this->options['messages_to_receive'],
             $this->options['message_timeout']
@@ -209,7 +208,7 @@ class IronMqProvider extends AbstractProvider
     public function delete($id)
     {
         try {
-            $result = $this->ironmq->deleteMessage($this->getNameWithPrefix(), $id);
+            $result = $this->rabbitMq->deleteMessage($this->getNameWithPrefix(), $id);
             $this->log(200, "Message deleted.", ['message_id' => $result->id]);
         } catch ( \Exception $e) {
             if (false !== strpos($e->getMessage(), "Queue not found")) {
@@ -253,7 +252,7 @@ class IronMqProvider extends AbstractProvider
      * Dispatches the `{queue}.message_received` event
      *
      * @param NotificationEvent $event The Notification Event
-     * @return Boolean
+     * @return Boolean|void
      */
     public function onNotification(NotificationEvent $event)
     {
@@ -275,8 +274,6 @@ class IronMqProvider extends AbstractProvider
             Events::Message($this->name),
             $messageEvent
         );
-
-        return true;
     }
 
     /**
@@ -288,7 +285,7 @@ class IronMqProvider extends AbstractProvider
      * Stops Event Propagation after removing the Message
      *
      * @param MessageEvent $event The SQS Message Event
-     * @return Boolean
+     * @return Boolean|void
      */
     public function onMessageReceived(MessageEvent $event)
     {
@@ -300,7 +297,5 @@ class IronMqProvider extends AbstractProvider
         }
 
         $event->stopPropagation();
-
-        return true;
     }
 }

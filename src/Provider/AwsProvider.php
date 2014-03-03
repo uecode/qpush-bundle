@@ -131,7 +131,7 @@ class AwsProvider extends AbstractProvider
             $key = $this->getNameWithPrefix() . '_url';
             $this->cache->delete($key);
 
-            $this->log(200,"SQS Queue removed", ['QueueUrl' => $this->queueUrl]);
+            $this->log(200, "SQS Queue removed", ['QueueUrl' => $this->queueUrl]);
         }
 
         if ($this->topicExists() || !empty($this->queueUrl)) {
@@ -148,7 +148,7 @@ class AwsProvider extends AbstractProvider
             $key = $this->getNameWithPrefix() . '_arn';
             $this->cache->delete($key);
 
-            $this->log(200,"SNS Topic removed", ['TopicArn' => $topicArn]);
+            $this->log(200, "SNS Topic removed", ['TopicArn' => $topicArn]);
         }
 
         return true;
@@ -215,7 +215,7 @@ class AwsProvider extends AbstractProvider
             'MessageId'             => $result->get('MessageId'),
             'push_notifications'    => $this->options['push_notifications']
         ];
-        $this->log(200,"Message published to SQS", $context);
+        $this->log(200, "Message published to SQS", $context);
 
         return $result->get('MessageId');
     }
@@ -261,7 +261,7 @@ class AwsProvider extends AbstractProvider
             $message = new Message($id, $body, $metadata);
 
             $context = ['MessageId' => $id];
-            $this->log(200,"Message fetched from SQS Queue", $context);
+            $this->log(200, "Message fetched from SQS Queue", $context);
 
         }
 
@@ -269,7 +269,8 @@ class AwsProvider extends AbstractProvider
     }
 
     /**
-     * @return bool
+     * @param mixed $id
+     * @return Boolean
      */
     public function delete($id)
     {
@@ -286,7 +287,7 @@ class AwsProvider extends AbstractProvider
             'QueueUrl'      => $this->queueUrl,
             'ReceiptHandle' => $id
         ];
-        $this->log(200,"Message deleted from SQS Queue", $context);
+        $this->log(200, "Message deleted from SQS Queue", $context);
 
         return true;
     }
@@ -298,7 +299,7 @@ class AwsProvider extends AbstractProvider
      * to reduce the need to needlessly call the create method on an existing
      * Queue.
      *
-     * @return boolean
+     * @return Boolean
      */
     public function queueExists()
     {
@@ -396,7 +397,7 @@ class AwsProvider extends AbstractProvider
      * to reduce the need to needlessly call the create method on an existing
      * Topic.
      *
-     * @return boolean
+     * @return Boolean
      */
     public function topicExists()
     {
@@ -521,7 +522,7 @@ class AwsProvider extends AbstractProvider
                     'Protocol' => $protocol,
                     'SubscriptionArn' => $subscription['SubscriptionArn']
                 ];
-                $this->log(200,"Endpoint unsubscribed from SNS Topic", $context);
+                $this->log(200, "Endpoint unsubscribed from SNS Topic", $context);
 
                 return true;
             }
@@ -553,7 +554,7 @@ class AwsProvider extends AbstractProvider
             ]);
 
             $context = ['TopicArn' => $topicArn];
-            $this->log(200,"Subscription to SNS Confirmed", $context);
+            $this->log(200, "Subscription to SNS Confirmed", $context);
 
             return;
         }
@@ -569,7 +570,7 @@ class AwsProvider extends AbstractProvider
     /**
      * Removes the message from queue after all other listeners have fired
      *
-     * If an earlier listener has errored or stopped propigation, this method
+     * If an earlier listener has failed or stopped propagation, this method
      * will not fire and the Queued Message should become visible in queue again.
      *
      * Stops Event Propagation after removing the Message

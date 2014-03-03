@@ -28,7 +28,7 @@ use Symfony\Bridge\Monolog\Logger;
 /**
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
-interface ProviderInterface
+interface Provider
 {
     /**
      * Prefix prepended to the queue names

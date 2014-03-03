@@ -49,29 +49,31 @@ class NotificationEventTest extends \PHPUnit_Framework_TestCase
 
     public function testNotificationEventConstructor()
     {
+        $notification = new Notification(123, ['foo' => 'bar'], ['bar' => 'baz']);
+
         $event = new NotificationEvent(
             'test',
             NotificationEvent::TYPE_SUBSCRIPTION,
-            new Notification(123, ['foo' => 'bar'], ['bar' => 'baz'])
+            $notification
         );
         $this->assertInstanceOf('Uecode\Bundle\QPushBundle\Event\NotificationEvent', $event);
 
         $event = new NotificationEvent(
             'test',
             NotificationEvent::TYPE_MESSAGE,
-            new Notification(123, ['foo' => 'bar'], ['bar' => 'baz'])
+            $notification
         );
         $this->assertInstanceOf('Uecode\Bundle\QPushBundle\Event\NotificationEvent', $event);
 
         $this->setExpectedException('InvalidArgumentException');
-        $event = new NotificationEvent(
+        new NotificationEvent(
             'test',
             'InvalidNotificationType',
-            new Notification(123, ['foo' => 'bar'], ['bar' => 'baz'])
+            $notification
         );
 
         $this->setExpectedException('PHPUnit_Framework_Error');
-        $event = new NotificationEvent(
+        new NotificationEvent(
             'test',
             NotificationEvent::TYPE_SUBSCRIPTION,
             ['bad argument']

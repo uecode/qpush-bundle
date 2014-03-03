@@ -48,7 +48,7 @@ class MessageEvent extends Event
      * Constructor.
      *
      * @param string  $queueName   The queue name
-     * @param Message $message The Message
+     * @param Message $message     The Message
      */
     public function __construct($queueName, Message $message)
     {

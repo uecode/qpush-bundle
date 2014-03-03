@@ -40,7 +40,7 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * Mock Client
      *
-     * @var stdClass
+     * @var \stdClass
      */
     protected $provider;
 

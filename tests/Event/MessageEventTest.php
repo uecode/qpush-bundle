@@ -23,7 +23,6 @@
 namespace Uecode\Bundle\QPushBundle\Tests\Event;
 
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
-
 use Uecode\Bundle\QPushBundle\Message\Message;
 
 /**
@@ -35,7 +34,10 @@ class MessageEventTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->event = new MessageEvent('test', new Message(123, ['foo' => 'bar'], ['bar' => 'baz']));
+        $this->event = new MessageEvent(
+            'test',
+            new Message(123, ['foo' => 'bar'], ['bar' => 'baz'])
+        );
     }
 
     public function tearDown()
@@ -49,7 +51,7 @@ class MessageEventTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Uecode\Bundle\QPushBundle\Event\MessageEvent', $event);
 
         $this->setExpectedException('PHPUnit_Framework_Error');
-        $event = new MessageEvent('test', ['bad argument']);
+        new MessageEvent('test', ['bad argument']);
     }
 
     public function testGetQueueName()

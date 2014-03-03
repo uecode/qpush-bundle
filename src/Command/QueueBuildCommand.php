@@ -69,9 +69,11 @@ class QueueBuildCommand extends ContainerAwareCommand
     private function buildQueue($registry, $name)
     {
         if (!$registry->has($name)) {
-            return $this->output->writeln(
-                sprintf("The [%s] queue you have specified does not exists!", $name)
+            $this->output->writeln(
+                sprintf("The [%s] queue you have specified does not exist!", $name)
             );
+
+            return 1;
         }
 
         $registry->get($name)->create();

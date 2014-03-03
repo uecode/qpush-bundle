@@ -27,7 +27,6 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Uecode\Bundle\QPushBundle\Message\Message;
 use Uecode\Bundle\QPushBundle\Message\Notification;
 use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
@@ -89,6 +88,7 @@ class RequestListener
      * Handles Messages sent from a IronMQ Push Queue
      *
      * @param GetResponseEvent $event The Kernel Request's GetResponseEvent
+     * @return string
      */
     private function handleIronMqNotifications(GetResponseEvent $event)
     {
@@ -121,6 +121,7 @@ class RequestListener
      * Handles Notifications sent from AWS SNS
      *
      * @param GetResponseEvent $event The Kernel Request's GetResponseEvent
+     * @return string
      */
     private function handleSnsNotifications(GetResponseEvent $event)
     {

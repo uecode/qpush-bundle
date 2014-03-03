@@ -74,6 +74,9 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('project_id')->end()
                     ->end()
                 ->end()
+                ->scalarNode('rabbitmq')
+                    ->defaultValue(null)
+                ->end()
             ->end()
         ;
 

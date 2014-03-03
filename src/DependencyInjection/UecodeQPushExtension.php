@@ -22,7 +22,6 @@
 
 namespace Uecode\Bundle\QPushBundle\DependencyInjection;
 
-use Uecode\Bundle\QPushBundle\DependencyInjection\Configuration;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -53,7 +52,6 @@ class UecodeQPushExtension extends Extension
             new FileLocator(__DIR__.'/../Resources/config')
         );
 
-        $loader->load('parameters.yml');
         $loader->load('services.yml');
 
         $cache      = $container->getDefinition('uecode_qpush.file_cache');
@@ -61,7 +59,6 @@ class UecodeQPushExtension extends Extension
         $registry   = $container->getDefinition('uecode_qpush.registry');
 
         foreach ($config['queues'] as $queue => $values) {
-
             // Adds logging property to queue options
             $values['options']['logging_enabled'] = $config['logging_enabled'];
 
@@ -79,6 +76,13 @@ class UecodeQPushExtension extends Extension
                 case 'ironmq':
                     $class  = $container->getParameter('uecode_qpush.provider.ironmq');
                     $client = $this->createIronMQClient(
+                        $config['providers'][$provider],
+                        $container
+                    );
+                    break;
+                case 'rabbitmq':
+                    $class  = $container->getParameter('uecode_qpush.provider.rabbitmq');
+                    $client = $this->createRabbitMQClient(
                         $config['providers'][$provider],
                         $container
                     );
@@ -121,7 +125,9 @@ class UecodeQPushExtension extends Extension
      * @param array            $config    A Configuration array for the client
      * @param ContainerBuilder $container The container
      *
-     * return Definition
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     * @return Definition
      */
     private function createAwsClient($config, ContainerBuilder $container)
     {
@@ -167,7 +173,9 @@ class UecodeQPushExtension extends Extension
      * @param array            $config    A Configuration array for the provider
      * @param ContainerBuilder $container The container
      *
-     * return Definition
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     * @return Definition
      */
     private function createIronMQClient($config, ContainerBuilder $container)
     {
@@ -202,6 +210,39 @@ class UecodeQPushExtension extends Extension
         }
 
         return $ironmq;
+    }
+
+
+    /**
+     * Creates a definition for the RabbitMQ provider
+     *
+     * @param array            $config    A Configuration array for the provider
+     * @param ContainerBuilder $container The container
+     *
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     * @return Definition
+     */
+    private function createRabbitMQClient($config, ContainerBuilder $container)
+    {
+        if (!$container->hasDefinition('uecode_qpush.provider.rabbitmq')) {
+
+            $rabbitMq = new Definition('RabbitMQ');
+            $rabbitMq->setArguments([
+                [
+                    'x'    => $config['x']
+                ]
+            ]);
+
+            $container->setDefinition('uecode_qpush.provider.rabbitmq', $rabbitMq)
+                ->setPublic(false)
+            ;
+
+        } else {
+            $rabbitMq = $container->getDefinition('uecode_qpush.provider.rabbitmq');
+        }
+
+        return $rabbitMq;
     }
 
     /**
