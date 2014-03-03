@@ -27,7 +27,7 @@ Caching
 -------
 
 Providers can leverage a caching layer to limit the amount of calls to the Message Queue
-for basic lookup functionality for things like the Queue ARN, etc.
+for basic lookup functionality for things like the Queue ARN (Amazon Resource Name), etc.
 
 By default the library will attempt to use file cache, however you can pass your
 own cache service, as long as its an instance of ``Doctrine\Common\Cache\Cache``.

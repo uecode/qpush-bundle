@@ -26,13 +26,11 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Uecode\Bundle\QPushBundle\Event\Events;
-use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 
 /**
  * @author Luis Cordova <cordoval@gmail.com>
  */
-class QueueStatusCommand
+class QueueStatusCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
