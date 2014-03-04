@@ -48,24 +48,11 @@ class UecodeQPushExtension extends Extension
         $loader->load('parameters.yml');
         $loader->load('services.yml');
 
+        $container->setParameter('uecode_qpush.cache', $config['cache_service']);
         $container->setParameter('uecode_qpush.queues', $config['queues']);
         $container->setParameter('uecode_qpush.providers', $config['providers']);
 
-        if (!empty($config['cache_service'])) {
-            if (!$container->hasDefinition($config['cache_service'])) {
-                throw new \InvalidArgumentException(
-                    sprintf(
-                        'The \'%s\' service id is either invalid or the' .
-                        ' service is not defined!', 
-                        $config['cache_service']
-                    )
-                );
-            } 
-            $cache = $container->getDefinition($config['cache_service']);
-        } else {
-            $cache = $container->getDefinition('uecode_qpush.file_cache');
-        }
-
+        $cache      = $container->getDefinition('uecode_qpush.file_cache');
         $logger     = $container->getDefinition('uecode_qpush.logger');
         $registry   = $container->getDefinition('uecode_qpush.registry');
 
