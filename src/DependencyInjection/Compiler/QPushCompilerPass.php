@@ -32,53 +32,31 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class QPushCompilerPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
-    {
-        $cache      = $container->getParameter('uecode_qpush.cache');
-        $queues     = $container->getParameter('uecode_qpush.queues');
-        $providers  = $container->getParameter('uecode_qpush.providers');
-
-        foreach ($queues as $queue => $options) {
-            $name = sprintf('uecode_qpush.%s', $queue);
-
-            $definition = $container->getDefinition($name);
-
-            if ($cache = $this->getCache($cache, $container)) {
-                $definition->replaceArgument(2, $cache);
-            }
-
-            $provider = $options['provider'];
-            if (isset($providers[$provider]['provider_service'])) {
-                $service = $providers[$provider]['provider_service'];
-                if (!$container->hasDefinition($service)) {
-                    throw new \InvalidArgumentException(
-                        sprintf("The service \"%s\" does not exist.", $service)
-                    );
-                }
-                $definition->addMethodCall('setService', [new Reference($service)]);
-            }
-        }
-    }
-
     /**
-     * @param string           $cache     Optional Cache Service Id
      * @param ContainerBuilder $container Container from Symfony
      *
      * @throws \InvalidArgumentException
-     * @return Reference|Definition
      */
-    private function getCache($cache, ContainerBuilder $container)
+    public function process(ContainerBuilder $container)
     {
+        $cache = $container->getParameter('uecode_qpush.cache');
+
         if (!empty($cache)) {
             if (!$container->hasDefinition($cache)) {
                 throw new \InvalidArgumentException(
-                    sprintf("The service \"%s\" does not exist.", $cache)
+                    sprintf("The \"%s\" service is not defined!", $cache)
                 );
             }
 
-            return new Reference($cache);
-        }
+            $cache  = $container->getDefinition($cache);
+            $queues = $container->getParameter('uecode_qpush.queues');
 
-        return false;
+            foreach ($queues as $queue) {
+                $name       = sprintf('uecode_qpush.%s', $queue);
+                $definition = $container->getDefinition($name);
+
+                $definition->replaceArgument(3, $cache);
+            }
+        }
     }
 }

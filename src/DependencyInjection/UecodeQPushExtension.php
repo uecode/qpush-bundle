@@ -40,14 +40,6 @@ class UecodeQPushExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $container->setParameter('uecode_qpush.cache', $config['cache_service']);
-        if (empty($config['cache_service'])) {
-            $this->createFileCache($container);
-        }
-
-        $container->setParameter('uecode_qpush.queues', $config['queues']);
-        $container->setParameter('uecode_qpush.providers', $config['providers']);
-
         $loader = new YamlFileLoader(
             $container,
             new FileLocator(__DIR__.'/../Resources/config')
@@ -55,6 +47,10 @@ class UecodeQPushExtension extends Extension
 
         $loader->load('parameters.yml');
         $loader->load('services.yml');
+
+        $container->setParameter('uecode_qpush.cache', $config['cache_service']);
+        $container->setParameter('uecode_qpush.queues', $config['queues']);
+        $container->setParameter('uecode_qpush.providers', $config['providers']);
 
         $cache      = $container->getDefinition('uecode_qpush.file_cache');
         $logger     = $container->getDefinition('uecode_qpush.logger');
@@ -65,9 +61,10 @@ class UecodeQPushExtension extends Extension
             // Adds logging property to queue options
             $values['options']['logging_enabled'] = $config['logging_enabled'];
 
-            $provider = $values['provider'];
-            $class = null;
-            $client = null;
+            $provider   = $values['provider'];
+            $class      = null;
+            $client     = null;
+
             switch ($provider) {
                 case 'aws':
                     $class  = $container->getParameter('uecode_qpush.provider.aws');
@@ -202,25 +199,6 @@ class UecodeQPushExtension extends Extension
         }
 
         return $ironmq;
-    }
-
-    /**
-     * Sets a Definition for PhpFileCache in the container
-     *
-     * @param ContainerBuilder $container The container
-     */
-    private function createFileCache(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('uecode_qpush.file_cache')) {
-            $directory = $container->getParameter('kernel.cache_dir') . '/qpush/';
-            $container->setDefinition(
-                'uecode_qpush.file_cache',
-                new Definition(
-                    'Doctrine\Common\Cache\PhpFileCache',
-                    [$directory, 'uecode.php']
-                )
-            )->setPublic(false);
-        }
     }
 
     /**
