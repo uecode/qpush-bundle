@@ -184,6 +184,8 @@ class IronMqProvider extends AbstractProvider
         );
         
         if (!$messages) {
+            $this->log(200, "No messages found in queue.");
+            
             return [];
         }
 
