@@ -182,6 +182,10 @@ class IronMqProvider extends AbstractProvider
             $this->options['messages_to_receive'],
             $this->options['message_timeout']
         );
+        
+        if (!$messages) {
+            return array();
+        }
 
         // Convert to Message Class
         foreach ($messages as &$message) {
