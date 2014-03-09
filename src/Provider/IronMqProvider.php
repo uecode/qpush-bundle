@@ -184,7 +184,7 @@ class IronMqProvider extends AbstractProvider
         );
         
         if (!$messages) {
-            return array();
+            return [];
         }
 
         // Convert to Message Class
