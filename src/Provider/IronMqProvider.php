@@ -208,7 +208,7 @@ class IronMqProvider extends AbstractProvider
     {
         try {
             $result = $this->ironmq->deleteMessage($this->getNameWithPrefix(), $id);
-            $this->log(200, "Message deleted.", ['message_id' => $result->id]);
+            $this->log(200, "Message deleted.", ['message_id' => $id]);
         } catch ( \Exception $e) {
             if (false !== strpos($e->getMessage(), "Queue not found")) {
                 $this->log(400, "Queue did not exist");
