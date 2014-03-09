@@ -182,6 +182,12 @@ class IronMqProvider extends AbstractProvider
             $this->options['messages_to_receive'],
             $this->options['message_timeout']
         );
+        
+        if (!is_array($messages)) {
+            $this->log(200, "No messages found in queue.");
+            
+            return [];
+        }
 
         // Convert to Message Class
         foreach ($messages as &$message) {
