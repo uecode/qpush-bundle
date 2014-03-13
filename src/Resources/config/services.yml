@@ -24,7 +24,7 @@ services:
 
     ### QPush Event Listeners
     uecode_qpush.request_listener:
-        class: Uecode\Bundle\QPushBundle\EventListener\RequestListener
+        class: %uecode_qpush.request_listener.class%
         arguments:
             - @event_dispatcher
             - @uecode_qpush.logger
