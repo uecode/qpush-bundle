@@ -80,7 +80,7 @@ Symfony Application as a Subscriber
 
 The QPush Bundle uses a Request Listener which will capture and dispatch notifications from your queue providers for you. The specific route you use does not matter.
 
-In most cases, it is recommended to just list the host or domain for your Symfony application as the ``endpoint`` of your subscriber.
+In most cases, it is recommended to just list the host or domain for your Symfony application as the ``endpoint`` of your subscriber.  You do not need to create a new action for QPush to receive messages.
 
 Logging with Monolog
 --------------------
@@ -127,5 +127,5 @@ However, a working configuration would look like the following
                     messages_to_receive:    1
                     receive_wait_time:      3
                     subscribers:
-                        - { endpoint: http://example1.com/qpush, protocol: http }
-                        - { endpoint: http://example2.com/qpush, protocol: http }
+                        - { endpoint: http://example1.com/, protocol: http }
+                        - { endpoint: http://example2.com/, protocol: http }
