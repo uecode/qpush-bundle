@@ -64,9 +64,10 @@ uecode_qpush:
             token:      YOUR_IRON_MQ_TOKEN_HERE
             project_id: YOUR_IRON_MQ_PROJECT_ID_HERE
     queues:
-        my_queue_name:
+        my_queue_key:
             provider: aws #or ironmq
             options:
+                queue_name: my_actual_queue_name #optional. If missing, name will be qpush_my_queue_key
                 push_notifications: true
                 subscribers:
                     - { endpoint: http://example.com/qpush, protocol: http }
