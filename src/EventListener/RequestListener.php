@@ -126,10 +126,6 @@ class RequestListener
     {
         $notification = json_decode((string)$event->getRequest()->getContent(), true);
 
-        if (false === strpos($notification['TopicArn'], 'qpush_')) {
-            return;
-        }
-
         $type = $event->getRequest()->headers->get('x-amz-sns-message-type');
 
         $metadata = [
