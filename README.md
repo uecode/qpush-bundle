@@ -21,7 +21,7 @@ The bundle should be installed through composer.
 ```json
 {
     "require": {
-        "uecode/qpush-bundle": "~1.1",
+        "uecode/qpush-bundle": "~1.2.0",
     }
 }
 ```
@@ -84,7 +84,7 @@ an array, typically associative.
 ######Example
 
 ```php
-#src/My/Bundle/ExampleBundle/Controller/MyController.php
+// src/My/Bundle/ExampleBundle/Controller/MyController.php
 
 public function publishAction()
 {
@@ -116,7 +116,7 @@ services:
 
 ######Example
 ```php
-#src/My/Bundle/ExampleBundle/Service/ExampleService.php
+// src/My/Bundle/ExampleBundle/Service/ExampleService.php
 
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 
@@ -136,7 +136,7 @@ These properties are accessible through simple getters from the message object.
 
 ######Example
 ```php
-#src/My/Bundle/ExampleBundle/Service/ExampleService.php
+// src/My/Bundle/ExampleBundle/Service/ExampleService.php
 
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Message\Message;
