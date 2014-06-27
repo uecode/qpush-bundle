@@ -17,8 +17,8 @@
         "email": "kkirk@undergroundelephant.com"
     },
     "require": {
-        "php": ">=5.4.0",
-        "doctrine/common": "~2.4"
+        "php":                    ">=5.4.0",
+        "doctrine/common":        "~2.4"
     },
     "require-dev": {
         "symfony/symfony":        "~2.3",
