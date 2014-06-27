@@ -1,15 +1,15 @@
 Configure the Bundle
 ====================
 
-The bundle allows you to specify different Message Queue providers - however, 
-Amazon AWS and IronMQ are the only ones currently supported. 
+The bundle allows you to specify different Message Queue providers - however,
+Amazon AWS and IronMQ are the only ones currently supported.
 
 We are actively looking to add more and would be more than happy to accept contributions.
 
 Providers
 ---------
 
-This bundle allows you to configure and use multiple supported providers with in the same 
+This bundle allows you to configure and use multiple supported providers with in the same
 application. Each queue that you create is attached to one of your registered providers
 and can have its own configuration options.
 
@@ -27,7 +27,7 @@ Caching
 -------
 
 Providers can leverage a caching layer to limit the amount of calls to the Message Queue
-for basic lookup functionality for things like the Queue ARN, etc.
+for basic lookup functionality - this is important for things like AWS's ARN values, etc.
 
 By default the library will attempt to use file cache, however you can pass your
 own cache service, as long as its an instance of ``Doctrine\Common\Cache\Cache``.
@@ -85,22 +85,16 @@ In most cases, it is recommended to just list the host or domain for your Symfon
 Logging with Monolog
 --------------------
 
-By default, logging is enabled in the QPush Bundle and uses Monolog. You can 
-toggle this behavior by setting ``logging_enabled`` to ``false``.
+By default, logging is enabled in the Qpush Bundle and uses Monolog, configured
+via the MonologBundle. You can toggle the logging behavior by setting
+``logging_enabled`` to ``false``.
 
-Logs will output to your Symfony log directory and to a file in the format of
-``{env}.qpush.log``.::
-
-    #development
-    /app/log/dev.qpush.log
-    
-    #development
-    /app/log/prod.qpush.log
+Logs will output to your default Symfony environment logs using the 'qpush' channel.
 
 Example Configuration
 ---------------------
 
-However, a working configuration would look like the following
+A working configuration would look like the following
 
 .. code-block:: yaml
 
@@ -117,7 +111,7 @@ However, a working configuration would look like the following
                 project_id: YOUR_IRONMQ_PROJECT_ID_HERE
         queues:
             default:
-                provider: aws #or ironmq
+                provider: ironmq #or aws
                 options:
                     push_notifications:     true
                     notification_retries:   3

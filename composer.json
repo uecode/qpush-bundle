@@ -21,11 +21,11 @@
         "doctrine/common": "~2.4"
     },
     "require-dev": {
-        "symfony/symfony": "~2.3",
-        "monolog/monolog": "~1.7",
-        "phpunit/phpunit": "~3.7",
-        "aws/aws-sdk-php": "~2.5",
-        "iron-io/iron_mq": "~1.5"
+        "symfony/symfony":        "~2.3",
+        "symfony/monolog-bundle": "~2.3",
+        "phpunit/phpunit":        "~3.7",
+        "aws/aws-sdk-php":        "~2.5",
+        "iron-io/iron_mq":        "~1.5"
     },
     "suggest": {
         "aws/aws-sdk-php": "Required to use AWS as a Queue Provider",

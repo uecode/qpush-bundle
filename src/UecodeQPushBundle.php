@@ -51,7 +51,7 @@ class UecodeQPushBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new QPushCompilerPass);
+        // $container->addCompilerPass(new QPushCompilerPass);
         $container->addCompilerPass(
             new RegisterListenersPass(
                 'event_dispatcher',

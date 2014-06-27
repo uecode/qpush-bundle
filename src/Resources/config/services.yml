@@ -5,18 +5,7 @@ services:
     uecode_qpush:
         alias: uecode_qpush.registry
 
-    ### QPush Logger
-    uecode_qpush.logger:
-        class: Symfony\Bridge\Monolog\Logger
-        arguments: [qpush]
-        calls:
-             - [pushHandler, [@uecode_qpush.logger_handler]]
-
-    uecode_qpush.logger_handler:
-        class: Monolog\Handler\StreamHandler
-        arguments: [%kernel.logs_dir%/%kernel.environment%.qpush.log, 200]
-
-    ### QPush File Cache
+    ### QPush Default File Cache
     uecode_qpush.file_cache:
         class: Doctrine\Common\Cache\PhpFileCache
         arguments: [%kernel.cache_dir%/qpush, qpush.php]
