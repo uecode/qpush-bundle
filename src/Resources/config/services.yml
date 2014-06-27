@@ -27,7 +27,6 @@ services:
         class: %uecode_qpush.request_listener.class%
         arguments:
             - @event_dispatcher
-            - @uecode_qpush.logger
         tags:
             - { name: kernel.event_listener, event: kernel.request, priority: 254 }
 

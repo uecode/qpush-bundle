@@ -22,7 +22,6 @@
 
 namespace Uecode\Bundle\QPushBundle\EventListener;
 
-use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -45,22 +44,13 @@ class RequestListener
     private $dispatcher;
 
     /**
-     * Monolog Logger
-     *
-     * @var Logger
-     */
-    private $logger;
-
-    /**
      * Constructor.
      *
      * @param EventDispatcherInterface $dispatcher A Symfony Event Dispatcher
-     * @param Logger                   $logger     A Monolog Logger
      */
-    public function __construct(EventDispatcherInterface $dispatcher, Logger $logger)
+    public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher   = $dispatcher;
-        $this->logger       = $logger;
     }
 
     /**
