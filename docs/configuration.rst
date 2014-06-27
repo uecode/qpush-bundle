@@ -58,6 +58,8 @@ The options and their descriptions are listed below.
 +--------------------------+-------------------------------------------------------------------------------------------+---------------+
 | Option                   | Description                                                                               | Default Value |
 +==========================+===========================================================================================+===============+
+| ``queue_name``           | The name used to describe the queue on the Provider's side                                | ``null``      |
++--------------------------+-------------------------------------------------------------------------------------------+---------------+
 | ``push_notifications``   | Whether or not to POST notifications to subscribers of a Queue                            | ``false``     |
 +--------------------------+-------------------------------------------------------------------------------------------+---------------+
 | ``notification_retries`` | How many attempts notifications are resent in case of errors - if supported               | ``3``         |
@@ -110,9 +112,10 @@ A working configuration would look like the following
                 token: YOUR_IRONMQ_TOKEN_HERE
                 project_id: YOUR_IRONMQ_PROJECT_ID_HERE
         queues:
-            default:
+            my_queue_key:
                 provider: ironmq #or aws
                 options:
+                    queue_name:             my_actual_queue_name
                     push_notifications:     true
                     notification_retries:   3
                     message_delay:          0
