@@ -45,7 +45,7 @@ public function registerBundles()
 
 ##Basic Configuration:
 
-Here is a basic configuration that would create a push queue called 
+Here is a basic configuration that would create a push queue called
 `my_queue_name` using AWS or IronMQ. You can read about the supported providers
 and provider options in the [full documentation](http://qpush-bundle.rtfd.org).
 
@@ -56,18 +56,18 @@ and provider options in the [full documentation](http://qpush-bundle.rtfd.org).
 
 uecode_qpush:
     providers:
+        ironmq:
+            token:      YOUR_IRON_MQ_TOKEN_HERE
+            project_id: YOUR_IRON_MQ_PROJECT_ID_HERE
         aws:
             key:    YOUR_AWS_KEY_HERE
             secret: YOUR_AWS_SECRET_HERE
             region: YOUR_AWS_REGION_HERE
-        ironmq:
-            token:      YOUR_IRON_MQ_TOKEN_HERE
-            project_id: YOUR_IRON_MQ_PROJECT_ID_HERE
     queues:
         my_queue_key:
-            provider: aws #or ironmq
+            provider: ironmq #or aws
             options:
-                queue_name: my_actual_queue_name #optional. If missing, name will be qpush_my_queue_key
+                queue_name: my_queue_name #optional. the queue name used on the provider
                 push_notifications: true
                 subscribers:
                     - { endpoint: http://example.com/qpush, protocol: http }
@@ -89,12 +89,12 @@ an array, typically associative.
 public function publishAction()
 {
     $message = ['foo' => 'bar'];
-    
+
     // fetch your provider service from the container
-    $this->get('uecode_qpush')->get('my_queue_name')->publish($message);
+    $this->get('uecode_qpush')->get('my_queue_key')->publish($message);
 
     // you can also fetch it directly
-    $this->get('uecode_qpush.my_queue_name')->publish($message);
+    $this->get('uecode_qpush.my_queue_key')->publish($message);
 }
 
 ```
@@ -111,7 +111,7 @@ services:
     my_example_service:
     	class: My\Bundle\ExampleBundle\Service\ExampleService
     	tags:
-    		- { name: uecode_qpush.event_listener, event: my_queue_name.message_received, method: onMessageReceived }
+    		- { name: uecode_qpush.event_listener, event: my_queue_key.message_received, method: onMessageReceived }
 ```
 
 ######Example

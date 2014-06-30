@@ -48,13 +48,8 @@ class UecodeQPushExtension extends Extension
         $loader->load('parameters.yml');
         $loader->load('services.yml');
 
-        $container->setParameter('uecode_qpush.cache', $config['cache_service']);
-        $container->setParameter('uecode_qpush.queues', $config['queues']);
-        $container->setParameter('uecode_qpush.providers', $config['providers']);
-
-        $cache      = $container->getDefinition('uecode_qpush.file_cache');
-        $logger     = $container->getDefinition('uecode_qpush.logger');
-        $registry   = $container->getDefinition('uecode_qpush.registry');
+        $registry = $container->getDefinition('uecode_qpush.registry');
+        $cache    = $config['cache_service'] ?: 'uecode_qpush.file_cache';
 
         foreach ($config['queues'] as $queue => $values) {
 
@@ -83,7 +78,7 @@ class UecodeQPushExtension extends Extension
             }
 
             $definition = new Definition(
-                $class, [$queue, $values['options'], $client, $cache, $logger]
+                $class, [$queue, $values['options'], $client, new Reference($cache), new Reference('logger')]
             );
 
             $name = sprintf('uecode_qpush.%s', $queue);
@@ -118,7 +113,7 @@ class UecodeQPushExtension extends Extension
      * @param array            $config    A Configuration array for the client
      * @param ContainerBuilder $container The container
      *
-     * return Definition
+     * return Reference
      */
     private function createAwsClient($config, ContainerBuilder $container)
     {
@@ -150,12 +145,9 @@ class UecodeQPushExtension extends Extension
 
             $container->setDefinition('uecode_qpush.provider.aws', $aws)
                 ->setPublic(false);
-
-        } else {
-            $aws = $container->getDefinition('uecode_qpush.provider.aws');
         }
 
-        return $aws;
+        return new Reference('uecode_qpush.provider.aws');
     }
 
     /**
@@ -164,7 +156,7 @@ class UecodeQPushExtension extends Extension
      * @param array            $config    A Configuration array for the provider
      * @param ContainerBuilder $container The container
      *
-     * return Definition
+     * return Reference
      */
     private function createIronMQClient($config, ContainerBuilder $container)
     {
@@ -193,12 +185,9 @@ class UecodeQPushExtension extends Extension
 
             $container->setDefinition('uecode_qpush.provider.ironmq', $ironmq)
                 ->setPublic(false);
-
-        } else {
-            $ironmq = $container->getDefinition('uecode_qpush.provider.ironmq');
         }
 
-        return $ironmq;
+        return new Reference('uecode_qpush.provider.ironmq');
     }
 
     /**
