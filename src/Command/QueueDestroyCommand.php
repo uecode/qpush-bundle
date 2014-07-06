@@ -25,6 +25,7 @@ namespace Uecode\Bundle\QPushBundle\Command;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -45,6 +46,12 @@ class QueueDestroyCommand extends ContainerAwareCommand
                 'Name of a specific queue to destroy',
                 null
             )
+            ->addOption(
+                'force',
+                null,
+                InputOption::VALUE_NONE,
+                'Set this parameter to force this action'
+            )
         ;
     }
 
@@ -57,30 +64,34 @@ class QueueDestroyCommand extends ContainerAwareCommand
         $name = $input->getArgument('name');
 
         if (null !== $name) {
+            if (!$input->getOption('force')) {
+                $response = $dialog->askConfirmation(
+                    $output,
+                    sprintf(
+                        '<comment>This will remove the %s queue, even if it has messages! Are you sure? </comment>',
+                        $name
+                    ),
+                    false
+                );
+
+                if (!$response) {
+                    return 0;
+                }
+            }
+
+            return $this->destroyQueue($registry, $name);
+        }
+
+        if (!$input->getOption('force')) {
             $response = $dialog->askConfirmation(
                 $output,
-                sprintf(
-                    '<comment>This will remove the %s queue, even if it has messages! Are you sure? </comment>',
-                    $name
-                ),
+                '<comment>This will remove ALL queues, even if they have messages.  Are you sure? </comment>',
                 false
             );
 
             if (!$response) {
                 return 0;
             }
-
-            return $this->destroyQueue($registry, $name);
-        }
-
-        $response = $dialog->askConfirmation(
-            $output,
-            '<comment>This will remove ALL queues, even if they have messages.  Are you sure? </comment>',
-            false
-        );
-
-        if (!$response) {
-            return 0;
         }
 
         foreach ($registry->all() as $queue) {
