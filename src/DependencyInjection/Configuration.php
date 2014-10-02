@@ -74,12 +74,12 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('project_id')->end()
                         ->enumNode('host')
                             ->defaultValue('mq-aws-us-east-1')
-                            ->values(array(
+                            ->values([
                                 'mq-aws-us-east-1',
                                 'mq-aws-eu-west-1',
                                 'mq-rackspace-ord',
                                 'mq-rackspace-lon'
-                            ))
+                            ])
                         ->end()
                         ->scalarNode('port')
                             ->defaultValue('443')
