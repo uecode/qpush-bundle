@@ -12,11 +12,7 @@
         >
     <filter>
         <whitelist>
-            <directory suffix=".php">src/DependencyInjection</directory>
-            <directory suffix=".php">src/Event</directory>
-            <directory suffix=".php">src/EventListener</directory>
-            <directory suffix=".php">src/Message</directory>
-            <directory suffix=".php">src/Provider</directory>
+            <directory suffix=".php">src/</directory>
         </whitelist>
     </filter>
 
