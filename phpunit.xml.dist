@@ -29,6 +29,5 @@
     </testsuites>
     <logging>
         <log type="coverage-text" target="php://stdout" />
-        <log type="coverage-html" target="coverage/" />
     </logging>
 </phpunit>
