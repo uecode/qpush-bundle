@@ -115,10 +115,7 @@ abstract class AbstractProvider implements ProviderInterface
         }
 
         // Add the queue name and provider to the context
-        $context = array_merge(
-            ['queue' => $this->name, 'provider'  => $this->getProvider()],
-            $context
-        );
+        $context = array_merge(['queue' => $this->name, 'provider'  => $this->getProvider()], $context);
 
         $this->logger->addRecord($level, $message, $context);
     }
