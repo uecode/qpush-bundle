@@ -62,12 +62,12 @@ class TestProvider extends AbstractProvider
     /**
      * @codeCoverageIgnore
      */
-    public function publish(array $message) { }
+    public function publish(array $message, array $options = []) { }
 
     /**
      * @codeCoverageIgnore
      */
-    public function receive() { }
+    public function receive(array $options = []) { }
 
     /**
      * @codeCoverageIgnore

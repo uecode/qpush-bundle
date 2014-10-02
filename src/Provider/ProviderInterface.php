@@ -56,6 +56,10 @@ interface ProviderInterface
     /**
      * Returns the Queue Name prefixed with the QPush Prefix
      *
+     * If a Queue name is explicitly set in the configuration, use just that
+     * name - which is beneficial for reuising existing queues not created by
+     * qpush.  Otherwise, create the queue with the qpush prefix/
+     *
      * @return string
      */
     public function getNameWithPrefix();
@@ -102,10 +106,11 @@ interface ProviderInterface
      * This method should return a string MessageId or Response
      *
      * @param array $message The message to queue
+     * @param  array $options An array of options that override the queue defaults
      *
      * @return string
      */
-    public function publish(array $message);
+    public function publish(array $message, array $options = []);
 
     /**
      * Polls the Queue for Messages
@@ -115,9 +120,11 @@ interface ProviderInterface
      * this method is not meant to be used to long poll indefinitely, but should
      * return in reasonable amount of time
      *
+     * @param  array $options An array of options that override the queue defaults
+     *
      * @return array
      */
-    public function receive();
+    public function receive(array $options = []);
 
     /**
      * Deletes the Queue Message

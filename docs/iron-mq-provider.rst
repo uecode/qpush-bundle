@@ -5,7 +5,7 @@ The IronMQ Provider uses its Push Queues to notify subscribers of new queued
 messages without needing to continually poll the queue.
 
 Using a Push Queue is optional with this provider and its possible to use simple
-Pull queues by utilizing the provided Console Command (``uecode:qpush::receive``) 
+Pull queues by utilizing the provided Console Command (``uecode:qpush::receive``)
 to poll the queue.
 
 **Configuration**
@@ -23,7 +23,7 @@ and needs to have the library included in your ``composer.json`` file.
 
 
 Configuring the provider is very easy. It requires that you have already created
-an account and have a project id. 
+an account and have a project id.
 
 `Iron.io <http://www.iron.io/>`_ provides free accounts for Development, which makes
 testing and using this service extremely easy.
@@ -38,8 +38,11 @@ queue to use the `ironmq` provider.
     uecode_qpush:
         providers:
             ironmq:
-                token: YOUR_TOKEN_HERE
+                token:      YOUR_TOKEN_HERE
                 project_id: YOUR_PROJECT_ID_HERE
+                host:       YOUR_OPTIONAL_HOST_HERE
+                port:       YOUR_OPTIONAL_PORT_HERE
+                version_id: YOUR_OPTIONAL_VERSION_HERE
         queues:
             my_queue_name:
                 provider: ironmq

@@ -45,6 +45,10 @@ class AbstractProviderTest extends \PHPUnit_Framework_TestCase
     public function tearDown()
     {
         $this->provider = null;
+
+        if (file_exists('/tmp/qpush.provider.test.php')) {
+            unlink('/tmp/qpush.provider.test.php');
+        }
     }
 
     private function getTestProvider(array $options = [])
@@ -162,5 +166,14 @@ class AbstractProviderTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertFalse($result);
+    }
+
+    public function testMergeOptions()
+    {
+        $options = ['message_delay' => 1, 'not_an_option' => false];
+        $merged  = $this->provider->mergeOptions($options);
+
+        $this->assertTrue($merged['message_delay'] === 1);
+        $this->assertFalse(isset($merged['not_an_option']));
     }
 }
