@@ -1,5 +1,5 @@
 IronMQ Provider
-^^^^^^^^^^^^^^^
+---------------
 
 The IronMQ Provider uses its Push Queues to notify subscribers of new queued
 messages without needing to continually poll the queue.
@@ -8,7 +8,8 @@ Using a Push Queue is optional with this provider and its possible to use simple
 Pull queues by utilizing the provided Console Command (``uecode:qpush::receive``)
 to poll the queue.
 
-**Configuration**
+Configuration
+^^^^^^^^^^^^^
 
 This provider relies on the `Iron MQ <https://github.com/iron-io/iron_mq_php>`_ classes
 and needs to have the library included in your ``composer.json`` file.
@@ -51,7 +52,8 @@ queue to use the `ironmq` provider.
                     subscribers:
                         - { endpoint: http://example.com/qpush, protocol: http }
 
-**IronMQ Push Queues**
+IronMQ Push Queues
+^^^^^^^^^^^^^^^^^^
 
 If you set ``push_notifications`` to ``true`` in your queue config, this provider
 will automatically create your Queue as a Push Queue and loop over your list of ``subscribers``,
@@ -63,3 +65,65 @@ the same new messages.
 
 You can chose to have your IronMQ queues work as a Pull Queue by setting ``push_notifications`` to ``false``.
 This would require you to use the ``uecode:qpush:receive`` Console Command to poll the queue.
+
+Overriding Queue Options
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+It's possible to override the default queue options that are set in your config file
+when sending or receiving messages.
+
+**Publishing**
+
+The ``publish()`` method takes an array as a second argument. For the IronMQ
+Provider you are able to change the options listed below per publish.
+
++--------------------------+-------------------------------------------------------------------------------------------+---------------+
+| Option                   | Description                                                                               | Default Value |
++==========================+===========================================================================================+===============+
+| ``message_delay``        | Time in seconds before a published Message is available to be read in a Queue             | ``0``         |
++--------------------------+-------------------------------------------------------------------------------------------+---------------+
+| ``message_timeout``      | Time in seconds a worker has to delete a Message before it is available to other workers  | ``30``        |
++--------------------------+-------------------------------------------------------------------------------------------+---------------+
+| ``message_expiration``   | Time in seconds that Messages may remain in the Queue before being removed                | ``604800``    |
++--------------------------+-------------------------------------------------------------------------------------------+---------------+
+
+.. code-block:: php
+
+    $message = ['foo' => 'bar'];
+
+    // Optional config to override default options
+    $options = [
+        'message_delay'      => 1,
+        'message_timeout'    => 1,
+        'message_expiration' => 60
+    ];
+
+    $this->get('uecode_qpush.my_queue_name')->publish($message, $options);
+
+
+**Receiving**
+
+The ``receive()`` method takes an array as a second argument. For the AWS Provider
+you are able to change the options listed below per attempt to receive messages.
+
++--------------------------+-------------------------------------------------------------------------------------------+---------------+
+| Option                   | Description                                                                               | Default Value |
++==========================+===========================================================================================+===============+
+| ``messages_to_receive``  | Maximum amount of messages that can be received when polling the queue                    | ``1``         |
++--------------------------+-------------------------------------------------------------------------------------------+---------------+
+| ``message_timeout``      | Time in seconds a worker has to delete a Message before it is available to other workers  | ``30``        |
++--------------------------+-------------------------------------------------------------------------------------------+---------------+
+
+.. code-block:: php
+
+    // Optional config to override default options
+    $options = [
+        'messages_to_receive' => 3,
+        'message_timeout'     => 10
+    ];
+
+    $messages = $this->get('uecode_qpush.my_queue_name')->receive($options);
+
+    foreach ($messages as $message) {
+        echo $message->getBody();
+    }
