@@ -7,22 +7,18 @@ php:
 env:
     - SYMFONY_VERSION=2.3.*
     - SYMFONY_VERSION=2.4.*
-    - SYMFONY_VERSION=dev-master
+    - SYMFONY_VERSION=2.5.*
 
 before_script:
     - composer self-update
     - composer require symfony/framework-bundle:${SYMFONY_VERSION} --no-update
     - composer install --dev --prefer-source
 
-script: phpunit --coverage-text --coverage-clover=coverage.coverage-clover
+script: phpunit --coverage-text --coverage-clover=coverage.clover
 
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
   - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
-
-matrix:
-  allow_failures:
-    - env: SYMFONY_VERSION=dev-master
 
 notifications:
     webhooks: http://ue.hipchat.com/hubot/travis?room=Underground Elephant
