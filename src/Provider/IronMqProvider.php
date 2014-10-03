@@ -64,15 +64,7 @@ class IronMqProvider extends AbstractProvider
     }
 
     /**
-     * Builds the configured queues
-     *
-     * If a Queue name is passed and configured, this method will build only that
-     * Queue.
-     *
-     * All Create methods are idempotent, if the resource exists, the current ARN
-     * will be returned
-     *
-     * @return Boolean
+     * {@inheritDoc}
      */
     public function create()
     {
@@ -109,7 +101,7 @@ class IronMqProvider extends AbstractProvider
     }
 
     /**
-     * @return Boolean
+     * {@inheritDoc}
      */
     public function destroy()
     {
@@ -133,14 +125,13 @@ class IronMqProvider extends AbstractProvider
     }
 
     /**
-     * Pushes a message to the Queue
-     *
-     * @param array $message The message to queue
+     * {@inheritDoc}
      *
      * @return int
      */
-    public function publish(array $message)
+    public function publish(array $message, array $options = [])
     {
+        $options      = $this->mergeOptions($options);
         $publishStart = microtime(true);
 
         if (!$this->queueExists()) {
@@ -151,9 +142,9 @@ class IronMqProvider extends AbstractProvider
             $this->getNameWithPrefix(),
             json_encode([$this->name => $message]),
             [
-                'timeout'       => $this->options['message_timeout'],
-                'delay'         => $this->options['message_delay'],
-                'expires_in'    => $this->options['message_expiration']
+                'timeout'       => $options['message_timeout'],
+                'delay'         => $options['message_delay'],
+                'expires_in'    => $options['message_expiration']
             ]
         );
 
@@ -167,25 +158,25 @@ class IronMqProvider extends AbstractProvider
     }
 
     /**
-     * Polls the Queue for Messages
-     *
-     * @return array
+     * {@inheritDoc}
      */
-    public function receive()
+    public function receive(array $options = [])
     {
+        $options = $this->mergeOptions($options);
+
         if (!$this->queueExists()) {
             $this->create();
         }
 
         $messages = $this->ironmq->getMessages(
             $this->getNameWithPrefix(),
-            $this->options['messages_to_receive'],
-            $this->options['message_timeout']
+            $options['messages_to_receive'],
+            $options['message_timeout']
         );
-        
+
         if (!is_array($messages)) {
             $this->log(200, "No messages found in queue.");
-            
+
             return [];
         }
 
@@ -208,7 +199,7 @@ class IronMqProvider extends AbstractProvider
     }
 
     /**
-     * @return Boolean
+     * {@inheritDoc}
      */
     public function delete($id)
     {

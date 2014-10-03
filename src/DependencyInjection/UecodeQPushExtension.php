@@ -125,13 +125,6 @@ class UecodeQPushExtension extends Extension
                 );
             }
 
-            // Validate the config
-            if (empty($config['key']) || empty($config['secret'])) {
-                throw new \InvalidArgumentException(
-                    'The `key` and `secret` must be set in your configuration file to use the AWS Provider'
-                );
-            }
-
             $aws = new Definition('Aws\Common\Aws');
             $aws->setFactoryClass('Aws\Common\Aws');
             $aws->setFactoryMethod('factory');
@@ -165,13 +158,6 @@ class UecodeQPushExtension extends Extension
             if (!class_exists('IronMQ')) {
                 throw new \RuntimeException(
                     'You must require "iron-io/iron_mq" to use the Iron MQ provider.'
-                );
-            }
-
-            // Validate the config
-            if (empty($config['token']) || empty($config['project_id'])) {
-                throw new \InvalidArgumentException(
-                    'The `token` and `project_id` must be properly set in your configuration file to use the IronMQ Provider'
                 );
             }
 

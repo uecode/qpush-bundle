@@ -156,5 +156,3 @@ public function onMessageReceived(MessageEvent $event)
 Once all other Event Listeners have been invoked on a `MessageEvent`, the Bundle
 will automatically attempt to remove the Message from your Queue for you.
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/uecode/qpush-bundle/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-

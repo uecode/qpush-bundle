@@ -1,0 +1,42 @@
+uecode_qpush:
+    cache_service: null
+    logging_enabled: true
+    providers:
+        aws:
+            key: 123
+            secret: 123
+            region: us-east-1
+        ironmq:
+            token: 123
+            project_id: 123
+    queues:
+        test_aws:
+            provider: aws
+            options:
+                push_notifications:     true
+                notification_retries:   3
+                message_delay:          0
+                message_timeout:        30
+                message_expiration:     604800
+                messages_to_receive:    1
+                receive_wait_time:      3
+                subscribers:
+                    - { endpoint: http://example.com/qpush, protocol: http }
+        test_ironmq:
+            provider: ironmq
+            options:
+                push_notifications:     true
+                notification_retries:   3
+                message_delay:          0
+                message_timeout:        30
+                message_expiration:     604800
+                messages_to_receive:    1
+                receive_wait_time:      3
+                subscribers:
+                    - { endpoint: http://example.com/qpush, protocol: http }
+
+services:
+    event_dispatcher:
+        class: stdObject
+    logger:
+        class: stdObject

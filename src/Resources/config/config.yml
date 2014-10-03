@@ -10,6 +10,7 @@ uecode_qpush:
         ironmq:
             token:
             project_id:
+            host:
     queues:
         default:
             provider: aws #or ironmq

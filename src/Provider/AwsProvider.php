@@ -24,6 +24,7 @@ namespace Uecode\Bundle\QPushBundle\Provider;
 
 use Aws\Common\Aws;
 use Aws\Sqs\SqsClient;
+use Aws\Sqs\Exception\SqsException;
 use Doctrine\Common\Cache\Cache;
 use Symfony\Bridge\Monolog\Logger;
 use Uecode\Bundle\QPushBundle\Event\Events;
@@ -122,17 +123,20 @@ class AwsProvider extends AbstractProvider
      */
     public function destroy()
     {
+        $key = $this->getNameWithPrefix() . '_url';
+        $this->cache->delete($key);
+
         if ($this->queueExists()) {
             // Delete the SQS Queue
             $this->sqs->deleteQueue([
                 'QueueUrl' => $this->queueUrl
             ]);
 
-            $key = $this->getNameWithPrefix() . '_url';
-            $this->cache->delete($key);
-
             $this->log(200,"SQS Queue removed", ['QueueUrl' => $this->queueUrl]);
         }
+
+        $key = $this->getNameWithPrefix() . '_arn';
+        $this->cache->delete($key);
 
         if ($this->topicExists() || !empty($this->queueUrl)) {
             // Delete the SNS Topic
@@ -145,9 +149,6 @@ class AwsProvider extends AbstractProvider
                 'TopicArn' => $topicArn
             ]);
 
-            $key = $this->getNameWithPrefix() . '_arn';
-            $this->cache->delete($key);
-
             $this->log(200,"SNS Topic removed", ['TopicArn' => $topicArn]);
         }
 
@@ -155,17 +156,16 @@ class AwsProvider extends AbstractProvider
     }
 
     /**
-     * Pushes a message to the Queue
+     * {@inheritDoc}
      *
      * This method will either use a SNS Topic to publish a queued message or
      * straight to SQS depending on the application configuration.
      *
-     * @param array $message The message to queue
-     *
      * @return string
      */
-    public function publish(array $message)
+    public function publish(array $message, array $options = [])
     {
+        $options      = $this->mergeOptions($options);
         $publishStart = microtime(true);
 
         // ensures that the SQS Queue and SNS Topic exist
@@ -173,7 +173,7 @@ class AwsProvider extends AbstractProvider
             $this->create();
         }
 
-        if ($this->options['push_notifications']) {
+        if ($options['push_notifications']) {
 
             if ($this->topicExists()) {
                 $this->create();
@@ -196,7 +196,7 @@ class AwsProvider extends AbstractProvider
             $context = [
                 'TopicArn'              => $this->topicArn,
                 'MessageId'             => $result->get('MessageId'),
-                'push_notifications'    => $this->options['push_notifications'],
+                'push_notifications'    => $options['push_notifications'],
                 'publish_time'          => microtime(true) - $publishStart
             ];
             $this->log(200,"Message published to SNS", $context);
@@ -207,13 +207,13 @@ class AwsProvider extends AbstractProvider
         $result = $this->sqs->sendMessage([
             'QueueUrl'      => $this->queueUrl,
             'MessageBody'   => json_encode($message),
-            'DelaySeconds'  => $this->options['message_delay']
+            'DelaySeconds'  => $options['message_delay']
         ]);
 
         $context = [
             'QueueUrl'              => $this->queueUrl,
             'MessageId'             => $result->get('MessageId'),
-            'push_notifications'    => $this->options['push_notifications']
+            'push_notifications'    => $options['push_notifications']
         ];
         $this->log(200,"Message published to SQS", $context);
 
@@ -221,24 +221,20 @@ class AwsProvider extends AbstractProvider
     }
 
     /**
-     * Polls the Queue for Messages
-     *
-     * The `receiveMessage` method will remain open for the configured
-     * `received_message_wait_time_seconds` value on this queue, to allow for
-     * long polling.
-     *
-     * @return array
+     * {@inheritDoc}
      */
-    public function receive()
+    public function receive(array $options = [])
     {
+        $options = $this->mergeOptions($options);
+
         if (!$this->queueExists()) {
             $this->create();
         }
 
         $result = $this->sqs->receiveMessage([
             'QueueUrl'              => $this->queueUrl,
-            'MaxNumberOfMessages'   => $this->options['messages_to_receive'],
-            'WaitTimeSeconds'       => $this->options['receive_wait_time']
+            'MaxNumberOfMessages'   => $options['messages_to_receive'],
+            'WaitTimeSeconds'       => $options['receive_wait_time']
         ]);
 
         $messages = $result->get('Messages') ?: [];
@@ -269,6 +265,8 @@ class AwsProvider extends AbstractProvider
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @return bool
      */
     public function delete($id)

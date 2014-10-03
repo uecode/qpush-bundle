@@ -12,11 +12,10 @@
         >
     <filter>
         <whitelist>
-            <directory suffix=".php">src/Provider</directory>
-            <directory suffix=".php">src/Message</directory>
-            <directory suffix=".php">src/Event</directory>
+            <directory suffix=".php">src/</directory>
         </whitelist>
     </filter>
+
     <php>
     </php>
     <testsuites>
@@ -24,4 +23,7 @@
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>
+    <logging>
+        <log type="coverage-text" target="php://stdout" />
+    </logging>
 </phpunit>

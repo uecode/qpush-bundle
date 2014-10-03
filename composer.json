@@ -17,12 +17,12 @@
         "email": "kkirk@undergroundelephant.com"
     },
     "require": {
-        "php":                    ">=5.4.0",
-        "doctrine/common":        "~2.4"
+        "php":                      ">=5.4.0",
+        "doctrine/common":          "~2.4",
+        "symfony/framework-bundle": "~2.3",
+        "symfony/monolog-bundle":   "~2.3"
     },
     "require-dev": {
-        "symfony/symfony":        "~2.3",
-        "symfony/monolog-bundle": "~2.3",
         "phpunit/phpunit":        "~3.7",
         "aws/aws-sdk-php":        "~2.5",
         "iron-io/iron_mq":        "~1.5"

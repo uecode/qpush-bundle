@@ -4,7 +4,7 @@ Usage
 Once configured, you can create messages and publish them to the queue. You may also
 create services that will automatically be fired as messages are pushed to your application.
 
-For your convenience, a custom ``Provider`` service will be created and registered 
+For your convenience, a custom ``Provider`` service will be created and registered
 in the Container for each of your defined Queues. The container queue service id will be
 in the format of ``uecode_qpush.{your queue name}``.
 
@@ -20,13 +20,13 @@ call the ``publish`` method on the respective queue, which accepts an array.
 
     public function publishAction()
     {
-        $message = [ 
-            'messages should be an array'.
+        $message = [
+            'messages should be an array',
             'they can be flat arrays' => [
                 'or multidimensional'
             ]
         ];
-        
+
         $this->get('uecode_qpush.my_queue_name')->publish($message);
     }
 
@@ -34,7 +34,7 @@ Working with messages from your Queue
 -------------------------------------
 
 Messages are either automatically received by your application and events dispatched
-(setting ``push_notification`` to ``true``), or can be picked up by Cron jobs through an included 
+(setting ``push_notification`` to ``true``), or can be picked up by Cron jobs through an included
 command if you are not using a Message Queue provider that supports Push notifications.
 
 When the notifications or messages are Pushed to your application, the QPush Bundle automatically
@@ -62,7 +62,7 @@ and a ``Uecode\Bundle\QPushBundle\Message\Message`` object, accessible through g
 The ``Message`` objects contain the provider specific message id, a message body,
 and a collection of provider specific metadata.
 
-These properties are accessible through simple getters. 
+These properties are accessible through simple getters.
 
 The message ``body`` is an array matching your original message. The ``metadata`` property is an
 ``ArrayCollection`` of varying fields sent with your message from your Queue Provider.
@@ -100,7 +100,7 @@ Tag Property    Example                                 Description
 
 The ``priority`` is useful to chain services, ensuring that they fire in a certain order - the higher priorities fire earlier.
 
-Each event fired by the Qpush Bundle is prefixed with the name of your queue, ex: ``my_queue_name.message_received``. 
+Each event fired by the Qpush Bundle is prefixed with the name of your queue, ex: ``my_queue_name.message_received``.
 
 This allows you to assign services to fire only on certain queues, based on the queue name.
 However, you may also have multiple tags on a single service, so that one service can handle
@@ -130,7 +130,7 @@ take a single argument, an instance of ``Uecode\Bundle\QPushBundle\Event\Message
         $queueName  = $event->getQueueName();
         $message    = $event->getMessage();
         $metadata   = $message()->getMetadata();
-        
+
         // Process ...
     }
 
@@ -170,13 +170,13 @@ Push Queues in Development
 --------------------------
 
 It is recommended to use your ``config_dev.yml`` file to disable the
-``push_notifications`` settings on your queues. This will make the queue a simple 
-Pull queue. You can then use the ``uecode:qpush:receive`` Console Command to receive 
+``push_notifications`` settings on your queues. This will make the queue a simple
+Pull queue. You can then use the ``uecode:qpush:receive`` Console Command to receive
 messages from your Queue.
 
 If you need to test the Push Queue functionality from a local stack or internal
-machine, it possible to use `ngrok <https://ngrok.com/>`_ to tunnel to your development
-environment, so its reachable by your Queue Provider. 
+machine, it's possible to use `ngrok <https://ngrok.com/>`_ to tunnel to your development
+environment, so its reachable by your Queue Provider.
 
 You would need to update your `config_dev.yml` configuration to use the `ngrok` url for
 your subscriber(s).

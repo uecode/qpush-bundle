@@ -61,33 +61,63 @@ abstract class AbstractProvider implements ProviderInterface
      */
     protected $logger;
 
+    /**
+     * {@inheritDoc}
+     */
     public function getName()
     {
         return $this->name;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getNameWithPrefix()
     {
         if (!empty($this->options['queue_name'])) {
             return $this->options['queue_name'];
         }
-        
+
         return sprintf("%s_%s", self::QPUSH_PREFIX, $this->name);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getOptions()
     {
         return $this->options;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getCache()
     {
         return $this->cache;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getlogger()
     {
         return $this->logger;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function log($level, $message, array $context = [])
+    {
+        if (!$this->options['logging_enabled']) {
+            return false;
+        }
+
+        // Add the queue name and provider to the context
+        $context = array_merge(['queue' => $this->name, 'provider'  => $this->getProvider()], $context);
+
+        $this->logger->addRecord($level, $message, $context);
     }
 
     /**
@@ -106,28 +136,25 @@ abstract class AbstractProvider implements ProviderInterface
         return false;
     }
 
-    public function log($level, $message, array $context = [])
+    /**
+     * Merge override options while restricting what keys are allowed
+     *
+     * @param  array $options An array of options that override the queue defaults
+     *
+     * @return array
+     */
+    public function mergeOptions(array $options = [])
     {
-        if (!$this->options['logging_enabled']) {
-            return false;
-        }
-
-        // Add the queue name and provider to the context
-        $context = array_merge(
-            ['queue' => $this->name, 'provider'  => $this->getProvider()],
-            $context
-        );
-
-        $this->logger->addRecord($level, $message, $context);
+        return array_merge($this->options, array_intersect_key($options, $this->options));
     }
 
     abstract public function getProvider();
 
     abstract public function create();
 
-    abstract public function publish(array $message);
+    abstract public function publish(array $message, array $options = []);
 
-    abstract public function receive();
+    abstract public function receive(array $options = []);
 
     abstract public function delete($id);
 
