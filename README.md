@@ -4,7 +4,7 @@ QPush - Symfony2 Push Queue Bundle
 [![Build Status](https://img.shields.io/travis/uecode/qpush-bundle/master.svg?style=flat-square)](https://travis-ci.org/uecode/qpush-bundle)
 [![Quality Score](https://img.shields.io/scrutinizer/g/uecode/qpush-bundle.svg?style=flat-square)](https://scrutinizer-ci.com/g/uecode/qpush-bundle/)
 [![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/uecode/qpush-bundle.svg?style=flat-square)](https://scrutinizer-ci.com/g/uecode/qpush-bundle/)
-[![Total Downloads](http://img.shields.io/packagist/dt/uecode/qpush-bundle.svg)](https://packagist.org/packages/uecode/qpush-bundle)
+[![Total Downloads](http://img.shields.io/packagist/dt/uecode/qpush-bundle.svg?style=flat-square)](https://packagist.org/packages/uecode/qpush-bundle)
 
 ##Overview
 This bundle allows you to easily consume messages from Push Queues by simply
