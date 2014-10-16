@@ -1,9 +1,10 @@
 QPush - Symfony2 Push Queue Bundle
 ==================================
 
-[![Build Status](https://travis-ci.org/uecode/qpush-bundle.png?branch=master)](https://travis-ci.org/uecode/qpush-bundle)
-[![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/uecode/qpush-bundle/badges/quality-score.png?s=2c0d37936bb5ea34f338139961bfc4c8dedccb07)](https://scrutinizer-ci.com/g/uecode/qpush-bundle/)
-[![Code Coverage](https://scrutinizer-ci.com/g/uecode/qpush-bundle/badges/coverage.png?s=372bcf1c9656b514075b29e4e39f8506772a7a16)](https://scrutinizer-ci.com/g/uecode/qpush-bundle/)
+[![Build Status](https://img.shields.io/travis/uecode/qpush-bundle/master.svg?style=flat-square)](https://travis-ci.org/uecode/qpush-bundle)
+[![Quality Score](https://img.shields.io/scrutinizer/g/uecode/qpush-bundle.svg?style=flat-square)](https://scrutinizer-ci.com/g/uecode/qpush-bundle/)
+[![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/uecode/qpush-bundle.svg?style=flat-square)](https://scrutinizer-ci.com/g/uecode/qpush-bundle/)
+[![Total Downloads](http://img.shields.io/packagist/dt/uecode/qpush-bundle.svg)](https://packagist.org/packages/uecode/qpush-bundle)
 
 ##Overview
 This bundle allows you to easily consume messages from Push Queues by simply
