@@ -175,7 +175,7 @@ class AwsProvider extends AbstractProvider
 
         if ($options['push_notifications']) {
 
-            if ($this->topicExists()) {
+            if (!$this->topicExists()) {
                 $this->create();
             }
 
