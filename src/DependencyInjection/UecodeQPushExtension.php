@@ -75,6 +75,13 @@ class UecodeQPushExtension extends Extension
                         $container
                     );
                     break;
+                case 'sync':
+                    $class  = $container->getParameter('uecode_qpush.provider.sync');
+                    $client = $this->createSyncClient(
+                        $config['providers'][$provider],
+                        $container
+                    );
+                    break;
             }
 
             $definition = new Definition(
@@ -174,6 +181,11 @@ class UecodeQPushExtension extends Extension
         }
 
         return new Reference('uecode_qpush.provider.ironmq');
+    }
+
+    private function createSyncClient($config, ContainerBuilder $container)
+    {
+        return new Reference('event_dispatcher');
     }
 
     /**
