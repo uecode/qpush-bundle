@@ -2,7 +2,8 @@ Configure the Bundle
 ====================
 
 The bundle allows you to specify different Message Queue providers - however,
-Amazon AWS and IronMQ are the only ones currently supported.
+Amazon AWS and IronMQ are the only ones currently supported. Blocking, synchronous queues
+are also supported through the ``sync`` driver to aid development and debugging.
 
 We are actively looking to add more and would be more than happy to accept contributions.
 
@@ -22,6 +23,7 @@ For specific instructions on how to configure each provider, please view their d
 
     aws-provider
     iron-mq-provider
+    sync-provider
 
 Caching
 -------
@@ -113,7 +115,7 @@ A working configuration would look like the following
                 project_id: YOUR_IRONMQ_PROJECT_ID_HERE
         queues:
             my_queue_key:
-                provider: ironmq #or aws
+                provider: ironmq #or aws or sync
                 options:
                     queue_name:             my_actual_queue_name
                     push_notifications:     true
