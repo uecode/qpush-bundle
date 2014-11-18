@@ -48,23 +48,11 @@ class SyncProvider extends AbstractProvider
         $this->log(200, 'Message received and dispatched on Sync Queue', $context);
     }
 
-    public function create()
-    {
-        // pass
-    }
+    public function create() {}
 
-    public function destroy()
-    {
-        // pass
-    }
+    public function destroy() {}
 
-    public function delete($id)
-    {
-        // pass
-    }
+    public function delete($id) {}
 
-    public function receive(array $options = [])
-    {
-        // pass
-    }
+    public function receive(array $options = []) {}
 } 
