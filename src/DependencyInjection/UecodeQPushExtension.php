@@ -169,7 +169,10 @@ class UecodeQPushExtension extends Extension
             $ironmq->setArguments([
                 [
                     'token'         => $config['token'],
-                    'project_id'    => $config['project_id']
+                    'project_id'    => $config['project_id'],
+                    'host'          => sprintf('%s.iron.io', $config['host']),
+                    'port'          => $config['port'],
+                    'api_version'   => $config['api_version']
                 ]
             ]);
 
