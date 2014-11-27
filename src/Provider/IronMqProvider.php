@@ -183,14 +183,14 @@ class IronMqProvider extends AbstractProvider
         // Convert to Message Class
         foreach ($messages as &$message) {
             $id         = $message->id;
-            $body       = $message->body;
+            $body       = json_decode($message->body);
             $metadata   = [
                 'timeout'           => $message->timeout,
                 'reserved_count'    => $message->reserved_count,
                 'push_status'       => $message->push_status
             ];
 
-            $message = new Message($id, $body, $metadata);
+            $message = new Message($id, json_encode($body->{$this->name}), $metadata);
 
             $this->log(200, "Message has been received.", ['message_id' => $id]);
         }
