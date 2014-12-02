@@ -140,7 +140,7 @@ class IronMqProvider extends AbstractProvider
 
         $result = $this->ironmq->postMessage(
             $this->getNameWithPrefix(),
-            json_encode([$this->name => $message]),
+            json_encode($message),
             [
                 'timeout'       => $options['message_timeout'],
                 'delay'         => $options['message_delay'],

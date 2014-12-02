@@ -74,7 +74,7 @@ class IronMqMockClient
     {
         $response                   = new \stdClass;
         $response->id               = 123;
-        $response->body             = "test";
+        $response->body             = '{"test":{"foo":"bar"}}';
         $response->timeout          = 60;
         $response->reserved_count   = 1;
         $response->push_status      = new \stdClass;
