@@ -60,19 +60,21 @@ class UecodeQPushExtension extends Extension
             $class      = null;
             $client     = null;
 
-            switch ($provider) {
+            switch ($config['providers'][$provider]['driver']) {
                 case 'aws':
                     $class  = $container->getParameter('uecode_qpush.provider.aws');
                     $client = $this->createAwsClient(
                         $config['providers'][$provider],
-                        $container
+                        $container,
+                        $provider
                     );
                     break;
                 case 'ironmq':
                     $class  = $container->getParameter('uecode_qpush.provider.ironmq');
                     $client = $this->createIronMQClient(
                         $config['providers'][$provider],
-                        $container
+                        $container,
+                        $provider
                     );
                     break;
                 case 'sync':
@@ -116,12 +118,15 @@ class UecodeQPushExtension extends Extension
      *
      * @param array            $config    A Configuration array for the client
      * @param ContainerBuilder $container The container
+     * @param string           $name      The provider key
      *
-     * return Reference
+     * @return Reference
      */
-    private function createAwsClient($config, ContainerBuilder $container)
+    private function createAwsClient($config, ContainerBuilder $container, $name)
     {
-        if (!$container->hasDefinition('uecode_qpush.provider.aws')) {
+        $service = sprintf('uecode_qpush.provider.%s', $name);
+
+        if (!$container->hasDefinition($service)) {
 
             if (!class_exists('Aws\Common\Aws')) {
                 throw new \RuntimeException(
@@ -140,11 +145,11 @@ class UecodeQPushExtension extends Extension
                 ]
             ]);
 
-            $container->setDefinition('uecode_qpush.provider.aws', $aws)
+            $container->setDefinition($service, $aws)
                 ->setPublic(false);
         }
 
-        return new Reference('uecode_qpush.provider.aws');
+        return new Reference($service);
     }
 
     /**
@@ -152,12 +157,15 @@ class UecodeQPushExtension extends Extension
      *
      * @param array            $config    A Configuration array for the provider
      * @param ContainerBuilder $container The container
+     * @param string           $name      The provider key
      *
-     * return Reference
+     * @return Reference
      */
-    private function createIronMQClient($config, ContainerBuilder $container)
+    private function createIronMQClient($config, ContainerBuilder $container, $name)
     {
-        if (!$container->hasDefinition('uecode_qpush.provider.ironmq')) {
+        $service = sprintf('uecode_qpush.provider.%s', $name);
+
+        if (!$container->hasDefinition($service)) {
 
             if (!class_exists('IronMQ')) {
                 throw new \RuntimeException(
@@ -176,11 +184,11 @@ class UecodeQPushExtension extends Extension
                 ]
             ]);
 
-            $container->setDefinition('uecode_qpush.provider.ironmq', $ironmq)
+            $container->setDefinition($service, $ironmq)
                 ->setPublic(false);
         }
 
-        return new Reference('uecode_qpush.provider.ironmq');
+        return new Reference($service);
     }
 
     private function createSyncClient()

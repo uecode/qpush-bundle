@@ -56,39 +56,76 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder    = new TreeBuilder();
         $node           = $treeBuilder->root('providers');
+        $requirements   = [
+            'aws' => ['key', 'secret'],
+            'ironmq' => ['token', 'project_id'],
+            'sync' => [],
+        ];
 
         $node
-            ->children()
-                ->arrayNode('aws')
-                    ->children()
-                        ->scalarNode('key')->end()
-                        ->scalarNode('secret')->end()
-                        ->scalarNode('region')
-                            ->defaultValue('us-east-1')
-                        ->end()
+            ->beforeNormalization()
+                ->always(function (array $providers) use ($requirements) {
+                    array_walk(
+                        $providers,
+                        function (&$provider, $name) use ($requirements) {
+                            if (
+                                empty($provider['driver']) &&
+                                array_key_exists($name, $requirements)
+                            ) {
+                                $provider['driver'] = $name;
+                            }
+                        }
+                    );
+
+                    return $providers;
+                })
+            ->end()
+            ->useAttributeAsKey('name')
+            ->prototype('array')
+                ->treatNullLike([])
+                ->children()
+                    ->enumNode('driver')
+                        ->values(array_keys($requirements))
+                    ->end()
+                    // IronMQ
+                    ->scalarNode('token')->end()
+                    ->scalarNode('project_id')->end()
+                    ->enumNode('host')
+                        ->defaultValue('mq-aws-us-east-1')
+                        ->values([
+                            'mq-aws-us-east-1',
+                            'mq-aws-eu-west-1',
+                            'mq-rackspace-ord',
+                            'mq-rackspace-lon',
+                        ])
+                    ->end()
+                    ->scalarNode('port')
+                        ->defaultValue('443')
+                    ->end()
+                    ->scalarNode('api_version')
+                        ->defaultValue(1)
+                    ->end()
+                    // AWS
+                    ->scalarNode('key')->end()
+                    ->scalarNode('secret')->end()
+                    ->scalarNode('region')
+                        ->defaultValue('us-east-1')
                     ->end()
                 ->end()
-                ->arrayNode('ironmq')
-                    ->children()
-                        ->scalarNode('token')->end()
-                        ->scalarNode('project_id')->end()
-                        ->enumNode('host')
-                            ->defaultValue('mq-aws-us-east-1')
-                            ->values([
-                                'mq-aws-us-east-1',
-                                'mq-aws-eu-west-1',
-                                'mq-rackspace-ord',
-                                'mq-rackspace-lon'
-                            ])
-                        ->end()
-                        ->scalarNode('port')
-                            ->defaultValue('443')
-                        ->end()
-                        ->scalarNode('api_version')
-                            ->defaultValue(1)
-                        ->end()
-                    ->end()
-                ->end()
+
+                ->validate()
+                ->always()
+                ->then(function (array $provider) use ($node, $requirements) {
+                    foreach ($requirements[$provider['driver']] as $requirement) {
+                        if (empty($provider[$requirement])) {
+                            throw new \InvalidArgumentException(
+                                sprintf('%s queue providers must have a %s; none provided', $provider['driver'], $requirement)
+                            );
+                        }
+                    }
+
+                    return $provider;
+                })
             ->end()
         ;
 
