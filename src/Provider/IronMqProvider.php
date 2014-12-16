@@ -72,6 +72,7 @@ class IronMqProvider extends AbstractProvider
             $params = [
                 'push_type'     => 'multicast',
                 'retries'       => $this->options['notification_retries'],
+                'retry_delay'   => $this->options['notification_retry_delay'],
                 'subscribers'   => []
             ];
 
