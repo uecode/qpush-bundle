@@ -3,6 +3,7 @@ uecode_qpush:
     logging_enabled: true
     providers:
         aws:
+            driver: aws
             key: 123
             secret: 123
             region: us-east-1
@@ -12,6 +13,7 @@ uecode_qpush:
             secret: 432
             region: eu-west-1
         ironmq:
+            driver: ironmq
             token: 123
             project_id: 123
         secondary_ironmq:

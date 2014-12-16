@@ -63,28 +63,12 @@ class Configuration implements ConfigurationInterface
         ];
 
         $node
-            ->beforeNormalization()
-                ->always(function (array $providers) use ($requirements) {
-                    array_walk(
-                        $providers,
-                        function (&$provider, $name) use ($requirements) {
-                            if (
-                                empty($provider['driver']) &&
-                                array_key_exists($name, $requirements)
-                            ) {
-                                $provider['driver'] = $name;
-                            }
-                        }
-                    );
-
-                    return $providers;
-                })
-            ->end()
             ->useAttributeAsKey('name')
             ->prototype('array')
                 ->treatNullLike([])
                 ->children()
                     ->enumNode('driver')
+                        ->isRequired()
                         ->values(array_keys($requirements))
                     ->end()
                     // IronMQ

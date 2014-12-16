@@ -60,11 +60,7 @@ class UecodeQPushExtension extends Extension
             $class      = null;
             $client     = null;
 
-            $driver = isset($config['providers'][$provider]['driver']) ?
-                $config['providers'][$provider]['driver']
-                : $provider;
-
-            switch ($driver) {
+            switch ($config['providers'][$provider]['driver']) {
                 case 'aws':
                     $class  = $container->getParameter('uecode_qpush.provider.aws');
                     $client = $this->createAwsClient(
