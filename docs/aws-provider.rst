@@ -28,13 +28,14 @@ credentials in your configuration.
 
     uecode_qpush:
         providers:
-            aws:
+            my_provider:
+                driver: aws
                 key:    <aws key>
                 secret: <aws secret>
                 region: us-east-1
         queues:
             my_queue_name:
-                provider: aws
+                provider: my_provider
                 options:
                     push_notifications: true
                     subscribers:

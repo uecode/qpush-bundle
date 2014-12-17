@@ -107,15 +107,24 @@ A working configuration would look like the following
         logging_enabled: true
         providers:
             aws:
+                driver: aws #optional for providers named 'aws' or 'ironmq'
+                key: YOUR_AWS_KEY_HERE
+                secret: YOUR_AWS_SECRET_HERE
+                region: YOUR_AWS_REGION_HERE
+            another_aws_provider:
+                driver: aws #required for named providers
                 key: YOUR_AWS_KEY_HERE
                 secret: YOUR_AWS_SECRET_HERE
                 region: YOUR_AWS_REGION_HERE
             ironmq:
+                driver: aws #optional for providers named 'aws' or 'ironmq'
                 token: YOUR_IRONMQ_TOKEN_HERE
                 project_id: YOUR_IRONMQ_PROJECT_ID_HERE
+            in_band:
+                driver: sync
         queues:
             my_queue_key:
-                provider: ironmq #or aws or sync
+                provider: ironmq #or aws or in_band or another_aws_provider
                 options:
                     queue_name:             my_actual_queue_name
                     push_notifications:     true

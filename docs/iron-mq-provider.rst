@@ -30,7 +30,7 @@ an account and have a project id.
 testing and using this service extremely easy.
 
 Just include your OAuth `token` and `project_id` in the configuration and set your
-queue to use the `ironmq` provider.
+queue to use a provider using the `ironmq` driver.
 
 .. code-block:: yaml
 
@@ -38,7 +38,8 @@ queue to use the `ironmq` provider.
 
     uecode_qpush:
         providers:
-            ironmq:
+            my_provider:
+                driver:     ironmq
                 token:      YOUR_TOKEN_HERE
                 project_id: YOUR_PROJECT_ID_HERE
                 host:       YOUR_OPTIONAL_HOST_HERE
@@ -46,7 +47,7 @@ queue to use the `ironmq` provider.
                 version_id: YOUR_OPTIONAL_VERSION_HERE
         queues:
             my_queue_name:
-                provider: ironmq
+                provider: my_provider
                 options:
                     push_notifications: true
                     subscribers:
