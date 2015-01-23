@@ -111,7 +111,7 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
             'TopicArn'  => 'SomeArn',
             'Subject'   => 'aws-test',
             'Message'   => '{"foo": "bar"}',
-            'Timestamp' => date('Y-m-d H:i:s')
+            'Timestamp' => date('Y-m-d H:i:s', 1422040603)
         ];
 
         $request = new Request([],[],[],[],[],[], json_encode($message));
@@ -127,8 +127,24 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
 
     public function AwsOnNotificationReceived(NotificationEvent $event)
     {
-        $this->assertEquals($event->getNotification()->getId(), 123);
-        $this->assertEquals($event->getNotification()->getBody(), ['foo' => 'bar']);
+        $notification = $event->getNotification();
+        $this->assertInstanceOf('\Uecode\Bundle\QPushBundle\Message\Notification', $notification);
+
+        $this->assertEquals(123, $notification->getId());
+
+        $this->assertInternalType('array', $notification->getBody());
+        $this->assertEquals($notification->getBody(), ['foo' => 'bar']);
+
+        $this->assertInstanceOf('\Doctrine\Common\Collections\ArrayCollection', $notification->getMetadata());
+        $this->assertEquals(
+            [
+                'Type'      => 'Notification',
+                'TopicArn'  => 'SomeArn',
+                'Timestamp' => date('Y-m-d H:i:s', 1422040603),
+                'Subject'   => 'aws-test'
+            ],
+            $notification->getMetadata()->toArray()
+        );
     }
 
     public function testListenerHandlesAwsSubscriptionRequests()
@@ -141,7 +157,7 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
             'SubscribeUrl' => 'http://foo.bar',
             'Subject'      => 'aws-test',
             'Message'      => '{"foo": "bar"}',
-            'Timestamp'    => date('Y-m-d H:i:s')
+            'Timestamp'    => date('Y-m-d H:i:s', 1422040603)
         ];
 
         $request = new Request([],[],[],[],[],[], json_encode($message));
