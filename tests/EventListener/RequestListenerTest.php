@@ -29,6 +29,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Uecode\Bundle\QPushBundle\EventListener\RequestListener;
+use Uecode\Bundle\QPushBundle\Event\Events as QPushEvents;
+use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
 
 /**
  * @author Keith Kirk <kkirk@undergroundelephant.com>
@@ -47,11 +49,14 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $listener         = new RequestListener($this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'));
         $this->dispatcher = new EventDispatcher('UTF-8');
-        $this->dispatcher->addListener(KernelEvents::REQUEST, [$listener, 'onKernelRequest']);
+        $listener         = new RequestListener($this->dispatcher);
 
-        $this->kernel     = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $this->dispatcher->addListener(KernelEvents::REQUEST, [$listener, 'onKernelRequest']);
+        $this->dispatcher->addListener(QPushEvents::Notification('ironmq-test'), [$this, 'IronMqOnNotificationReceived']);
+        $this->dispatcher->addListener(QPushEvents::Notification('aws-test'), [$this, 'AwsOnNotificationReceived']);
+
+        $this->kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
     }
 
     public function testListenerDoesNothingForSubRequests()
@@ -64,9 +69,9 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testListenerHandlesIronMQMessageRequests()
     {
-        $message = ['test' => '{"foo": "bar"}'];
+        $message = '{"foo": "bar","_qpush_queue":"ironmq-test"}';
 
-        $request = new Request([],[],[],[],[],[], json_encode($message));
+        $request = new Request([],[],[],[],[],[], $message);
         $request->headers->set('iron-message-id', 123);
         $request->headers->set('iron-subscriber-message-id', 456);
         $request->headers->set('iron-subscriber-message-url', 'http://foo.bar');
@@ -78,14 +83,34 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("IronMQ Notification Received.", $event->getResponse()->getContent());
     }
 
+    public function IronMqOnNotificationReceived(NotificationEvent $event)
+    {
+        $notification = $event->getNotification();
+        $this->assertInstanceOf('\Uecode\Bundle\QPushBundle\Message\Notification', $notification);
+
+        $this->assertEquals(123, $notification->getId());
+
+        $this->assertInternalType('array', $notification->getBody());
+        $this->assertEquals($notification->getBody(), ['foo' => 'bar']);
+
+        $this->assertInstanceOf('\Doctrine\Common\Collections\ArrayCollection', $notification->getMetadata());
+        $this->assertEquals(
+            [
+                'iron-subscriber-message-id'  => 456,
+                'iron-subscriber-message-url' => 'http://foo.bar'
+            ],
+            $notification->getMetadata()->toArray()
+        );
+    }
+
     public function testListenerHandlesAwsNotificationRequests()
     {
         $message = [
             'Type'      => 'Notification',
             'MessageId' => 123,
             'TopicArn'  => 'SomeArn',
-            'Subject'   => 'Test',
-            'Message'   => 'Test Message',
+            'Subject'   => 'aws-test',
+            'Message'   => '{"foo": "bar"}',
             'Timestamp' => date('Y-m-d H:i:s')
         ];
 
@@ -93,10 +118,17 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
         $request->headers->set('x-amz-sns-message-type', 'Notification');
 
         $event = new GetResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+
         $this->dispatcher->dispatch(KernelEvents::REQUEST, $event);
 
         $this->assertTrue($event->hasResponse());
         $this->assertEquals("SNS Message Notification Received.", $event->getResponse()->getContent());
+    }
+
+    public function AwsOnNotificationReceived(NotificationEvent $event)
+    {
+        $this->assertEquals($event->getNotification()->getId(), 123);
+        $this->assertEquals($event->getNotification()->getBody(), ['foo' => 'bar']);
     }
 
     public function testListenerHandlesAwsSubscriptionRequests()
@@ -107,8 +139,8 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
             'Token'        => 456,
             'TopicArn'     => 'SomeArn',
             'SubscribeUrl' => 'http://foo.bar',
-            'Subject'      => 'Test',
-            'Message'      => 'Test Message',
+            'Subject'      => 'aws-test',
+            'Message'      => '{"foo": "bar"}',
             'Timestamp'    => date('Y-m-d H:i:s')
         ];
 
