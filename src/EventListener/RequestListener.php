@@ -87,15 +87,22 @@ class RequestListener
 
         // We add the message in an array with Queue as the property name
         $message    = json_decode($event->getRequest()->getContent(), true);
-        $queue      = key($message);
+
+        if (empty($message['_qpush_queue'])) {
+            return;
+        }
+
+        $queue      = $message['_qpush_queue'];
         $metadata   = [
-            'iron-subscriber-message-id'    => $headers->get('iron-subscriber-message-id'),
-            'iron-subscriber-message-url'   => $headers->get('iron-subscriber-message-url')
+            'iron-subscriber-message-id'  => $headers->get('iron-subscriber-message-id'),
+            'iron-subscriber-message-url' => $headers->get('iron-subscriber-message-url')
         ];
+
+        unset($message['_qpush_queue']);
 
         $notification = new Notification(
             $messageId,
-            $message[$queue],
+            $message,
             $metadata
         );
 
