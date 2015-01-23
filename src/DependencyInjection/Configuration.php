@@ -54,8 +54,8 @@ class Configuration implements ConfigurationInterface
 
     private function getProvidersNode()
     {
-        $treeBuilder    = new TreeBuilder();
-        $node           = $treeBuilder->root('providers');
+        $treeBuilder = new TreeBuilder();
+        $node        = $treeBuilder->root('providers');
 
         $node
             ->children()
@@ -97,8 +97,8 @@ class Configuration implements ConfigurationInterface
 
     private function getQueuesNode()
     {
-        $treeBuilder    = new TreeBuilder();
-        $node           = $treeBuilder->root('queues');
+        $treeBuilder = new TreeBuilder();
+        $node        = $treeBuilder->root('queues');
 
         $node
             ->requiresAtLeastOneElement()
@@ -161,8 +161,8 @@ class Configuration implements ConfigurationInterface
 
     private function getSubscribersNode()
     {
-        $treeBuilder    = new TreeBuilder();
-        $node           = $treeBuilder->root('subscribers');
+        $treeBuilder = new TreeBuilder();
+        $node        = $treeBuilder->root('subscribers');
 
         $node
             ->prototype('array')
