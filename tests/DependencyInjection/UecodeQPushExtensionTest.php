@@ -65,7 +65,19 @@ class UecodeQPushExtensionTest extends \PHPUnit_Framework_TestCase
         $this->container->compile();
 
         $this->assertTrue($this->container->has('uecode_qpush'));
+
         $this->assertTrue($this->container->has('uecode_qpush.test_aws'));
+        $this->assertTrue($this->container->has('uecode_qpush.test_secondary_aws'));
+        $this->assertNotSame(
+            $this->container->get('uecode_qpush.test_aws'),
+            $this->container->get('uecode_qpush.test_secondary_aws')
+        );
+
         $this->assertTrue($this->container->has('uecode_qpush.test_ironmq'));
+        $this->assertTrue($this->container->has('uecode_qpush.test_secondary_ironmq'));
+        $this->assertNotSame(
+            $this->container->get('uecode_qpush.test_ironmq'),
+            $this->container->get('uecode_qpush.test_secondary_ironmq')
+        );
     }
 }

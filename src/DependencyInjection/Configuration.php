@@ -54,41 +54,62 @@ class Configuration implements ConfigurationInterface
 
     private function getProvidersNode()
     {
-        $treeBuilder = new TreeBuilder();
-        $node        = $treeBuilder->root('providers');
+        $treeBuilder    = new TreeBuilder();
+        $node           = $treeBuilder->root('providers');
+        $requirements   = [
+            'aws' => ['key', 'secret'],
+            'ironmq' => ['token', 'project_id'],
+            'sync' => [],
+        ];
 
         $node
-            ->children()
-                ->arrayNode('aws')
-                    ->children()
-                        ->scalarNode('key')->end()
-                        ->scalarNode('secret')->end()
-                        ->scalarNode('region')
-                            ->defaultValue('us-east-1')
-                        ->end()
+            ->useAttributeAsKey('name')
+            ->prototype('array')
+                ->treatNullLike([])
+                ->children()
+                    ->enumNode('driver')
+                        ->isRequired()
+                        ->values(array_keys($requirements))
+                    ->end()
+                    // IronMQ
+                    ->scalarNode('token')->end()
+                    ->scalarNode('project_id')->end()
+                    ->enumNode('host')
+                        ->defaultValue('mq-aws-us-east-1')
+                        ->values([
+                            'mq-aws-us-east-1',
+                            'mq-aws-eu-west-1',
+                            'mq-rackspace-ord',
+                            'mq-rackspace-lon',
+                        ])
+                    ->end()
+                    ->scalarNode('port')
+                        ->defaultValue('443')
+                    ->end()
+                    ->scalarNode('api_version')
+                        ->defaultValue(1)
+                    ->end()
+                    // AWS
+                    ->scalarNode('key')->end()
+                    ->scalarNode('secret')->end()
+                    ->scalarNode('region')
+                        ->defaultValue('us-east-1')
                     ->end()
                 ->end()
-                ->arrayNode('ironmq')
-                    ->children()
-                        ->scalarNode('token')->end()
-                        ->scalarNode('project_id')->end()
-                        ->enumNode('host')
-                            ->defaultValue('mq-aws-us-east-1')
-                            ->values([
-                                'mq-aws-us-east-1',
-                                'mq-aws-eu-west-1',
-                                'mq-rackspace-ord',
-                                'mq-rackspace-lon'
-                            ])
-                        ->end()
-                        ->scalarNode('port')
-                            ->defaultValue('443')
-                        ->end()
-                        ->scalarNode('api_version')
-                            ->defaultValue(1)
-                        ->end()
-                    ->end()
-                ->end()
+
+                ->validate()
+                ->always()
+                ->then(function (array $provider) use ($node, $requirements) {
+                    foreach ($requirements[$provider['driver']] as $requirement) {
+                        if (empty($provider[$requirement])) {
+                            throw new \InvalidArgumentException(
+                                sprintf('%s queue providers must have a %s; none provided', $provider['driver'], $requirement)
+                            );
+                        }
+                    }
+
+                    return $provider;
+                })
             ->end()
         ;
 
@@ -119,36 +140,41 @@ class Configuration implements ConfigurationInterface
                                 ->defaultFalse()
                                 ->info('Whether notifications are sent to the subscribers')
                             ->end()
-                             ->scalarNode('notification_retries')
-                                 ->defaultValue(3)
-                                 ->info('How many attempts the Push Notifications are retried if the Subscriber returns an error')
-                                 ->example(3)
-                             ->end()
-                             ->scalarNode('message_delay')
-                                 ->defaultValue(0)
-                                 ->info('How many seconds before messages are inititally visible in the Queue')
-                                 ->example(0)
-                             ->end()
-                             ->scalarNode('message_timeout')
-                                 ->defaultValue(30)
-                                 ->info('How many seconds the Queue hides a message while its being processed')
-                                 ->example(30)
-                             ->end()
-                             ->scalarNode('message_expiration')
-                                 ->defaultValue(604800)
-                                 ->info('How many seconds a message is kept in Queue, the default is 7 days (604800 seconds)')
-                                 ->example(604800)
-                             ->end()
-                             ->scalarNode('messages_to_receive')
-                                 ->defaultValue(1)
-                                 ->info('Max amount of messages to receive at once - an event will be fired for each individually')
-                                 ->example(1)
-                             ->end()
-                             ->scalarNode('receive_wait_time')
-                                 ->defaultValue(3)
-                                 ->info('How many seconds to Long Poll when requesting messages - if supported')
-                                 ->example(3)
-                             ->end()
+                            ->scalarNode('notification_retries')
+                                ->defaultValue(3)
+                                ->info('How many attempts the Push Notifications are retried if the Subscriber returns an error')
+                                ->example(3)
+                            ->end()
+                            ->scalarNode('notification_retry_delay')
+                                ->defaultValue(60)
+                                ->info('Delay between each Push Notification retry in seconds')
+                                ->example(3)
+                                ->end()
+                            ->scalarNode('message_delay')
+                                ->defaultValue(0)
+                                ->info('How many seconds before messages are inititally visible in the Queue')
+                                ->example(0)
+                            ->end()
+                            ->scalarNode('message_timeout')
+                                ->defaultValue(30)
+                                ->info('How many seconds the Queue hides a message while its being processed')
+                                ->example(30)
+                            ->end()
+                            ->scalarNode('message_expiration')
+                                ->defaultValue(604800)
+                                ->info('How many seconds a message is kept in Queue, the default is 7 days (604800 seconds)')
+                                ->example(604800)
+                            ->end()
+                            ->scalarNode('messages_to_receive')
+                                ->defaultValue(1)
+                                ->info('Max amount of messages to receive at once - an event will be fired for each individually')
+                                ->example(1)
+                            ->end()
+                            ->scalarNode('receive_wait_time')
+                                ->defaultValue(3)
+                                ->info('How many seconds to Long Poll when requesting messages - if supported')
+                                ->example(3)
+                            ->end()
                             ->append($this->getSubscribersNode())
                         ->end()
                     ->end()

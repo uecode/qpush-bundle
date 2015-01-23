@@ -8,7 +8,7 @@ of queue-based code paths.
 Configuration
 ^^^^^^^^^^^^^
 
-To use the sync queue, set the ``provider`` of a given queue to ``sync``. No further
+To designate a queue as synchronous, set the ``driver`` of its provider to ``sync``. No further
 configuration is necessary.
 
 .. code-block:: yaml
@@ -16,6 +16,9 @@ configuration is necessary.
     #app/config_dev.yml
 
     uecode_qpush:
+        providers:
+            in_band:
+                driver: sync
         queues:
             my_queue_name:
-                provider: sync
+                provider: in_band
