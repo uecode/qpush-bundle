@@ -152,7 +152,9 @@ class IronMqProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testReceive()
     {
-        $this->assertTrue(is_array($this->provider->receive()));
+        $messages = $this->provider->receive();
+        $this->assertInternalType('array', $messages);
+        $this->assertEquals(['foo' => 'bar'], $messages[0]->getBody());
     }
 
     public function testDelete()
@@ -177,6 +179,7 @@ class IronMqProviderTest extends \PHPUnit_Framework_TestCase
             NotificationEvent::TYPE_MESSAGE,
             new Notification(123, "test", [])
         );
+
         $event->setDispatcher(
             $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface')
         );
