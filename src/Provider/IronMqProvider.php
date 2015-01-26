@@ -141,7 +141,7 @@ class IronMqProvider extends AbstractProvider
 
         $result = $this->ironmq->postMessage(
             $this->getNameWithPrefix(),
-            json_encode($message),
+            json_encode($message + ['_qpush_queue' => $this->name]),
             [
                 'timeout'       => $options['message_timeout'],
                 'delay'         => $options['message_delay'],
@@ -184,14 +184,16 @@ class IronMqProvider extends AbstractProvider
         // Convert to Message Class
         foreach ($messages as &$message) {
             $id         = $message->id;
-            $body       = $message->body;
+            $body       = json_decode($message->body, true);
             $metadata   = [
                 'timeout'           => $message->timeout,
                 'reserved_count'    => $message->reserved_count,
                 'push_status'       => $message->push_status
             ];
 
-            $message = new Message($id, $body, $metadata);
+            unset($body['_qpush_queue']);
+
+            $message = new Message($id, json_encode($body), $metadata);
 
             $this->log(200, "Message has been received.", ['message_id' => $id]);
         }

@@ -64,7 +64,7 @@ class IronMqMockClient
     {
         $response       = new \stdClass;
         $response->id   = 123;
-        $response->ids  = [ 123 ];
+        $response->ids  = [123];
         $response->msg  = "Messages put on queue.";
 
         return $response;
@@ -74,7 +74,7 @@ class IronMqMockClient
     {
         $response                   = new \stdClass;
         $response->id               = 123;
-        $response->body             = '{"test":{"foo":"bar"}}';
+        $response->body             = '{"foo":"bar","_qpush_queue":"test"}';
         $response->timeout          = 60;
         $response->reserved_count   = 1;
         $response->push_status      = new \stdClass;

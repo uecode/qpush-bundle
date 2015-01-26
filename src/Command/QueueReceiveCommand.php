@@ -76,19 +76,16 @@ class QueueReceiveCommand extends ContainerAwareCommand
             );
         }
 
-        $provider   = $registry->get($name);
-        $messages   = $provider->receive();
-        $count      = sizeof($messages);
+        $dispatcher = $this->getContainer()->get('event_dispatcher');
+        $messages   = $registry->get($name)->receive();
+
         foreach ($messages as $message) {
-
-            $messageEvent   = new MessageEvent($name, $message);
-            $dispatcher     = $this->getContainer()->get('event_dispatcher');
-
+            $messageEvent = new MessageEvent($name, $message);
             $dispatcher->dispatch(Events::Message($name), $messageEvent);
         }
 
         $msg = "<info>Finished polling %s Queue, %d messages fetched.</info>";
-        $this->output->writeln(sprintf($msg, $name, $count));
+        $this->output->writeln(sprintf($msg, $name, sizeof($messages)));
 
         return 0;
     }
