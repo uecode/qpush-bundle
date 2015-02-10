@@ -23,6 +23,7 @@
 namespace Uecode\Bundle\QPushBundle\Provider;
 
 use Aws\Common\Aws;
+use Aws\Sns\Exception\NotFoundException;
 use Aws\Sqs\SqsClient;
 use Aws\Sqs\Exception\SqsException;
 use Doctrine\Common\Cache\Cache;
@@ -408,6 +409,21 @@ class AwsProvider extends AbstractProvider
         if ($this->cache->contains($key)) {
             $this->topicArn = $this->cache->fetch($key);
 
+            return true;
+        }
+
+        if (!empty($this->queueUrl)) {
+            $queueArn = $this->sqs->getQueueArn($this->queueUrl);
+            $topicArn = str_replace('sqs', 'sns', $queueArn);
+            try {
+                $result   = $this->sns->getTopicAttributes([
+                    'TopicArn' => $topicArn
+                ]);
+            } catch (NotFoundException $e) {
+                return false;
+            }
+            $this->topicArn = $topicArn;
+            $this->cache->save($key, $this->topicArn);
             return true;
         }
 
