@@ -311,13 +311,15 @@ class AwsProvider extends AbstractProvider
             return true;
         }
 
-        $result = $this->sqs->getQueueUrl([
-            'QueueName' => $this->getNameWithPrefix()
-        ]);
+        try {
+            $result = $this->sqs->getQueueUrl([
+                'QueueName' => $this->getNameWithPrefix()
+            ]);
 
-        if($this->queueUrl = $result->get('QueueUrl')) {
-            return true;
-        }
+            if ($this->queueUrl = $result->get('QueueUrl')) {
+                return true;
+            }
+        } catch (SqsException $e) {}
 
         return false;
     }
