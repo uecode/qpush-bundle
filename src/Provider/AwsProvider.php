@@ -20,7 +20,7 @@
  * @license     Apache License, Version 2.0
  */
 
-namespace Uecode\Bundle\QPushBundle\Provider;
+namespace Uecode\Bundle\QPushBundle\Provider;c
 
 use Aws\Common\Aws;
 use Aws\Sqs\SqsClient;
@@ -92,7 +92,9 @@ class AwsProvider extends AbstractProvider
      */
     public function create()
     {
-        $this->createQueue();
+        if (!$this->queueExists()) {
+            $this->createQueue();
+        }
 
         if ($this->options['push_notifications']) {
            // Create the SNS Topic
