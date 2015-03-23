@@ -9,7 +9,7 @@ The bundle should be installed through composer.
 
     {
         "require": {
-            "uecode/qpush-bundle": "~2.0.0",
+            "uecode/qpush-bundle": "~2.1.0",
         }
     }
 
