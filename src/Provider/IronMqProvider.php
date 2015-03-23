@@ -172,7 +172,8 @@ class IronMqProvider extends AbstractProvider
         $messages = $this->ironmq->getMessages(
             $this->getNameWithPrefix(),
             $options['messages_to_receive'],
-            $options['message_timeout']
+            $options['message_timeout'],
+            $options['receive_wait_time']
         );
 
         if (!is_array($messages)) {

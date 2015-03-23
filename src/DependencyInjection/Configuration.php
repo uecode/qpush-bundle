@@ -171,7 +171,7 @@ class Configuration implements ConfigurationInterface
                                 ->example(1)
                             ->end()
                             ->scalarNode('receive_wait_time')
-                                ->defaultValue(3)
+                                ->defaultValue(0)
                                 ->info('How many seconds to Long Poll when requesting messages - if supported')
                                 ->example(3)
                             ->end()
