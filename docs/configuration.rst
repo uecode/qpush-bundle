@@ -24,6 +24,7 @@ For specific instructions on how to configure each provider, please view their d
     aws-provider
     iron-mq-provider
     sync-provider
+    custom-provider
 
 Caching
 -------
@@ -122,6 +123,9 @@ A working configuration would look like the following
                 project_id: YOUR_IRONMQ_PROJECT_ID_HERE
             in_band:
                 driver: sync
+            custom_provider:
+                driver: custom
+                service: YOUR_CUSTOM_SERVICE_ID
         queues:
             my_queue_key:
                 provider: ironmq #or aws or in_band or another_aws_provider

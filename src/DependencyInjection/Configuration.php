@@ -60,6 +60,7 @@ class Configuration implements ConfigurationInterface
             'aws' => ['key', 'secret'],
             'ironmq' => ['token', 'project_id'],
             'sync' => [],
+            'custom' => ['service']
         ];
 
         $node
@@ -74,6 +75,7 @@ class Configuration implements ConfigurationInterface
                     // IronMQ
                     ->scalarNode('token')->end()
                     ->scalarNode('project_id')->end()
+                    ->scalarNode('service')->end()
                     ->enumNode('host')
                         ->defaultValue('mq-aws-us-east-1')
                         ->values([
