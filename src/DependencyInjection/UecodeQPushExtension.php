@@ -81,6 +81,10 @@ class UecodeQPushExtension extends Extension
                     $class  = $container->getParameter('uecode_qpush.provider.sync');
                     $client = $this->createSyncClient();
                     break;
+                case 'custom':
+                    $class  = $container->getParameter('uecode_qpush.provider.custom');
+                    $client = $this->createCustomClient($config['providers'][$provider]['service']);
+                    break;
             }
 
             $definition = new Definition(
@@ -194,6 +198,16 @@ class UecodeQPushExtension extends Extension
     private function createSyncClient()
     {
         return new Reference('event_dispatcher');
+    }
+
+    /**
+     * @param string $serviceId
+     *
+     * @return Reference
+     */
+    private function createCustomClient($serviceId)
+    {
+        return new Reference($serviceId);
     }
 
     /**

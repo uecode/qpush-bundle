@@ -4,3 +4,4 @@ parameters:
     uecode_qpush.provider.aws:           Uecode\Bundle\QPushBundle\Provider\AwsProvider
     uecode_qpush.provider.ironmq:        Uecode\Bundle\QPushBundle\Provider\IronMqProvider
     uecode_qpush.provider.sync:          Uecode\Bundle\QPushBundle\Provider\SyncProvider
+    uecode_qpush.provider.custom:        Uecode\Bundle\QPushBundle\Provider\CustomProvider
