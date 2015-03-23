@@ -1,11 +1,20 @@
 language: php
 
+sudo: false
+
+cache:
+    directories:
+        - $HOME/.composer/cache
+
 php:
-    - 5.5
     - 5.4
+    - 5.5
     - 5.6
-    - 7.0
     - hhvm
+    
+matrix:
+    allow_failures:
+        - php: hhvm
 
 env:
     - SYMFONY_VERSION=2.3.*
@@ -14,9 +23,9 @@ env:
     - SYMFONY_VERSION=2.6.*
 
 install:
-    - travis_retry composer self-update
+    - composer self-update
     - composer require symfony/framework-bundle:${SYMFONY_VERSION} --no-update
-    - travis_retry composer install --prefer-source
+    - composer install --prefer-dist
 
 script: phpunit --coverage-text --coverage-clover=coverage.clover
 
@@ -24,16 +33,3 @@ after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
   - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
 
-notifications:
-    webhooks: http://ue.hipchat.com/hubot/travis?room=Underground Elephant
-
-matrix:
-    allow_failures:
-        - php: hhvm
-        - php: 7.0
-
-sudo: false
-
-cache:
-    directories:
-        - $HOME/.composer/cache
