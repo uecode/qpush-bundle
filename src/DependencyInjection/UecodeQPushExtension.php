@@ -171,13 +171,13 @@ class UecodeQPushExtension extends Extension
 
         if (!$container->hasDefinition($service)) {
 
-            if (!class_exists('IronMQ')) {
+            if (!class_exists('IronMQ\IronMQ')) {
                 throw new \RuntimeException(
-                    'You must require "iron-io/iron_mq" to use the Iron MQ provider.'
+                    'You must require "iron-io/iron_mq" to use the Iron MQ provider. If it was already required, check if the library is properly loaded.'
                 );
             }
 
-            $ironmq = new Definition('IronMQ');
+            $ironmq = new Definition('IronMQ\IronMQ');
             $ironmq->setArguments([
                 [
                     'token'         => $config['token'],
