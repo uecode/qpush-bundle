@@ -22,18 +22,22 @@
 
 namespace Uecode\Bundle\QPushBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 
 /**
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
-class QueueReceiveCommand extends ContainerAwareCommand
+class QueueReceiveCommand extends Command implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     protected $output;
 
     protected function configure()
@@ -53,7 +57,7 @@ class QueueReceiveCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->output = $output;
-        $registry = $this->getContainer()->get('uecode_qpush');
+        $registry = $this->container->get('uecode_qpush');
 
         $name = $input->getArgument('name');
 
