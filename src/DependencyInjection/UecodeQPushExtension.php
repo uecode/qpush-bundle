@@ -139,8 +139,7 @@ class UecodeQPushExtension extends Extension
             }
 
             $aws = new Definition('Aws\Common\Aws');
-            $aws->setFactoryClass('Aws\Common\Aws');
-            $aws->setFactoryMethod('factory');
+            $aws->setFactory(['Aws\Common\Aws', 'factory']);
             $aws->setArguments([
                 [
                     'key'      => $config['key'],

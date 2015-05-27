@@ -181,11 +181,11 @@ class IronMqProviderTest extends \PHPUnit_Framework_TestCase
             new Notification(123, "test", [])
         );
 
-        $event->setDispatcher(
+        $this->provider->onNotification(
+            $event,
+            NotificationEvent::TYPE_MESSAGE,
             $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface')
         );
-
-        $this->provider->onNotification($event);
     }
 
     public function testOnMessageReceived()

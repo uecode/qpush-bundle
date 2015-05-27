@@ -263,11 +263,13 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testOnNotificationSubscriptionEvent()
     {
+        $dispatcher = $this->getMockForAbstractClass('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->provider->onNotification(new NotificationEvent(
             'test',
             NotificationEvent::TYPE_SUBSCRIPTION,
             new Notification(123, "test", [])
-        ));
+        ), NotificationEvent::TYPE_SUBSCRIPTION, $dispatcher);
+
     }
 
     public function testOnNotificationMessageEvent()
@@ -277,11 +279,12 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
             NotificationEvent::TYPE_MESSAGE,
             new Notification(123, "test", [])
         );
-        $event->setDispatcher(
+
+        $this->provider->onNotification(
+            $event,
+            NotificationEvent::TYPE_MESSAGE,
             $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface')
         );
-
-        $this->provider->onNotification($event);
     }
 
     public function testOnMessageReceived()
