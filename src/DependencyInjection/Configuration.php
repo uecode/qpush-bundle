@@ -60,7 +60,8 @@ class Configuration implements ConfigurationInterface
             'aws' => ['key', 'secret'],
             'ironmq' => ['token', 'project_id'],
             'sync' => [],
-            'custom' => ['service']
+            'custom' => ['service'],
+            'file' => ['path']
         ];
 
         $node
@@ -97,6 +98,8 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('region')
                         ->defaultValue('us-east-1')
                     ->end()
+                    // File
+                    ->scalarNode('path')->end()
                 ->end()
 
                 ->validate()
