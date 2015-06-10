@@ -29,8 +29,8 @@
         "phpunit/phpunit":        "~3.7",
         "aws/aws-sdk-php":        "~2.5",
         "iron-io/iron_mq":        "~1.5",
-        "symfony/finder": "^2.7",
-        "symfony/filesystem": "^2.7"
+        "symfony/finder":         "~2.3",
+        "symfony/filesystem":     "~2.3"
     },
     "suggest": {
         "aws/aws-sdk-php": "Required to use AWS as a Queue Provider",
