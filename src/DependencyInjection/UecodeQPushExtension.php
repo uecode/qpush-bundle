@@ -87,6 +87,7 @@ class UecodeQPushExtension extends Extension
                     break;
                 case 'file':
                     $class = $container->getParameter('uecode_qpush.provider.file');
+                    $values['options']['path'] = $config['providers'][$provider]['path'];
                     break;
             }
 
