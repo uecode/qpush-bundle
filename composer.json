@@ -22,7 +22,7 @@
         "symfony/dependency-injection": "^2.6",
         "symfony/config": "^2.6",
         "symfony/http-kernel": "^2.6",
-        "symfony/console": "2.8.*",
+        "symfony/console": "2.7.*",
         "symfony/monolog-bundle":   "~2.6"
     },
     "require-dev": {
