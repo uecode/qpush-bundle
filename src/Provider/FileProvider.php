@@ -67,12 +67,12 @@ class FileProvider extends AbstractProvider
         ;
         if ($this->options['message_delay'] > 0) {
             $finder->date(
-                sprintf('< %s', $this->convertSecondToHuman($this->options['message_delay']))
+                sprintf('< %d seconds ago', $this->options['message_delay'])
             );
         }
         $finder
             ->date(
-                sprintf('> %s', $this->convertSecondToHuman($this->options['message_expiration']))
+                sprintf('> %d seconds ago', $this->options['message_expiration'])
             )
         ;
         $messages = [];
@@ -91,28 +91,6 @@ class FileProvider extends AbstractProvider
             }
         }
         return $messages;
-    }
-
-    private function convertSecondToHuman($seconds) {
-        if ($seconds / 60 >= 1) {
-            $minutes = floor($seconds / 60);
-            $seconds = $seconds % 60;
-        } else {
-            return sprintf('%d seconds ago', $seconds);
-        }
-        if ($minutes / 60 >= 1) {
-            $hours = floor($minutes / 60);
-            $minutes = $minutes % 60;
-        } else {
-            return sprintf('%d minutes %d seconds ago', $minutes, $seconds);
-        }
-        if ($hours / 24 >= 1) {
-            $days = floor($hours / 24);
-            $hours = $hours % 24;
-        } else {
-            return sprintf('%d hours %d minutes %d seconds ago', $hours, $minutes, $seconds);
-        }
-        return sprintf('%d days %d hours %d minutes %d seconds ago', $days, $hours, $minutes, $seconds);
     }
 
     public function delete($id)
@@ -148,7 +126,7 @@ class FileProvider extends AbstractProvider
             ->name('*.json')
         ;
         $finder->date(
-            sprintf('> %s', $this->convertSecondToHuman($this->options['message_expiration']))
+            sprintf('> %d seconds ago', $this->options['message_expiration'])
         );
         /** @var SplFileInfo $file */
         foreach ($finder as $file) {
