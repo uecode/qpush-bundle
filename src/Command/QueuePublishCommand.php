@@ -27,14 +27,31 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class QueuePublishCommand extends Command implements ContainerAwareInterface
 {
-    use ContainerAwareTrait;
+    /**
+     * @var ContainerInterface
+     *
+     * @api
+     */
+    protected $container;
+
+    /**
+     * Sets the Container associated with this Controller.
+     *
+     * @param ContainerInterface $container A ContainerInterface instance
+     *
+     * @api
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
 
     protected $output;
 
