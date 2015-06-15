@@ -22,16 +22,37 @@
 
 namespace Uecode\Bundle\QPushBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
-class QueuePublishCommand extends ContainerAwareCommand
+class QueuePublishCommand extends Command implements ContainerAwareInterface
 {
+    /**
+     * @var ContainerInterface
+     *
+     * @api
+     */
+    protected $container;
+
+    /**
+     * Sets the Container associated with this Controller.
+     *
+     * @param ContainerInterface $container A ContainerInterface instance
+     *
+     * @api
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
     protected $output;
 
     protected function configure()
@@ -55,7 +76,7 @@ class QueuePublishCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->output = $output;
-        $registry = $this->getContainer()->get('uecode_qpush');
+        $registry = $this->container->get('uecode_qpush');
 
         $name = $input->getArgument('name');
         $message = $input->getArgument('message');

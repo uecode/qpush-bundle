@@ -79,6 +79,7 @@ class RequestListener
      * Handles Messages sent from a IronMQ Push Queue
      *
      * @param GetResponseEvent $event The Kernel Request's GetResponseEvent
+     * @return string|void
      */
     private function handleIronMqNotifications(GetResponseEvent $event)
     {
@@ -118,6 +119,7 @@ class RequestListener
      * Handles Notifications sent from AWS SNS
      *
      * @param GetResponseEvent $event The Kernel Request's GetResponseEvent
+     * @return string
      */
     private function handleSnsNotifications(GetResponseEvent $event)
     {

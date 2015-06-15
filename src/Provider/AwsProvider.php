@@ -23,10 +23,12 @@
 namespace Uecode\Bundle\QPushBundle\Provider;
 
 use Aws\Common\Aws;
+use Aws\Sns\SnsClient;
 use Aws\Sqs\SqsClient;
 use Aws\Sqs\Exception\SqsException;
 use Doctrine\Common\Cache\Cache;
 use Symfony\Bridge\Monolog\Logger;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
@@ -538,8 +540,11 @@ class AwsProvider extends AbstractProvider
      * the `{queue}.message_received` event for each message retrieved
      *
      * @param NotificationEvent $event The Notification Event
+     * @param string $eventName Name of the event
+     * @param EventDispatcherInterface $dispatcher
+     * @return bool|void
      */
-    public function onNotification(NotificationEvent $event)
+    public function onNotification(NotificationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (NotificationEvent::TYPE_SUBSCRIPTION == $event->getType()) {
             $topicArn   = $event->getNotification()->getMetadata()->get('TopicArn');
@@ -560,19 +565,20 @@ class AwsProvider extends AbstractProvider
         foreach ($messages as $message) {
 
             $messageEvent = new MessageEvent($this->name, $message);
-            $event->getDispatcher()->dispatch(Events::Message($this->name), $messageEvent);
+            $dispatcher->dispatch(Events::Message($this->name), $messageEvent);
         }
     }
 
     /**
      * Removes the message from queue after all other listeners have fired
      *
-     * If an earlier listener has errored or stopped propigation, this method
+     * If an earlier listener has erred or stopped propagation, this method
      * will not fire and the Queued Message should become visible in queue again.
      *
      * Stops Event Propagation after removing the Message
      *
      * @param MessageEvent $event The SQS Message Event
+     * @return bool|void
      */
     public function onMessageReceived(MessageEvent $event)
     {

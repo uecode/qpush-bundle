@@ -24,6 +24,7 @@ namespace Uecode\Bundle\QPushBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
 use Symfony\Bridge\Monolog\Logger;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Uecode\Bundle\QPushBundle\Provider\ProviderInterface;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
@@ -121,14 +122,18 @@ abstract class AbstractProvider implements ProviderInterface
     }
 
     /**
+     * @param NotificationEvent $event
+     * @param string $eventName Name of the event
+     * @param EventDispatcherInterface $dispatcher
      * @return bool
      */
-    public function onNotification(NotificationEvent $event)
+    public function onNotification(NotificationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         return false;
     }
 
     /**
+     * @param MessageEvent $event
      * @return bool
      */
     public function onMessageReceived(MessageEvent $event)

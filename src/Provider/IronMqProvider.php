@@ -25,6 +25,7 @@ namespace Uecode\Bundle\QPushBundle\Provider;
 use IronMQ;
 use Doctrine\Common\Cache\Cache;
 use Symfony\Bridge\Monolog\Logger;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
@@ -252,8 +253,11 @@ class IronMqProvider extends AbstractProvider
      * Dispatches the `{queue}.message_received` event
      *
      * @param NotificationEvent $event The Notification Event
+     * @param string $eventName Name of the event
+     * @param EventDispatcherInterface $dispatcher
+     * @return void
      */
-    public function onNotification(NotificationEvent $event)
+    public function onNotification(NotificationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $message = new Message(
             $event->getNotification()->getId(),
@@ -269,7 +273,7 @@ class IronMqProvider extends AbstractProvider
 
         $messageEvent = new MessageEvent($this->name, $message);
 
-        $event->getDispatcher()->dispatch(
+        $dispatcher->dispatch(
             Events::Message($this->name),
             $messageEvent
         );
@@ -284,6 +288,7 @@ class IronMqProvider extends AbstractProvider
      * Stops Event Propagation after removing the Message
      *
      * @param MessageEvent $event The SQS Message Event
+     * @return void
      */
     public function onMessageReceived(MessageEvent $event)
     {

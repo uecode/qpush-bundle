@@ -149,11 +149,12 @@ class AbstractProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testOnNotification()
     {
+        $dispatcher = $this->getMockForAbstractClass('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $result = $this->provider->onNotification(new NotificationEvent(
             'test',
             NotificationEvent::TYPE_SUBSCRIPTION,
             new Notification(123, "test", [])
-        ));
+        ), NotificationEvent::TYPE_SUBSCRIPTION, $dispatcher);
 
         $this->assertFalse($result);
     }
