@@ -12,9 +12,12 @@ use Uecode\Bundle\QPushBundle\Message\Message;
 class FileProvider extends AbstractProvider
 {
     protected $filePointerList = [];
+    protected $queuePath;
 
     public function __construct($name, array $options, $client, Cache $cache, Logger $logger) {
         $this->name     = $name;
+        /** @var md5 only contain numeric and A to F, so it is file system safe */
+        $this->queuePath = $options['path'].DIRECTORY_SEPARATOR.str_replace('-', '', hash('md5', $name));
         $this->options  = $options;
         $this->cache    = $cache;
         $this->logger   = $logger;
@@ -28,8 +31,9 @@ class FileProvider extends AbstractProvider
     public function create()
     {
         $fs = new Filesystem();
-        if (!$fs->exists($this->options['path'])) {
-            return $fs->mkdir($this->options['path']);
+        if (!$fs->exists($this->queuePath)) {
+            $fs->mkdir($this->queuePath);
+            return $fs->exists($this->queuePath);
         }
         return true;
     }
@@ -39,12 +43,12 @@ class FileProvider extends AbstractProvider
         $fileName = microtime(false);
         $fileName = str_replace(' ', '', $fileName);
         $path = substr(hash('md5', $fileName), 0, 3);
-        if (!is_dir($this->options['path'].DIRECTORY_SEPARATOR.$path)) {
-            mkdir($this->options['path'].DIRECTORY_SEPARATOR.$path);
+        if (!is_dir($this->queuePath.DIRECTORY_SEPARATOR.$path)) {
+            mkdir($this->queuePath.DIRECTORY_SEPARATOR.$path);
         }
         $fs = new Filesystem();
         $fs->dumpFile(
-            $this->options['path'].DIRECTORY_SEPARATOR.$path.DIRECTORY_SEPARATOR.$fileName.'.json',
+            $this->queuePath.DIRECTORY_SEPARATOR.$path.DIRECTORY_SEPARATOR.$fileName.'.json',
             json_encode($message)
         );
         return $fileName;
@@ -63,7 +67,7 @@ class FileProvider extends AbstractProvider
             ->ignoreUnreadableDirs(true)
             ->ignoreVCS(true)
             ->name('*.json')
-            ->in($this->options['path'])
+            ->in($this->queuePath)
         ;
         if ($this->options['message_delay'] > 0) {
             $finder->date(
@@ -82,7 +86,7 @@ class FileProvider extends AbstractProvider
             $id = substr($file->getFilename(), 0, -5);
             if (!isset($this->filePointerList[$id]) && flock($filePointer, LOCK_EX | LOCK_NB)) {
                 $this->filePointerList[$id] = $filePointer;
-                 $messages[] = new Message($id, json_decode($file->getContents(), true), []);
+                $messages[] = new Message($id, json_decode($file->getContents(), true), []);
             } else {
                 fclose($filePointer);
             }
@@ -101,7 +105,7 @@ class FileProvider extends AbstractProvider
             $path = substr(hash('md5', (string)$fileName), 0, 3);
             $fs = new Filesystem();
             $fs->remove(
-                $this->options['path'] . DIRECTORY_SEPARATOR . $path . DIRECTORY_SEPARATOR . $fileName . '.json'
+                $this->queuePath . DIRECTORY_SEPARATOR . $path . DIRECTORY_SEPARATOR . $fileName . '.json'
             );
             fclose($this->filePointerList[$id]);
             unset($this->filePointerList[$id]);
@@ -118,7 +122,7 @@ class FileProvider extends AbstractProvider
         $finder = new Finder();
         $finder
             ->files()
-            ->in($this->options['path'])
+            ->in($this->queuePath)
             ->ignoreDotFiles(true)
             ->ignoreUnreadableDirs(true)
             ->ignoreVCS(true)
@@ -137,8 +141,9 @@ class FileProvider extends AbstractProvider
     public function destroy()
     {
         $fs = new Filesystem();
-        $fs->remove($this->options['path']);
-        return !is_dir($this->options['path']);
+        $fs->remove($this->queuePath);
+        $this->filePointerList = [];
+        return !is_dir($this->queuePath);
     }
 
     /**
