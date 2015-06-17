@@ -41,6 +41,7 @@ credentials in your configuration.
                     subscribers:
                         - { endpoint: http://example.com/qpush, protocol: http }
 
+You may exclude the aws key and secret if you are using IAM role in EC2.
 
 Using SNS
 ^^^^^^^^^
