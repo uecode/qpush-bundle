@@ -74,6 +74,8 @@ uecode_qpush:
                     - { endpoint: http://example.com/qpush, protocol: http }
 ```
 
+You may exclude aws key and secret to default to IAM role on the EC2 machine.
+
 ##Publishing messages to your Queue
 
 Publishing messages is simple - fetch the registered Provider service from the
