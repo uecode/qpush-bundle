@@ -85,6 +85,10 @@ class UecodeQPushExtension extends Extension
                     $class  = $container->getParameter('uecode_qpush.provider.custom');
                     $client = $this->createCustomClient($config['providers'][$provider]['service']);
                     break;
+                case 'file':
+                    $class = $container->getParameter('uecode_qpush.provider.file');
+                    $values['options']['path'] = $config['providers'][$provider]['path'];
+                    break;
             }
 
             $definition = new Definition(

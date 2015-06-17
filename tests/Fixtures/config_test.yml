@@ -20,7 +20,18 @@ uecode_qpush:
             driver: ironmq
             token: 234
             project_id: 234
+        file:
+            driver: file
+            path: /tmp/my_queue
     queues:
+        test_file:
+            provider: file
+            options:
+                message_delay:          0
+                message_timeout:        30
+                message_expiration:     604800
+                messages_to_receive:    1
+                receive_wait_time:      3
         test_aws:
             provider: aws
             options:
