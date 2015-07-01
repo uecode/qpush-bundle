@@ -36,7 +36,8 @@
         "aws/aws-sdk-php": "Required to use AWS as a Queue Provider",
         "iron-io/iron_mq": "Required to use IronMQ as a Queue Provider",
         "symfony/finder": "Required to use File as a Queue Provider",
-        "symfony/filesystem": "Required to use File as a Queue Provider"
+        "symfony/filesystem": "Required to use File as a Queue Provider",
+        "ext-openssl": "Required to use the SNS message validator"
     },
     "autoload": {
         "psr-4": {

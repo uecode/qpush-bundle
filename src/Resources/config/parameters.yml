@@ -6,3 +6,4 @@ parameters:
     uecode_qpush.provider.sync:          Uecode\Bundle\QPushBundle\Provider\SyncProvider
     uecode_qpush.provider.custom:        Uecode\Bundle\QPushBundle\Provider\CustomProvider
     uecode_qpush.provider.file:          Uecode\Bundle\QPushBundle\Provider\FileProvider
+    uecode_qpush.sns_validator.class:    Aws\Sns\MessageValidator\MessageValidator
