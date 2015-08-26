@@ -75,8 +75,8 @@ class AwsProvider extends AbstractProvider
         $this->logger   = $logger;
         // get() method used for sdk v2, create methods for v3
         $useGet = method_exists($client, 'get');
-        $this->sqs      = $useGet ? $this->get('sqs') : $client->createSqs();
-        $this->sns      = $useGet ? $this->get('sns') : $client->createSns();
+        $this->sqs      = $useGet ? $client->get('sqs') : $client->createSqs();
+        $this->sns      = $useGet ? $client->get('sns') : $client->createSns();
     }
 
     public function getProvider()
