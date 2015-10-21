@@ -16,6 +16,12 @@ services:
         class: %uecode_qpush.request_listener.class%
         arguments:
             - @event_dispatcher
+            - @uecode_qpush.sns_validator
+            - ~
         tags:
             - { name: kernel.event_listener, event: kernel.request, priority: 254 }
+
+    uecode_qpush.sns_validator:
+        public: false
+        class: %uecode_qpush.sns_validator.class%
 

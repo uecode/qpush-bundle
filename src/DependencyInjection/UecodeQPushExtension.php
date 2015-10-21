@@ -22,6 +22,7 @@
 
 namespace Uecode\Bundle\QPushBundle\DependencyInjection;
 
+use Aws\Sns\MessageValidator\Message;
 use Uecode\Bundle\QPushBundle\DependencyInjection\Configuration;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Definition;
@@ -50,6 +51,16 @@ class UecodeQPushExtension extends Extension
 
         $registry = $container->getDefinition('uecode_qpush.registry');
         $cache    = $config['cache_service'] ?: 'uecode_qpush.file_cache';
+
+        $validationTokens = [];
+
+        foreach ($config['providers'] as $provider => $values) {
+            if ('ironmq' === $values['driver'] && isset($values['validationToken'])) {
+                $validationTokens[$provider] = $values['validationToken'];
+            } elseif ('aws' === $values['driver'] && !empty($values['validation'])) {
+                $validationTokens[$provider] = true;
+            }
+        }
 
         foreach ($config['queues'] as $queue => $values) {
 
@@ -213,6 +224,30 @@ class UecodeQPushExtension extends Extension
     private function createCustomClient($serviceId)
     {
         return new Reference($serviceId);
+    }
+
+    private function processValidationTokens(
+        ContainerBuilder $container,
+        array $config
+    ) {
+        $validationTokens = [];
+
+        foreach ($config['providers'] as $provider => $values) {
+            if (
+                'ironmq' === $values['driver'] &&
+                isset($values['validationToken'])
+            ) {
+                $validationTokens[$provider] = $values['validationToken'];
+            } elseif (
+                'aws' === $values['driver'] &&
+                !empty($values['validation'])
+            ) {
+                $validationTokens[$provider] = true;
+            }
+        }
+
+        $container->getDefinition('uecode_qpush.request_listener')
+            ->replaceArgument(2, $validationTokens);
     }
 
     /**

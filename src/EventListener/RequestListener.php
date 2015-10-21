@@ -22,6 +22,7 @@
 
 namespace Uecode\Bundle\QPushBundle\EventListener;
 
+use Aws\Sns\MessageValidator\MessageValidator;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -44,13 +45,27 @@ class RequestListener
     private $dispatcher;
 
     /**
+     * @var MessageValidator
+     */
+    private $snsValidator;
+
+    private $validationTokens;
+
+    /**
      * Constructor.
      *
      * @param EventDispatcherInterface $dispatcher A Symfony Event Dispatcher
+     * @param MessageValidator $validator An AWS SNS Message Validator
+     * @param array $validationTokens A hash of provider names to validation tokens
      */
-    public function __construct(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher   = $dispatcher;
+    public function __construct(
+        EventDispatcherInterface $dispatcher,
+        MessageValidator $validator,
+        array $validationTokens
+    ) {
+        $this->dispatcher       = $dispatcher;
+        $this->snsValidator     = $validator;
+        $this->validationTokens = $validationTokens;
     }
 
     /**

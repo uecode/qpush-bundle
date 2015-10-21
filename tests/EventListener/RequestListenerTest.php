@@ -43,6 +43,11 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
     protected $dispatcher;
 
     /**
+     * @var HttpKernelInterface
+     */
+    protected $kernel;
+
+    /**
      * @var MockInterface
      */
     protected $event;
@@ -50,7 +55,11 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->dispatcher = new EventDispatcher('UTF-8');
-        $listener         = new RequestListener($this->dispatcher);
+        $listener = new RequestListener(
+            $this->dispatcher,
+            $this->getMock('Aws\Sns\MessageValidator\MessageValidator'),
+            []
+        );
 
         $this->dispatcher->addListener(KernelEvents::REQUEST, [$listener, 'onKernelRequest']);
         $this->dispatcher->addListener(QPushEvents::Notification('ironmq-test'), [$this, 'IronMqOnNotificationReceived']);

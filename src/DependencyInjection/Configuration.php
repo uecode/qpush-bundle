@@ -76,7 +76,6 @@ class Configuration implements ConfigurationInterface
                     // IronMQ
                     ->scalarNode('token')->end()
                     ->scalarNode('project_id')->end()
-                    ->scalarNode('service')->end()
                     ->enumNode('host')
                         ->defaultValue('mq-aws-us-east-1')
                         ->values([
@@ -92,12 +91,18 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('api_version')
                         ->defaultValue(1)
                     ->end()
+                    ->scalarNode('validationToken')->end()
                     // AWS
                     ->scalarNode('key')->end()
                     ->scalarNode('secret')->end()
                     ->scalarNode('region')
                         ->defaultValue('us-east-1')
                     ->end()
+                    ->booleanNode('validate')
+                        ->defaultFalse()
+                    ->end()
+                    // Custom
+                    ->scalarNode('service')->end()
                     // File
                     ->scalarNode('path')->end()
                 ->end()
