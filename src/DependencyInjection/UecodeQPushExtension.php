@@ -142,15 +142,17 @@ class UecodeQPushExtension extends Extension
                 );
             }
 
+            $awsConfig = [];
+            if (!empty($config['key']) && !empty($config['secret'])) {
+                $awsConfig['key'] = $config['key'];
+                $awsConfig['secret'] = $config['secret'];
+            }
+
+            $awsConfig['region'] = $config['region'];
+
             $aws = new Definition('Aws\Common\Aws');
             $aws->setFactory(['Aws\Common\Aws', 'factory']);
-            $aws->setArguments([
-                [
-                    'key'      => $config['key'],
-                    'secret'   => $config['secret'],
-                    'region'   => $config['region']
-                ]
-            ]);
+            $aws->setArguments([$awsConfig]);
 
             $container->setDefinition($service, $aws)
                 ->setPublic(false);
