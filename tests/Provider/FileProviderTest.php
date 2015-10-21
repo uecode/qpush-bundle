@@ -12,20 +12,21 @@ class FileProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var FileProvider */
     protected $provider;
-    protected $path;
+    protected $basePath;
+    protected $queueHash;
     protected $umask;
 
     public function setUp()
     {
         $this->umask = umask(0);
-        $this->path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.time().rand(0, 1000);
-        mkdir($this->path);
+        $this->basePath = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.time().rand(0, 1000);
+        mkdir($this->basePath);
         $this->provider = $this->getFileProvider();
     }
 
     public function tearDown()
     {
-        $this->clean($this->path);
+        $this->clean($this->basePath);
         umask($this->umask);
     }
 
@@ -50,7 +51,7 @@ class FileProviderTest extends \PHPUnit_Framework_TestCase
     {
         $options = array_merge(
             [
-                'path'                  => $this->path,
+                'path'                  => $this->basePath,
                 'logging_enabled'       => false,
                 'message_delay'         => 0,
                 'message_timeout'       => 30,
@@ -70,6 +71,8 @@ class FileProviderTest extends \PHPUnit_Framework_TestCase
             'Symfony\Bridge\Monolog\Logger', [], ['qpush.test']
         );
 
+        $this->queueHash = str_replace('-', '', md5('test'));
+
         return new FileProvider('test', $options, null, $cache, $logger);
     }
 
@@ -83,18 +86,19 @@ class FileProviderTest extends \PHPUnit_Framework_TestCase
     public function testCreate()
     {
         $this->assertTrue($this->provider->create());
-        $this->assertTrue(is_readable($this->path));
-        $this->assertTrue(is_writable($this->path));
+        $this->assertTrue(is_readable($this->basePath.DIRECTORY_SEPARATOR.$this->queueHash));
+        $this->assertTrue(is_writable($this->basePath.DIRECTORY_SEPARATOR.$this->queueHash));
     }
 
     public function testDestroy()
     {
         $this->provider->destroy();
-        $this->assertFalse(is_dir($this->path));
+        $this->assertFalse(is_dir($this->basePath.DIRECTORY_SEPARATOR.$this->queueHash));
     }
 
     public function testReceive()
     {
+        $this->provider->create();
         $this->assertTrue(is_array($this->provider->receive()));
     }
 
@@ -103,8 +107,8 @@ class FileProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider->create();
 
         $path = substr(hash('md5', '123'), 0, 3);
-        mkdir($this->path.DIRECTORY_SEPARATOR.$path);
-        touch($this->path.DIRECTORY_SEPARATOR.$path.DIRECTORY_SEPARATOR.'123.json');
+        mkdir($this->basePath.DIRECTORY_SEPARATOR.$this->queueHash.DIRECTORY_SEPARATOR.$path);
+        touch($this->basePath.DIRECTORY_SEPARATOR.$this->queueHash.DIRECTORY_SEPARATOR.$path.DIRECTORY_SEPARATOR.'123.json');
 
         $messages = $this->provider->receive();
         $this->assertNotEmpty($messages);
@@ -113,6 +117,7 @@ class FileProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testPublish()
     {
+        $this->provider->create();
         $content = [
             ['testing'],
             ['testing 123']
@@ -129,6 +134,7 @@ class FileProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     public function testPublishDelay() {
+        $this->provider->create();
         $provider = $this->getFileProvider([
             'message_delay' => 2,
         ]);
@@ -142,16 +148,17 @@ class FileProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider->create();
         $id = $this->provider->publish(['foo' => 'bar']);
         $path = substr(hash('md5', $id), 0, 3);
-        $this->assertTrue(is_file($this->path.DIRECTORY_SEPARATOR.$path.DIRECTORY_SEPARATOR.$id.'.json'));
+        $this->assertTrue(is_file($this->basePath.DIRECTORY_SEPARATOR.$this->queueHash.DIRECTORY_SEPARATOR.$path.DIRECTORY_SEPARATOR.$id.'.json'));
         $this->provider->onMessageReceived(new MessageEvent(
             'test',
             $this->provider->receive()[0]
         ));
-        $this->assertFalse(is_file($this->path.DIRECTORY_SEPARATOR.$path.DIRECTORY_SEPARATOR.$id.'.json'));
+        $this->assertFalse(is_file($this->basePath.DIRECTORY_SEPARATOR.$this->queueHash.DIRECTORY_SEPARATOR.$path.DIRECTORY_SEPARATOR.$id.'.json'));
     }
 
     public function testCleanUp()
     {
+        $this->provider->create();
         $provider = $this->getFileProvider([
             'message_expiration' => 1,
         ]);
