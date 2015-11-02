@@ -91,7 +91,7 @@ class IronMqProvider extends AbstractProvider
             $params = ['push_type' => 'pull'];
         }
 
-        $result = $this->ironmq->createQueue($this->getNameWithPrefix(), $params);
+        $result = $this->ironmq->updateQueue($this->getNameWithPrefix(), $params);
         $this->queue = $result;
 
         $key = $this->getNameWithPrefix();

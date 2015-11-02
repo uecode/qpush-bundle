@@ -31,7 +31,7 @@ class IronMqMockClient
 {
     private $deleteCount = 0;
 
-    public function createQueue($queue, array $params = [])
+    public function updateQueue($queue, array $params = [])
     {
         $response                   = new \stdClass;
         $response->id               = '530295fe3c94fbcf0c79cffe';
