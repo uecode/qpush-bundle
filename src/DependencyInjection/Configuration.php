@@ -88,7 +88,7 @@ class Configuration implements ConfigurationInterface
                         ->defaultValue('443')
                     ->end()
                     ->scalarNode('api_version')
-                        ->defaultValue(1)
+                        ->defaultValue(3)
                     ->end()
                     // AWS
                     ->scalarNode('key')->end()
