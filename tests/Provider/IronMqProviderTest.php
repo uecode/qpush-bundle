@@ -196,4 +196,15 @@ class IronMqProviderTest extends \PHPUnit_Framework_TestCase
             new Message(123, ['foo' => 'bar'], [])
         ));
     }
+
+    public function testQueueInfo()
+    {
+        $this->assertNull($this->provider->queueInfo());
+
+        $this->provider->create();
+        $queue = $this->provider->queueInfo();
+        $this->assertEquals('530295fe3c94fbcf0c79cffe', $queue->id);
+        $this->assertEquals('test', $queue->name);
+        $this->assertEquals('52f67d032001c00005000057', $queue->project_id);
+    }
 }

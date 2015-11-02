@@ -302,4 +302,23 @@ class IronMqProvider extends AbstractProvider
 
         $event->stopPropagation();
     }
+
+    /**
+     * Get queue info
+     *
+     * This allows to get queue size. Allowing to know if processing is finished or not
+     *
+     * @return stdObject|null
+     */
+    public function queueInfo()
+    {
+        if ($this->queueExists()) {
+            $key = $this->getNameWithPrefix();
+            $this->queue = $this->ironmq->getQueue($key);
+
+            return $this->queue;
+        }
+
+        return null;
+    }
 }
