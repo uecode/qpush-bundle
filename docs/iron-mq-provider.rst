@@ -18,7 +18,7 @@ and needs to have the library included in your ``composer.json`` file.
 
     {
         require: {
-            "iron-io/iron_mq": "~1.5"
+            "iron-io/iron_mq": "^4.0"
         }
     }
 
