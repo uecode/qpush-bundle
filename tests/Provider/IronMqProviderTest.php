@@ -66,6 +66,7 @@ class IronMqProviderTest extends \PHPUnit_Framework_TestCase
                 'message_timeout'           => 30,
                 'message_expiration'        => 604800,
                 'messages_to_receive'       => 1,
+                'rate_limit'                => -1,
                 'receive_wait_time'         => 3,
                 'subscribers'               => [
                     [ 'protocol' => 'http', 'endpoint' => 'http://fake.com' ]
