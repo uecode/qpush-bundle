@@ -58,17 +58,17 @@ class IronMqProviderTest extends \PHPUnit_Framework_TestCase
     {
         $options = array_merge(
             [
-                'logging_enabled'           => false,
-                'push_notifications'        => true,
-                'notification_retries'      => 3,
-                'notification_retry_delay'  => 60,
-                'message_delay'             => 0,
-                'message_timeout'           => 30,
-                'message_expiration'        => 604800,
-                'messages_to_receive'       => 1,
-                'rate_limit'                => -1,
-                'receive_wait_time'         => 3,
-                'subscribers'               => [
+                'logging_enabled'            => false,
+                'push_notifications'         => true,
+                'notification_retries'       => 3,
+                'notification_retries_delay' => 60,
+                'message_delay'              => 0,
+                'message_timeout'            => 30,
+                'message_expiration'         => 604800,
+                'messages_to_receive'        => 1,
+                'rate_limit'                 => -1,
+                'receive_wait_time'          => 3,
+                'subscribers'                => [
                     [ 'protocol' => 'http', 'endpoint' => 'http://fake.com' ]
                 ]
             ],

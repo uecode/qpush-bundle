@@ -71,11 +71,13 @@ class IronMqProvider extends AbstractProvider
     {
         if ($this->options['push_notifications']) {
             $params = [
-                'push_type'     => 'multicast',
-                'rate_limit'    => $this->options['rate_limit'],
-                'retries'       => $this->options['notification_retries'],
-                'retry_delay'   => $this->options['notification_retry_delay'],
-                'subscribers'   => []
+                'push_type' => 'multicast',
+                'push'      => [
+                    'rate_limit'    => $this->options['rate_limit'],
+                    'retries'       => $this->options['notification_retries'],
+                    'retries_delay' => $this->options['notification_retries_delay'],
+                    'subscribers'   => []
+                ]
             ];
 
             foreach ($this->options['subscribers'] as $subscriber) {
@@ -85,7 +87,7 @@ class IronMqProvider extends AbstractProvider
                     );
                 }
 
-                $params['subscribers'][] = ['url' => $subscriber['endpoint']];
+                $params['push']['subscribers'][] = ['url' => $subscriber['endpoint']];
             }
 
         } else {

@@ -148,7 +148,7 @@ class Configuration implements ConfigurationInterface
                                 ->info('How many attempts the Push Notifications are retried if the Subscriber returns an error')
                                 ->example(3)
                             ->end()
-                            ->scalarNode('notification_retry_delay')
+                            ->scalarNode('notification_retries_delay')
                                 ->defaultValue(60)
                                 ->info('Delay between each Push Notification retry in seconds')
                                 ->example(3)
