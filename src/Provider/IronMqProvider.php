@@ -324,4 +324,3 @@ class IronMqProvider extends AbstractProvider
         return null;
     }
 }
-
