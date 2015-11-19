@@ -71,7 +71,7 @@ class IronMqProvider extends AbstractProvider
     {
         if ($this->options['push_notifications']) {
             $params = [
-                'push_type' => $this->options['push_type'],
+                'type' => $this->options['push_type'],
                 'push'      => [
                     'rate_limit'    => $this->options['rate_limit'],
                     'retries'       => $this->options['notification_retries'],
