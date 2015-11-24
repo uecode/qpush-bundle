@@ -323,4 +323,45 @@ class IronMqProvider extends AbstractProvider
 
         return null;
     }
+
+    /**
+     * Publishes multiple message at once
+     *
+     * @param array $messages
+     * @param array $options
+     *
+     * @return array
+     */
+    public function publishMessages(array $messages, array $options = [])
+    {
+        $options      = $this->mergeOptions($options);
+        $publishStart = microtime(true);
+
+        if (!$this->queueExists()) {
+            $this->create();
+        }
+
+        $encodedMessages = [];
+        foreach ($messages as $message) {
+            $encodedMessages[] = json_encode($messages + ['_qpush_queue' => $this->name]);
+        }
+
+        $result = $this->ironmq->postMessages(
+            $this->getNameWithPrefix(),
+            $encodedMessages,
+            [
+                'timeout'       => $options['message_timeout'],
+                'delay'         => $options['message_delay'],
+                'expires_in'    => $options['message_expiration']
+            ]
+        );
+
+        $context = [
+            'message_ids'    => $result->ids,
+            'publish_time'  => microtime(true) - $publishStart
+        ];
+        $this->log(200, "Messages have been published.", $context);
+
+        return $result->ids;
+    }
 }
