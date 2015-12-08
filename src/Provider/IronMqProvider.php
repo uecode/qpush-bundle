@@ -343,7 +343,7 @@ class IronMqProvider extends AbstractProvider
 
         $encodedMessages = [];
         foreach ($messages as $message) {
-            $encodedMessages[] = json_encode($messages + ['_qpush_queue' => $this->name]);
+            $encodedMessages[] = json_encode($message + ['_qpush_queue' => $this->name]);
         }
 
         $result = $this->ironmq->postMessages(
