@@ -22,10 +22,8 @@
 
 namespace Uecode\Bundle\QPushBundle\Provider;
 
-use Aws\Common\Aws;
 use Aws\Sns\SnsClient;
 use Aws\Sqs\SqsClient;
-use Aws\Sqs\Exception\SqsException;
 use Doctrine\Common\Cache\Cache;
 use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;

@@ -22,7 +22,6 @@
 
 namespace Uecode\Bundle\QPushBundle\DependencyInjection;
 
-use Uecode\Bundle\QPushBundle\DependencyInjection\Configuration;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
