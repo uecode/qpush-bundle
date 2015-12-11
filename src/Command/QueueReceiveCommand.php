@@ -97,7 +97,7 @@ class QueueReceiveCommand extends Command implements ContainerAwareInterface
             );
         }
 
-        $dispatcher = $this->getContainer()->get('event_dispatcher');
+        $dispatcher = $this->container->get('event_dispatcher');
         $messages   = $registry->get($name)->receive();
 
         foreach ($messages as $message) {
