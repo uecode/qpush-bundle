@@ -22,10 +22,10 @@
 
 namespace Uecode\Bundle\QPushBundle\Provider;
 
-use Aws\Common\Aws;
 use Aws\Sns\SnsClient;
 use Aws\Sqs\SqsClient;
 use Aws\Sqs\Exception\SqsException;
+
 use Doctrine\Common\Cache\Cache;
 use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -71,10 +71,12 @@ class AwsProvider extends AbstractProvider
     {
         $this->name     = $name;
         $this->options  = $options;
-        $this->sqs      = $client->get('Sqs');
-        $this->sns      = $client->get('Sns');
         $this->cache    = $cache;
         $this->logger   = $logger;
+        // get() method used for sdk v2, create methods for v3
+        $useGet = method_exists($client, 'get');
+        $this->sqs      = $useGet ? $client->get('Sqs') : $client->createSqs();
+        $this->sns      = $useGet ? $client->get('Sns') : $client->createSns();
     }
 
     public function getProvider()
