@@ -23,6 +23,7 @@
 namespace Uecode\Bundle\QPushBundle\Provider;
 
 use Aws\Sns\SnsClient;
+use Aws\Sns\Exception\NotFoundException;
 use Aws\Sqs\SqsClient;
 use Aws\Sqs\Exception\SqsException;
 
@@ -73,10 +74,11 @@ class AwsProvider extends AbstractProvider
         $this->options  = $options;
         $this->cache    = $cache;
         $this->logger   = $logger;
+
         // get() method used for sdk v2, create methods for v3
         $useGet = method_exists($client, 'get');
-        $this->sqs      = $useGet ? $client->get('Sqs') : $client->createSqs();
-        $this->sns      = $useGet ? $client->get('Sns') : $client->createSns();
+        $this->sqs = $useGet ? $client->get('Sqs') : $client->createSqs();
+        $this->sns = $useGet ? $client->get('Sns') : $client->createSns();
     }
 
     public function getProvider()
@@ -315,13 +317,17 @@ class AwsProvider extends AbstractProvider
             return true;
         }
 
-        $result = $this->sqs->getQueueUrl([
-            'QueueName' => $this->getNameWithPrefix()
-        ]);
+        try {
+            $result = $this->sqs->getQueueUrl([
+                'QueueName' => $this->getNameWithPrefix()
+            ]);
 
-        if($this->queueUrl = $result->get('QueueUrl')) {
-            return true;
-        }
+            if ($this->queueUrl = $result->get('QueueUrl')) {
+                $this->cache->save($key, $this->queueUrl);
+
+                return true;
+            }
+        } catch (SqsException $e) {}
 
         return false;
     }
@@ -409,6 +415,24 @@ class AwsProvider extends AbstractProvider
         $key = $this->getNameWithPrefix() . '_arn';
         if ($this->cache->contains($key)) {
             $this->topicArn = $this->cache->fetch($key);
+
+            return true;
+        }
+
+        if (!empty($this->queueUrl)) {
+            $queueArn = $this->sqs->getQueueArn($this->queueUrl);
+            $topicArn = str_replace('sqs', 'sns', $queueArn);
+
+            try {
+                $this->sns->getTopicAttributes([
+                    'TopicArn' => $topicArn
+                ]);
+            } catch (NotFoundException $e) {
+                return false;
+            }
+
+            $this->topicArn = $topicArn;
+            $this->cache->save($key, $this->topicArn);
 
             return true;
         }

@@ -22,6 +22,7 @@
 
 namespace Uecode\Bundle\QPushBundle\Tests\MockClient;
 
+use Aws\Sns\Exception\NotFoundException;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
@@ -47,6 +48,19 @@ class SnsMockClient
     {
         return new ArrayCollection([
             'TopicArn' => 'long_topic_arn_string'
+        ]);
+    }
+
+    public function getTopicAttributes(array $args)
+    {
+        if ($args['TopicArn'] == null) {
+            throw new NotFoundException;
+        }
+
+        return new ArrayCollection([
+            'Attributes' => [
+                'TopicArn' => 'long_topic_arn_string'
+            ]
         ]);
     }
 
