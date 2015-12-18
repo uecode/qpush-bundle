@@ -22,10 +22,10 @@
 
 namespace Uecode\Bundle\QPushBundle\Provider;
 
-use Aws\Sns\SnsClient;
 use Aws\Sns\Exception\NotFoundException;
-use Aws\Sqs\SqsClient;
+use Aws\Sns\SnsClient;
 use Aws\Sqs\Exception\SqsException;
+use Aws\Sqs\SqsClient;
 
 use Doctrine\Common\Cache\Cache;
 use Symfony\Bridge\Monolog\Logger;

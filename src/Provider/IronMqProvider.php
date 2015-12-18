@@ -46,7 +46,7 @@ class IronMqProvider extends AbstractProvider
     /**
      * IronMQ Queue
      *
-     * @var stdObject
+     * @var object
      */
     private $queue;
 
@@ -212,7 +212,7 @@ class IronMqProvider extends AbstractProvider
     public function delete($id)
     {
         try {
-            $result = $this->ironmq->deleteMessage($this->getNameWithPrefix(), $id);
+            $this->ironmq->deleteMessage($this->getNameWithPrefix(), $id);
             $this->log(200, "Message deleted.", ['message_id' => $id]);
         } catch ( \Exception $e) {
             if (false !== strpos($e->getMessage(), "Queue not found")) {

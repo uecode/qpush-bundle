@@ -16,7 +16,7 @@ class FileProvider extends AbstractProvider
 
     public function __construct($name, array $options, $client, Cache $cache, Logger $logger) {
         $this->name     = $name;
-        /** @var md5 only contain numeric and A to F, so it is file system safe */
+        /* md5 only contain numeric and A to F, so it is file system safe */
         $this->queuePath = $options['path'].DIRECTORY_SEPARATOR.str_replace('-', '', hash('md5', $name));
         $this->options  = $options;
         $this->cache    = $cache;
