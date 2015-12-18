@@ -2,3 +2,4 @@
 /vendor
 /docs/_build
 /coverage
+.idea
