@@ -136,22 +136,43 @@ class UecodeQPushExtension extends Extension
 
         if (!$container->hasDefinition($service)) {
 
-            if (!class_exists('Aws\Common\Aws')) {
+            $aws2 = class_exists('Aws\Common\Aws');
+            $aws3 = class_exists('Aws\Sdk');
+            if (!$aws2 && !$aws3) {
                 throw new \RuntimeException(
                     'You must require "aws/aws-sdk-php" to use the AWS provider.'
                 );
             }
 
-            $awsConfig = [];
-            if (!empty($config['key']) && !empty($config['secret'])) {
-                $awsConfig['key'] = $config['key'];
-                $awsConfig['secret'] = $config['secret'];
-            }
-
-            $awsConfig['region'] = $config['region'];
+            $awsConfig = [
+                'region' => $config['region']
+            ];
 
             $aws = new Definition('Aws\Common\Aws');
             $aws->setFactory(['Aws\Common\Aws', 'factory']);
+            $aws->setArguments([$awsConfig]);
+
+            if ($aws2) {
+                $aws = new Definition('Aws\Common\Aws');
+                $aws->setFactory(['Aws\Common\Aws', 'factory']);
+
+                if (!empty($config['key']) && !empty($config['secret'])) {
+                    $awsConfig['key']    = $config['key'];
+                    $awsConfig['secret'] = $config['secret'];
+                }
+
+            } else {
+                $aws = new Definition('Aws\Sdk');
+
+                if (!empty($config['key']) && !empty($config['secret'])) {
+                    $awsConfig['credentials'] = [
+                        'key'    => $config['key'],
+                        'secret' => $config['secret']
+                    ];
+                }
+                $awsConfig['version']  = 'latest';
+            }
+
             $aws->setArguments([$awsConfig]);
 
             $container->setDefinition($service, $aws)
