@@ -44,7 +44,12 @@ class MessageTest extends BaseMessageTest
         $message = new Message(123, ['foo' => 'bar'], ['baz' => 'qux']);
         $this->assertInstanceOf('Uecode\Bundle\QPushBundle\Message\Message', $message);
 
-        $this->setExpectedException('PHPUnit_Framework_Error');
+        if (version_compare(PHP_VERSION, '7.0', '>=')) {
+            $this->setExpectedException('TypeError');
+        } else {
+            $this->setExpectedException('PHPUnit_Framework_Error');
+        }
+
         new Message(123, ['foo' => 'bar'], 'invalid argument');
     }
 }
