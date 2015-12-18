@@ -31,7 +31,7 @@ class IronMqMockClient
 {
     private $deleteCount = 0;
 
-    public function updateQueue($queue, array $params = [])
+    public function createQueue($queue, array $params = [])
     {
         $response                   = new \stdClass;
         $response->id               = '530295fe3c94fbcf0c79cffe';
@@ -94,6 +94,18 @@ class IronMqMockClient
         if ($id == 789) {
             throw new \Exception('Random Exception');
         }
+
+        return $response;
+    }
+
+    public function getQueue($queue)
+    {
+        $response                   = new \stdClass;
+        $response->id               = '530295fe3c94fbcf0c79cffe';
+        $response->name             = 'test';
+        $response->size             = 0;
+        $response->total_messages   = 0;
+        $response->project_id       = '52f67d032001c00005000057';
 
         return $response;
     }

@@ -22,7 +22,7 @@
 
 namespace Uecode\Bundle\QPushBundle\Provider;
 
-use IronMQ;
+use IronMQ\IronMQ;
 use Doctrine\Common\Cache\Cache;
 use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -71,10 +71,13 @@ class IronMqProvider extends AbstractProvider
     {
         if ($this->options['push_notifications']) {
             $params = [
-                'push_type'     => 'multicast',
-                'retries'       => $this->options['notification_retries'],
-                'retry_delay'   => $this->options['notification_retry_delay'],
-                'subscribers'   => []
+                'type' => $this->options['push_type'],
+                'push'      => [
+                    'rate_limit'    => $this->options['rate_limit'],
+                    'retries'       => $this->options['notification_retries'],
+                    'retries_delay' => $this->options['notification_retries_delay'],
+                    'subscribers'   => []
+                ]
             ];
 
             foreach ($this->options['subscribers'] as $subscriber) {
@@ -84,14 +87,14 @@ class IronMqProvider extends AbstractProvider
                     );
                 }
 
-                $params['subscribers'][] = ['url' => $subscriber['endpoint']];
+                $params['push']['subscribers'][] = ['url' => $subscriber['endpoint']];
             }
 
         } else {
             $params = ['push_type' => 'pull'];
         }
 
-        $result = $this->ironmq->updateQueue($this->getNameWithPrefix(), $params);
+        $result = $this->ironmq->createQueue($this->getNameWithPrefix(), $params);
         $this->queue = $result;
 
         $key = $this->getNameWithPrefix();
@@ -300,5 +303,65 @@ class IronMqProvider extends AbstractProvider
         }
 
         $event->stopPropagation();
+    }
+
+    /**
+     * Get queue info
+     *
+     * This allows to get queue size. Allowing to know if processing is finished or not
+     *
+     * @return stdObject|null
+     */
+    public function queueInfo()
+    {
+        if ($this->queueExists()) {
+            $key = $this->getNameWithPrefix();
+            $this->queue = $this->ironmq->getQueue($key);
+
+            return $this->queue;
+        }
+
+        return null;
+    }
+
+    /**
+     * Publishes multiple message at once
+     *
+     * @param array $messages
+     * @param array $options
+     *
+     * @return array
+     */
+    public function publishMessages(array $messages, array $options = [])
+    {
+        $options      = $this->mergeOptions($options);
+        $publishStart = microtime(true);
+
+        if (!$this->queueExists()) {
+            $this->create();
+        }
+
+        $encodedMessages = [];
+        foreach ($messages as $message) {
+            $encodedMessages[] = json_encode($message + ['_qpush_queue' => $this->name]);
+        }
+
+        $result = $this->ironmq->postMessages(
+            $this->getNameWithPrefix(),
+            $encodedMessages,
+            [
+                'timeout'       => $options['message_timeout'],
+                'delay'         => $options['message_delay'],
+                'expires_in'    => $options['message_expiration']
+            ]
+        );
+
+        $context = [
+            'message_ids'    => $result->ids,
+            'publish_time'  => microtime(true) - $publishStart
+        ];
+        $this->log(200, "Messages have been published.", $context);
+
+        return $result->ids;
     }
 }

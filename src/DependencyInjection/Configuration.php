@@ -78,19 +78,17 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('project_id')->end()
                     ->scalarNode('service')->end()
                     ->enumNode('host')
-                        ->defaultValue('mq-aws-us-east-1')
+                        ->defaultValue('mq-aws-eu-west-1-1')
                         ->values([
-                            'mq-aws-us-east-1',
-                            'mq-aws-eu-west-1',
-                            'mq-rackspace-ord',
-                            'mq-rackspace-lon',
+                            'mq-aws-eu-west-1-1',
+                            'mq-aws-us-east-1-1',
                         ])
                     ->end()
                     ->scalarNode('port')
                         ->defaultValue('443')
                     ->end()
                     ->scalarNode('api_version')
-                        ->defaultValue(1)
+                        ->defaultValue(3)
                     ->end()
                     // AWS
                     ->scalarNode('key')->end()
@@ -145,12 +143,17 @@ class Configuration implements ConfigurationInterface
                                 ->defaultFalse()
                                 ->info('Whether notifications are sent to the subscribers')
                             ->end()
+                            ->scalarNode('push_type')
+                                ->defaultValue('multicast')
+                                ->info('Whether the push queue is multicast or unicast')
+                                ->example('unicast')
+                            ->end()
                             ->scalarNode('notification_retries')
                                 ->defaultValue(3)
                                 ->info('How many attempts the Push Notifications are retried if the Subscriber returns an error')
                                 ->example(3)
                             ->end()
-                            ->scalarNode('notification_retry_delay')
+                            ->scalarNode('notification_retries_delay')
                                 ->defaultValue(60)
                                 ->info('Delay between each Push Notification retry in seconds')
                                 ->example(3)
@@ -179,6 +182,11 @@ class Configuration implements ConfigurationInterface
                                 ->defaultValue(0)
                                 ->info('How many seconds to Long Poll when requesting messages - if supported')
                                 ->example(3)
+                            ->end()
+                            ->scalarNode('rate_limit')
+                                ->defaultValue(-1)
+                                ->info('How many push requests per second will be triggered. -1 for unlimited, 0 disables push')
+                                ->example(1)
                             ->end()
                             ->append($this->getSubscribersNode())
                         ->end()
