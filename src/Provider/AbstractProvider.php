@@ -25,7 +25,6 @@ namespace Uecode\Bundle\QPushBundle\Provider;
 use Doctrine\Common\Cache\Cache;
 use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Uecode\Bundle\QPushBundle\Provider\ProviderInterface;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
 
@@ -118,7 +117,7 @@ abstract class AbstractProvider implements ProviderInterface
         // Add the queue name and provider to the context
         $context = array_merge(['queue' => $this->name, 'provider'  => $this->getProvider()], $context);
 
-        $this->logger->addRecord($level, $message, $context);
+        return $this->logger->addRecord($level, $message, $context);
     }
 
     /**
