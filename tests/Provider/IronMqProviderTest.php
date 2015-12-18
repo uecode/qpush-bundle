@@ -58,16 +58,18 @@ class IronMqProviderTest extends \PHPUnit_Framework_TestCase
     {
         $options = array_merge(
             [
-                'logging_enabled'           => false,
-                'push_notifications'        => true,
-                'notification_retries'      => 3,
-                'notification_retry_delay'  => 60,
-                'message_delay'             => 0,
-                'message_timeout'           => 30,
-                'message_expiration'        => 604800,
-                'messages_to_receive'       => 1,
-                'receive_wait_time'         => 3,
-                'subscribers'               => [
+                'logging_enabled'            => false,
+                'push_notifications'         => true,
+                'push_type'                  => 'multicast',
+                'notification_retries'       => 3,
+                'notification_retries_delay' => 60,
+                'message_delay'              => 0,
+                'message_timeout'            => 30,
+                'message_expiration'         => 604800,
+                'messages_to_receive'        => 1,
+                'rate_limit'                 => -1,
+                'receive_wait_time'          => 3,
+                'subscribers'                => [
                     [ 'protocol' => 'http', 'endpoint' => 'http://fake.com' ]
                 ]
             ],
@@ -194,5 +196,16 @@ class IronMqProviderTest extends \PHPUnit_Framework_TestCase
             'test',
             new Message(123, ['foo' => 'bar'], [])
         ));
+    }
+
+    public function testQueueInfo()
+    {
+        $this->assertNull($this->provider->queueInfo());
+
+        $this->provider->create();
+        $queue = $this->provider->queueInfo();
+        $this->assertEquals('530295fe3c94fbcf0c79cffe', $queue->id);
+        $this->assertEquals('test', $queue->name);
+        $this->assertEquals('52f67d032001c00005000057', $queue->project_id);
     }
 }
