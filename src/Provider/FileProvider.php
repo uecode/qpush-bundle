@@ -43,10 +43,12 @@ class FileProvider extends AbstractProvider
         $fileName = microtime(false);
         $fileName = str_replace(' ', '', $fileName);
         $path = substr(hash('md5', $fileName), 0, 3);
-        if (!is_dir($this->queuePath.DIRECTORY_SEPARATOR.$path)) {
-            mkdir($this->queuePath.DIRECTORY_SEPARATOR.$path);
-        }
+
         $fs = new Filesystem();
+        if (!$fs->exists($this->queuePath.DIRECTORY_SEPARATOR.$path)) {
+            $fs->mkdir($this->queuePath.DIRECTORY_SEPARATOR.$path);
+        }
+
         $fs->dumpFile(
             $this->queuePath.DIRECTORY_SEPARATOR.$path.DIRECTORY_SEPARATOR.$fileName.'.json',
             json_encode($message)
