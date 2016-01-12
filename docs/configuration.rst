@@ -24,6 +24,7 @@ For specific instructions on how to configure each provider, please view their d
     aws-provider
     iron-mq-provider
     sync-provider
+    file-provider
     custom-provider
 
 Caching
