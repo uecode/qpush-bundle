@@ -1,13 +1,13 @@
 File Provider
 -------------
 
-The file provider uses the filesystem to dispatches and resolves queued messages.
+The file provider uses the filesystem to dispatch and resolve queued messages.
 
 Configuration
 ^^^^^^^^^^^^^
 
 To designate a queue as file, set the ``driver`` of its provider to ``file``. You will
-need to a read-able and write-able path to store the messages.
+need to configure a readable and writable path to store the messages.
 
 .. code-block:: yaml
 
