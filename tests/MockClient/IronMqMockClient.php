@@ -70,14 +70,13 @@ class IronMqMockClient
         return $response;
     }
 
-    public function getMessages($queue, $count, $timeout)
+    public function reserveMessages($queue, $count, $timeout)
     {
-        $response                   = new \stdClass;
-        $response->id               = 123;
-        $response->body             = '{"foo":"bar","_qpush_queue":"test"}';
-        $response->timeout          = 60;
-        $response->reserved_count   = 1;
-        $response->push_status      = new \stdClass;
+        $response                 = new \stdClass;
+        $response->id             = 123;
+        $response->body           = '{"foo":"bar","_qpush_queue":"test"}';
+        $response->reservation_id = 'def456';
+        $response->reserved_count = 1;
 
         return [$response];
     }

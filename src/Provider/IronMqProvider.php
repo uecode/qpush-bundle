@@ -50,6 +50,11 @@ class IronMqProvider extends AbstractProvider
      */
     private $queue;
 
+    /**
+     * @var Message[]
+     */
+    private $reservedMessages = [];
+
     public function __construct($name, array $options, $client, Cache $cache, Logger $logger)
     {
         $this->name     = $name;
@@ -91,14 +96,14 @@ class IronMqProvider extends AbstractProvider
             }
 
         } else {
-            $params = ['push_type' => 'pull'];
+            $params = ['type' => 'pull'];
         }
 
-        $result = $this->ironmq->createQueue($this->getNameWithPrefix(), $params);
-        $this->queue = $result;
+        $queueName = $this->getNameWithPrefix();
 
-        $key = $this->getNameWithPrefix();
-        $this->cache->save($key, json_encode($this->queue));
+        $this->queue = $this->ironmq->createQueue($queueName, $params);
+
+        $this->cache->save($queueName, json_encode($this->queue));
 
         $this->log(200, "Queue has been created.", $params);
 
@@ -111,8 +116,10 @@ class IronMqProvider extends AbstractProvider
     public function destroy()
     {
         // Catch `queue not found` exceptions, throw the rest.
+        $queueName = $this->getNameWithPrefix();
         try {
-            $this->ironmq->deleteQueue($this->getNameWithPrefix());
+            $this->ironmq->deleteQueue($queueName);
+            $this->queue = null;
         } catch ( \Exception $e) {
             if (false !== strpos($e->getMessage(), "Queue not found")) {
                 $this->log(400, "Queue did not exist");
@@ -121,8 +128,7 @@ class IronMqProvider extends AbstractProvider
             }
         }
 
-        $key = $this->getNameWithPrefix();
-        $this->cache->delete($key);
+        $this->cache->delete($queueName);
 
         $this->log(200, "Queue has been destroyed.");
 
@@ -159,7 +165,7 @@ class IronMqProvider extends AbstractProvider
         ];
         $this->log(200, "Message has been published.", $context);
 
-        return $result->id;
+        return (int) $result->id;
     }
 
     /**
@@ -173,7 +179,7 @@ class IronMqProvider extends AbstractProvider
             $this->create();
         }
 
-        $messages = $this->ironmq->getMessages(
+        $messages = $this->ironmq->reserveMessages(
             $this->getNameWithPrefix(),
             $options['messages_to_receive'],
             $options['message_timeout'],
@@ -191,9 +197,8 @@ class IronMqProvider extends AbstractProvider
             $id         = $message->id;
             $body       = json_decode($message->body, true);
             $metadata   = [
-                'timeout'           => $message->timeout,
-                'reserved_count'    => $message->reserved_count,
-                'push_status'       => $message->push_status
+                'reserved_count' => $message->reserved_count,
+                'reservation_id' => $message->reservation_id
             ];
 
             unset($body['_qpush_queue']);
@@ -203,6 +208,10 @@ class IronMqProvider extends AbstractProvider
             $this->log(200, "Message has been received.", ['message_id' => $id]);
         }
 
+        $this->reservedMessages = array_combine(array_values(array_map(function (Message $message) {
+            return $message->getId();
+        }, $messages)), $messages);
+
         return $messages;
     }
 
@@ -211,8 +220,10 @@ class IronMqProvider extends AbstractProvider
      */
     public function delete($id)
     {
+        $reservationId = $this->getReservationId($id);
+
         try {
-            $this->ironmq->deleteMessage($this->getNameWithPrefix(), $id);
+            $this->ironmq->deleteMessage($this->getNameWithPrefix(), $id, $reservationId);
             $this->log(200, "Message deleted.", ['message_id' => $id]);
         } catch ( \Exception $e) {
             if (false !== strpos($e->getMessage(), "Queue not found")) {
@@ -226,13 +237,13 @@ class IronMqProvider extends AbstractProvider
     }
 
     /**
-     * Checks whether or not the Queue exsits
+     * Checks whether or not the Queue exists
      *
      * This method relies on in-memory cache and the Cache provider
      * to reduce the need to needlessly call the create method on an existing
      * Queue.
-     *
-     * @return Boolean
+     * @return bool
+     * @throws \Exception
      */
     public function queueExists()
     {
@@ -240,11 +251,21 @@ class IronMqProvider extends AbstractProvider
             return true;
         }
 
-        $key = $this->getNameWithPrefix();
-        if ($this->cache->contains($key)) {
-            $this->queue = json_decode($this->cache->fetch($key));
+        $queueName = $this->getNameWithPrefix();
+        if ($this->cache->contains($queueName)) {
+            $this->queue = json_decode($this->cache->fetch($queueName));
 
             return true;
+        }
+        try {
+            $this->queue = $this->ironmq->getQueue($queueName);
+            $this->cache->save($queueName, json_encode($this->queue));
+        } catch (\Exception $e) {
+            if (false !== strpos($e->getMessage(), "Queue not found")) {
+                $this->log(400, "Queue did not exist");
+            } else {
+                throw $e;
+            }
         }
 
         return false;
@@ -285,7 +306,7 @@ class IronMqProvider extends AbstractProvider
     /**
      * Removes the message from queue after all other listeners have fired
      *
-     * If an earlier listener has errored or stopped propigation, this method
+     * If an earlier listener has failed or stopped propagation, this method
      * will not fire and the Queued Message should become visible in queue again.
      *
      * Stops Event Propagation after removing the Message
@@ -310,13 +331,13 @@ class IronMqProvider extends AbstractProvider
      *
      * This allows to get queue size. Allowing to know if processing is finished or not
      *
-     * @return stdObject|null
+     * @return mixed
      */
     public function queueInfo()
     {
         if ($this->queueExists()) {
-            $key = $this->getNameWithPrefix();
-            $this->queue = $this->ironmq->getQueue($key);
+            $queueName = $this->getNameWithPrefix();
+            $this->queue = $this->ironmq->getQueue($queueName);
 
             return $this->queue;
         }
@@ -363,5 +384,23 @@ class IronMqProvider extends AbstractProvider
         $this->log(200, "Messages have been published.", $context);
 
         return $result->ids;
+    }
+
+    /**
+     * @param $id
+     * @return string|null
+     */
+    private function getReservationId($id)
+    {
+        if (!array_key_exists($id, $this->reservedMessages)) {
+            return null;
+        }
+
+        $messageToDelete = $this->reservedMessages[$id];
+        if (!$messageToDelete->getMetadata()->containsKey('reservation_id')) {
+            return null;
+        }
+
+        return $messageToDelete->getMetadata()->get('reservation_id');
     }
 }
