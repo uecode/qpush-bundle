@@ -22,178 +22,174 @@
 
 namespace Uecode\Bundle\QPushBundle\EventListener;
 
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Uecode\Bundle\QPushBundle\Message\Notification;
+use Symfony\Component\HttpKernel\HttpKernel;
 use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
+use Uecode\Bundle\QPushBundle\Message\Notification;
 
 /**
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
-class RequestListener
-{
-    /**
-     * Symfony Event Dispatcher
-     *
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
 
-    /**
-     * Constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher A Symfony Event Dispatcher
-     */
-    public function __construct(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
+class RequestListener {
+	/**
+	 * Symfony Event Dispatcher
+	 *
+	 * @var EventDispatcherInterface
+	 */
+	private $dispatcher;
 
-    /**
-     * Kernel Request Event Handler for QPush Notifications
-     *
-     * @param GetResponseEvent $event The Kernel Request's GetResponseEvent
-     */
-    public function onKernelRequest(GetResponseEvent $event)
-    {
-        if (HttpKernel::MASTER_REQUEST != $event->getRequestType()) {
-            return;
-        }
+	/**
+	 * Constructor.
+	 *
+	 * @param EventDispatcherInterface $dispatcher A Symfony Event Dispatcher
+	 */
+	public function __construct(EventDispatcherInterface $dispatcher) {
+		$this->dispatcher = $dispatcher;
+	}
 
-        if ($event->getRequest()->headers->has('x-amz-sns-message-type')) {
-            $result = $this->handleSnsNotifications($event);
-            $event->setResponse(new Response($result, 200));
-        }
+	/**
+	 * Kernel Request Event Handler for QPush Notifications
+	 *
+	 * @param GetResponseEvent $event The Kernel Request's GetResponseEvent
+	 */
+	public function onKernelRequest(GetResponseEvent $event) {
+		if (HttpKernel::MASTER_REQUEST != $event->getRequestType()) {
+			return;
+		}
 
-        if ($event->getRequest()->headers->has('iron-message-id')) {
-            $result = $this->handleIronMqNotifications($event);
-            $event->setResponse(new Response($result, 200));
-        }
-    }
+		if ($event->getRequest()->headers->has('x-amz-sns-message-type')) {
+			$result = $this->handleSnsNotifications($event);
+			$event->setResponse(new Response($result, 200));
+		}
 
-    /**
-     * Handles Messages sent from a IronMQ Push Queue
-     *
-     * @param GetResponseEvent $event The Kernel Request's GetResponseEvent
-     * @return string|void
-     */
-    private function handleIronMqNotifications(GetResponseEvent $event)
-    {
-        $headers    = $event->getRequest()->headers;
-        $messageId  = $headers->get('iron-message-id');
+		if ($event->getRequest()->headers->has('iron-message-id')) {
+			$result = $this->handleIronMqNotifications($event);
+			$event->setResponse(new Response($result, 200));
+		}
+	}
 
-        if (null === ($message = json_decode($event->getRequest()->getContent(), true))) {
-            throw new \InvalidArgumentException('Unable to decode JSON');
-        }
+	/**
+	 * Handles Messages sent from a IronMQ Push Queue
+	 *
+	 * @param GetResponseEvent $event The Kernel Request's GetResponseEvent
+	 * @return string|void
+	 */
+	private function handleIronMqNotifications(GetResponseEvent $event) {
+		$headers   = $event->getRequest()->headers;
+		$messageId = $headers->get('iron-message-id');
 
-        $queue = $this->getIronMqQueueName($event, $message);
-        $metadata = [
-            'iron-subscriber-message-id'  => $headers->get('iron-subscriber-message-id'),
-            'iron-subscriber-message-url' => $headers->get('iron-subscriber-message-url')
-        ];
+		if (null === ($message = json_decode($event->getRequest()->getContent(), true))) {
+			throw new \InvalidArgumentException('Unable to decode JSON');
+		}
 
-        $notification = new Notification(
-            $messageId,
-            $message,
-            $metadata
-        );
+		$queue    = $this->getIronMqQueueName($event, $message);
+		$metadata = [
+			'iron-subscriber-message-id'  => $headers->get('iron-subscriber-message-id'),
+			'iron-subscriber-message-url' => $headers->get('iron-subscriber-message-url')
+		];
 
-        $this->dispatcher->dispatch(
-            Events::Notification($queue),
-            new NotificationEvent($queue, NotificationEvent::TYPE_MESSAGE, $notification)
-        );
+		unset($message['_qpush_queue']);
 
-        return "IronMQ Notification Received.";
-    }
+		$notification = new Notification(
+			$messageId,
+			$message,
+			$metadata
+		);
 
-    /**
-     * Handles Notifications sent from AWS SNS
-     *
-     * @param GetResponseEvent $event The Kernel Request's GetResponseEvent
-     * @return string
-     */
-    private function handleSnsNotifications(GetResponseEvent $event)
-    {
-        $notification = json_decode((string)$event->getRequest()->getContent(), true);
+		$this->dispatcher->dispatch(
+			Events::Notification($queue),
+			new NotificationEvent($queue, NotificationEvent::TYPE_MESSAGE, $notification)
+		);
 
-        $type = $event->getRequest()->headers->get('x-amz-sns-message-type');
+		return "IronMQ Notification Received.";
+	}
 
-        $metadata = [
-            'Type'      => $notification['Type'],
-            'TopicArn'  => $notification['TopicArn'],
-            'Timestamp' => $notification['Timestamp'],
-        ];
+	/**
+	 * Handles Notifications sent from AWS SNS
+	 *
+	 * @param GetResponseEvent $event The Kernel Request's GetResponseEvent
+	 * @return string
+	 */
+	private function handleSnsNotifications(GetResponseEvent $event) {
+		$notification = json_decode((string) $event->getRequest()->getContent(), true);
 
-        if ($type === 'Notification') {
+		$type = $event->getRequest()->headers->get('x-amz-sns-message-type');
 
-            // We put the queue name in the Subject field
-            $queue                  = $notification['Subject'];
-            $metadata['Subject']    = $queue;
+		$metadata = [
+			'Type'      => $notification['Type'],
+			'TopicArn'  => $notification['TopicArn'],
+			'Timestamp' => $notification['Timestamp'],
+		];
 
-            $notification           = new Notification(
-                $notification['MessageId'],
-                $notification['Message'],
-                $metadata
-            );
+		if ($type === 'Notification') {
 
-            $this->dispatcher->dispatch(
-                Events::Notification($queue),
-                new NotificationEvent($queue, NotificationEvent::TYPE_MESSAGE, $notification)
-            );
+			// We put the queue name in the Subject field
+			$queue               = $notification['Subject'];
+			$metadata['Subject'] = $queue;
 
-            return "SNS Message Notification Received.";
-        }
+			$notification = new Notification(
+				$notification['MessageId'],
+				$notification['Message'],
+				$metadata
+			);
 
-        // For subscription notifications, we need to parse the Queue from
-        // the Topic ARN
-        $arnParts           = explode(':', $notification['TopicArn']);
-        $last               = end($arnParts);
-        $queue              = str_replace('qpush_', '', $last);
+			$this->dispatcher->dispatch(
+				Events::Notification($queue),
+				new NotificationEvent($queue, NotificationEvent::TYPE_MESSAGE, $notification)
+			);
 
-        // Get the token for the Subscription Confirmation
-        $metadata['Token']  = $notification['Token'];
+			return "SNS Message Notification Received.";
+		}
 
-        $notification = new Notification(
-            $notification['MessageId'],
-            $notification['Message'],
-            $metadata
-        );
+		// For subscription notifications, we need to parse the Queue from
+		// the Topic ARN
+		$arnParts = explode(':', $notification['TopicArn']);
+		$last     = end($arnParts);
+		$queue    = str_replace('qpush_', '', $last);
 
-        $this->dispatcher->dispatch(
-            Events::Notification($queue),
-            new NotificationEvent($queue, NotificationEvent::TYPE_SUBSCRIPTION, $notification)
-        );
+		// Get the token for the Subscription Confirmation
+		$metadata['Token'] = $notification['Token'];
 
-        return "SNS Subscription Confirmation Received.";
-    }
+		$notification = new Notification(
+			$notification['MessageId'],
+			$notification['Message'],
+			$metadata
+		);
 
-    /**
-     * Get the name of the IronMq queue.
-     *
-     * @param GetResponseEvent $event
-     * @param array $message
-     *
-     * @return string
-     */
-    private function getIronMqQueueName(GetResponseEvent $event, array &$message)
-    {
-        if (array_key_exists('_qpush_queue', $message)) {
-            return $message['_qpush_queue'];
-        } else if (null !== ($subscriberUrl = $event->getRequest()->headers->get('iron-subscriber-message-url'))) {
-            if (preg_match('#/queues/([a-z0-9_-]+)/messages/#i', $subscriberUrl, $matches)) {
-                $queue = $matches[1];
-                if (substr($queue, 0, 6) == 'qpush_') {
-                    $queue = substr($queue, 6);
-                }
+		$this->dispatcher->dispatch(
+			Events::Notification($queue),
+			new NotificationEvent($queue, NotificationEvent::TYPE_SUBSCRIPTION, $notification)
+		);
 
-                return $queue;
-            }
-        }
+		return "SNS Subscription Confirmation Received.";
+	}
 
-        throw new \RuntimeException('Unable to get queue name');
-    }
+	/**
+	 * Get the name of the IronMq queue.
+	 *
+	 * @param GetResponseEvent $event
+	 * @param array $message
+	 *
+	 * @return string
+	 */
+	private function getIronMqQueueName(GetResponseEvent $event, array&$message) {
+		if (array_key_exists('_qpush_queue', $message)) {
+			return $message['_qpush_queue'];
+		} else if (null !== ($subscriberUrl = $event->getRequest()->headers->get('iron-subscriber-message-url'))) {
+			if (preg_match('#/queues/([a-z0-9_-]+)/messages/#i', $subscriberUrl, $matches)) {
+				$queue = $matches[1];
+				if (substr($queue, 0, 6) == 'qpush_') {
+					$queue = substr($queue, 6);
+				}
+
+				return $queue;
+			}
+		}
+
+		throw new \RuntimeException('Unable to get queue name');
+	}
 }
