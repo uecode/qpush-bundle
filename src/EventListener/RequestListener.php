@@ -22,6 +22,7 @@
 
 namespace Uecode\Bundle\QPushBundle\EventListener;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -49,7 +50,7 @@ class RequestListener
      */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
-        $this->dispatcher   = $dispatcher;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -85,20 +86,15 @@ class RequestListener
         $headers    = $event->getRequest()->headers;
         $messageId  = $headers->get('iron-message-id');
 
-        // We add the message in an array with Queue as the property name
-        $message    = json_decode($event->getRequest()->getContent(), true);
-
-        if (empty($message['_qpush_queue'])) {
-            return;
+        if (null === ($message = json_decode($event->getRequest()->getContent(), true))) {
+            throw new \InvalidArgumentException('Unable to decode JSON');
         }
 
-        $queue      = $message['_qpush_queue'];
-        $metadata   = [
+        $queue = $this->getIronMqQueueName($event, $message);
+        $metadata = [
             'iron-subscriber-message-id'  => $headers->get('iron-subscriber-message-id'),
             'iron-subscriber-message-url' => $headers->get('iron-subscriber-message-url')
         ];
-
-        unset($message['_qpush_queue']);
 
         $notification = new Notification(
             $messageId,
@@ -173,5 +169,31 @@ class RequestListener
         );
 
         return "SNS Subscription Confirmation Received.";
+    }
+
+    /**
+     * Get the name of the IronMq queue.
+     *
+     * @param GetResponseEvent $event
+     * @param array $message
+     *
+     * @return string
+     */
+    private function getIronMqQueueName(GetResponseEvent $event, array &$message)
+    {
+        if (array_key_exists('_qpush_queue', $message)) {
+            return $message['_qpush_queue'];
+        } else if (null !== ($subscriberUrl = $event->getRequest()->headers->get('iron-subscriber-message-url'))) {
+            if (preg_match('#/queues/([a-z0-9_-]+)/messages/#i', $subscriberUrl, $matches)) {
+                $queue = $matches[1];
+                if (substr($queue, 0, 6) == 'qpush_') {
+                    $queue = substr($queue, 6);
+                }
+
+                return $queue;
+            }
+        }
+
+        throw new \RuntimeException('Unable to get queue name');
     }
 }
