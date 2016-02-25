@@ -170,8 +170,10 @@ class FileProviderTest extends \PHPUnit_Framework_TestCase
         $this->mockMessageAge($id, 3600);
 
         $provider->cleanUp();
-        $messages = $provider->receive();
-        $this->assertEmpty($messages);
+
+        $finder = new Finder();
+        $files = $finder->files()->in($this->basePath . DIRECTORY_SEPARATOR . $this->queueHash);
+        $this->assertCount(0, $files);
     }
 
     /**
