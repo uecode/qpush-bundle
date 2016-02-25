@@ -2,6 +2,7 @@
 
 namespace Uecode\Bundle\QPushBundle\Tests\Provider;
 
+use Symfony\Component\Finder\Finder;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Provider\FileProvider;
 
@@ -168,5 +169,24 @@ class FileProviderTest extends \PHPUnit_Framework_TestCase
         $provider->cleanUp();
         $messages = $provider->receive();
         $this->assertEmpty($messages);
+    }
+
+    /**
+     * @see https://github.com/uecode/qpush-bundle/issues/93
+     */
+    public function testCleanUpDoesNotRemoveCurrentMessages() {
+        $this->provider->create();
+        $provider = $this->getFileProvider([
+            'message_expiration' => 2,
+        ]);
+        $provider->publish(['testing']);
+        $provider->publish(['testing 123']);
+        sleep(2);
+        $currentMessage = ['dont remove me'];
+        $provider->publish($currentMessage);
+        $provider->cleanUp();
+        $messages = $provider->receive();
+        $this->assertCount(1, $messages);
+        $this->assertSame($currentMessage, $messages[0]->getBody());
     }
 }
