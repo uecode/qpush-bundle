@@ -132,7 +132,7 @@ class FileProvider extends AbstractProvider
             ->name('*.json')
         ;
         $finder->date(
-            sprintf('> %d seconds ago', $this->options['message_expiration'])
+            sprintf('< %d seconds ago', $this->options['message_expiration'])
         );
         /** @var SplFileInfo $file */
         foreach ($finder as $file) {

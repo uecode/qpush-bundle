@@ -2,6 +2,7 @@
 
 namespace Uecode\Bundle\QPushBundle\Tests\Provider;
 
+use Symfony\Component\Finder\Finder;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Provider\FileProvider;
 
@@ -160,13 +161,53 @@ class FileProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->provider->create();
         $provider = $this->getFileProvider([
-            'message_expiration' => 1,
+            'message_expiration' => 10,
         ]);
-        $provider->publish(['testing']);
-        $provider->publish(['testing 123']);
-        sleep(1);
+
+        $id = $provider->publish(['testing']);
+        $this->mockMessageAge($id, 3600);
+        $id = $provider->publish(['testing 123']);
+        $this->mockMessageAge($id, 3600);
+
+        $provider->cleanUp();
+
+        $finder = new Finder();
+        $files = $finder->files()->in($this->basePath . DIRECTORY_SEPARATOR . $this->queueHash);
+        $this->assertCount(0, $files);
+    }
+
+    /**
+     * @see https://github.com/uecode/qpush-bundle/issues/93
+     */
+    public function testCleanUpDoesNotRemoveCurrentMessages() {
+        $this->provider->create();
+        $provider = $this->getFileProvider([
+            'message_expiration' => 10,
+        ]);
+        $currentMessage = ['dont remove me'];
+
+        $id = $provider->publish(['testing']);
+        $this->mockMessageAge($id, 3600);
+        $id = $provider->publish(['testing 123']);
+        $this->mockMessageAge($id, 3600);
+        $provider->publish($currentMessage);
+
         $provider->cleanUp();
         $messages = $provider->receive();
-        $this->assertEmpty($messages);
+        $this->assertCount(1, $messages);
+        $this->assertSame($currentMessage, $messages[0]->getBody());
+    }
+
+    /**
+     * @param string $id
+     * @param int $ageInSeconds
+     * @return string
+     */
+    protected function mockMessageAge($id, $ageInSeconds) {
+        $path = substr(hash('md5', $id), 0, 3);
+        touch(
+            $this->basePath.DIRECTORY_SEPARATOR.$this->queueHash.DIRECTORY_SEPARATOR.$path.DIRECTORY_SEPARATOR.$id.'.json',
+            time() - $ageInSeconds
+        );
     }
 }
