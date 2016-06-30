@@ -8,14 +8,16 @@ Command (``uecode:qpush:receive``) to poll the queue.
 Configuration
 ^^^^^^^^^^^^^
 
-This provider relies on the `AWS SDK PHP v2 <https://github.com/aws/aws-sdk-php>`_ library, which
+This provider relies on the `AWS SDK PHP <https://github.com/aws/aws-sdk-php>`_ library, which
 needs to be required in your ``composer.json`` file.
+
+This bundle will support both v2 and v3 of the AWS SDK.
 
 .. code-block:: js
 
     {
         require: {
-            "aws/aws-sdk-php": : "2.*"
+            "aws/aws-sdk-php": : "2.*" #OR "3.*"
         }
     }
 
