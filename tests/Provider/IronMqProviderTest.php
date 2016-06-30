@@ -40,7 +40,7 @@ class IronMqProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * Mock Client
      *
-     * @var stdClass
+     * @var \stdClass
      */
     protected $provider;
 
@@ -108,11 +108,6 @@ class IronMqProviderTest extends \PHPUnit_Framework_TestCase
     public function testCreate()
     {
         $this->assertFalse($this->provider->queueExists());
-
-        $stub = $this->provider->getCache();
-        $stub->expects($this->once())
-             ->method('contains')
-             ->will($this->returnValue(true));
 
         $this->assertTrue($this->provider->queueExists());
 

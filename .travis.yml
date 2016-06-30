@@ -36,7 +36,7 @@ install:
     - composer install --prefer-dist
 
 script:
-    - if [ "$COVERAGE" = "yes" ]; then phpunit --coverage-text --coverage-clover=coverage.clover; else phpunit; fi
+    - if [ "$COVERAGE" = "yes" ]; then phpunit --coverage-text --coverage-clover=coverage.clover --testsuite "UecodeQPushBundle Test Suite"; else phpunit --testsuite "UecodeQPushBundle Test Suite"; fi
 
 after_script:
   - if [ "$COVERAGE" = "yes" ]; then wget https://scrutinizer-ci.com/ocular.phar; fi

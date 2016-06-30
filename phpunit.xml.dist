@@ -17,10 +17,16 @@
     </filter>
 
     <php>
+        <const name="IRONMQ_PROJECT_ID" value="CHANGE_ME"/>
+        <const name="IRONMQ_TOKEN" value="CHANGE_ME"/>
+        <const name="IRONMQ_HOST" value="mq-aws-eu-west-1-1.iron.io"/>
     </php>
     <testsuites>
         <testsuite name="UecodeQPushBundle Test Suite">
             <directory>./tests/</directory>
+        </testsuite>
+        <testsuite name="integration">
+            <directory>./integration_tests/</directory>
         </testsuite>
     </testsuites>
     <logging>
