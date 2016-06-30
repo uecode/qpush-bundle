@@ -94,10 +94,7 @@ class UecodeQPushExtension extends Extension
                 $class, [$queue, $values['options'], $client, new Reference($cache), new Reference('logger')]
             );
 
-            $name = sprintf('uecode_qpush.%s', $queue);
-
-            $container->setDefinition($name, $definition)
-                ->addTag('monolog.logger', ['channel' => 'qpush'])
+            $definition->addTag('monolog.logger', ['channel' => 'qpush'])
                 ->addTag(
                     'uecode_qpush.event_listener',
                     [
@@ -113,8 +110,23 @@ class UecodeQPushExtension extends Extension
                         'method' => "onMessageReceived",
                         'priority' => -255
                     ]
-                )
-            ;
+                );
+
+            if (!empty($values['options']['queue_name'])
+                && $config['providers'][$provider]['driver'] == 'aws'
+            ) {
+                $definition->addTag(
+                    'uecode_qpush.event_listener',
+                    [
+                        'event' => "{$values['options']['queue_name']}.on_notification",
+                        'method' => "onNotification",
+                        'priority' => 255
+                    ]
+                );
+            }
+
+            $name = sprintf('uecode_qpush.%s', $queue);
+            $container->setDefinition($name, $definition);
 
             $registry->addMethodCall('addProvider', [$queue, new Reference($name)]);
         }
