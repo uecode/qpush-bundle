@@ -1,19 +1,19 @@
 services:
     ### QPush Registry
     uecode_qpush.registry:
-        class: %uecode_qpush.registry.class%
+        class: '%uecode_qpush.registry.class%'
     uecode_qpush:
         alias: uecode_qpush.registry
 
     ### QPush Default File Cache
     uecode_qpush.file_cache:
         class: Doctrine\Common\Cache\PhpFileCache
-        arguments: [%kernel.cache_dir%/qpush, qpush.php]
+        arguments: ['%kernel.cache_dir%/qpush', qpush.php]
         public: false
 
     ### QPush Event Listeners
     uecode_qpush.request_listener:
-        class: %uecode_qpush.request_listener.class%
+        class: '%uecode_qpush.request_listener.class%'
         arguments:
             - '@event_dispatcher'
         tags:
