@@ -23,7 +23,7 @@
 namespace Uecode\Bundle\QPushBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
-use Symfony\Bridge\Monolog\Logger;
+use Monolog\Logger;
 
 /**
  * @author Keith Kirk <kkirk@undergroundelephant.com>

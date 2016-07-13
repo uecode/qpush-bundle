@@ -19,7 +19,7 @@ class SyncProviderTest extends \PHPUnit_Framework_TestCase
     protected $dispatcher;
 
     /**
-     * @var \Symfony\Bridge\Monolog\Logger
+     * @var \Monolog\Logger
      */
     protected $logger;
 
@@ -104,7 +104,7 @@ class SyncProviderTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->logger = $this->getMock(
-            'Symfony\Bridge\Monolog\Logger', [], ['qpush.test']
+            'Monolog\Logger', [], ['qpush.test']
         );
 
         return new SyncProvider('test', $options, $this->dispatcher, $cache, $this->logger);
@@ -120,4 +120,4 @@ class SyncProviderTest extends \PHPUnit_Framework_TestCase
             ->expects($this->never())
             ->method(new \PHPUnit_Framework_Constraint_IsAnything());
     }
-} 
+}

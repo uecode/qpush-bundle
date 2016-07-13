@@ -24,7 +24,7 @@ namespace Uecode\Bundle\QPushBundle\Provider;
 
 use IronMQ\IronMQ;
 use Doctrine\Common\Cache\Cache;
-use Symfony\Bridge\Monolog\Logger;
+use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
