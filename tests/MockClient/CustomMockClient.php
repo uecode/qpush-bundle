@@ -23,7 +23,7 @@
 namespace Uecode\Bundle\QPushBundle\Tests\MockClient;
 
 use Doctrine\Common\Cache\Cache;
-use Symfony\Bridge\Monolog\Logger;
+use Monolog\Logger;
 use Uecode\Bundle\QPushBundle\Provider\AbstractProvider;
 
 /**
@@ -40,7 +40,7 @@ class CustomMockClient extends AbstractProvider
      * @param array  $options An array of configuration options for the Queue
      * @param mixed  $client  A Queue Client for the provider
      * @param Cache  $cache   An instance of Doctrine\Common\Cache\Cache
-     * @param Logger $logger  An instance of Symfony\Bridge\Mongolog\Logger
+     * @param Logger $logger  An instance of Mongolog\Logger
      */
     public function __construct($name, array $options, $client, Cache $cache, Logger $logger)
     {

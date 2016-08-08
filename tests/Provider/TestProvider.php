@@ -23,7 +23,7 @@
 namespace Uecode\Bundle\QPushBundle\Tests\Provider;
 
 use Doctrine\Common\Cache\Cache;
-use Symfony\Bridge\Monolog\Logger;
+use Monolog\Logger;
 
 use Uecode\Bundle\QPushBundle\Provider\AbstractProvider;
 use Uecode\Bundle\QPushBundle\Message\Message;

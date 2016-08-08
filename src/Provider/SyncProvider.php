@@ -24,7 +24,7 @@ namespace Uecode\Bundle\QPushBundle\Provider;
 
 
 use Doctrine\Common\Cache\Cache;
-use Symfony\Bridge\Monolog\Logger;
+use Monolog\Logger;
 use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Message\Message;
@@ -75,4 +75,4 @@ class SyncProvider extends AbstractProvider
     public function delete($id) {}
 
     public function receive(array $options = []) {}
-} 
+}
