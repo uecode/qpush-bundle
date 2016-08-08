@@ -27,6 +27,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -80,22 +81,18 @@ class QueueDestroyCommand extends Command implements ContainerAwareInterface
     {
         $this->output = $output;
         $registry = $this->container->get('uecode_qpush');
-        $dialog = $this->getHelperSet()->get('dialog');
-
+        $questionHelper = $this->getHelperSet()->get('question');
         $name = $input->getArgument('name');
 
         if (null !== $name) {
             if (!$input->getOption('force')) {
-                $response = $dialog->askConfirmation(
-                    $output,
-                    sprintf(
-                        '<comment>This will remove the %s queue, even if it has messages! Are you sure? </comment>',
-                        $name
-                    ),
-                    false
-                );
+                $question = new ConfirmationQuestion(sprintf(
+                    '<comment>This will remove the %s queue, even if it has messages! Are you sure? </comment>',
+                    $name
+                ));
+                $confirmation = $questionHelper->ask($input, $output, $question);
 
-                if (!$response) {
+                if (!$confirmation) {
                     return 0;
                 }
             }
@@ -104,13 +101,10 @@ class QueueDestroyCommand extends Command implements ContainerAwareInterface
         }
 
         if (!$input->getOption('force')) {
-            $response = $dialog->askConfirmation(
-                $output,
-                '<comment>This will remove ALL queues, even if they have messages.  Are you sure? </comment>',
-                false
-            );
+            $question = new ConfirmationQuestion('<comment>This will remove ALL queues, even if they have messages.  Are you sure? </comment>');
+            $confirmation = $questionHelper->ask($input, $output, $question);
 
-            if (!$response) {
+            if (!$confirmation) {
                 return 0;
             }
         }
