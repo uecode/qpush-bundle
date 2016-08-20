@@ -7,7 +7,9 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="uecode_qpush_message")
+ * @ORM\Table(name="uecode_qpush_message"),
+ * indexes={@ORM\Index(name="queue_idx",columns={"queue"}),
+ *          @ORM\Index(name="delivered_idx",columns={"delivered"})})
  */
 class DoctrineMessage {
     /** 
@@ -51,6 +53,11 @@ class DoctrineMessage {
      */
     private $message;
 
+     /** 
+     * @ORM\Column(type="integer") 
+     */
+    private $length;
+    
     /**
      * Get id
      *
@@ -71,6 +78,7 @@ class DoctrineMessage {
     public function setMessage($message)
     {
         $this->message = $message;
+
         return $this;
     }
 
@@ -94,6 +102,7 @@ class DoctrineMessage {
     public function setQueue($queue)
     {
         $this->queue = $queue;
+
         return $this;
     }
 
@@ -177,5 +186,29 @@ class DoctrineMessage {
     public function getUpdated()
     {
         return $this->updated;
+    }
+
+    /**
+     * Set length
+     *
+     * @param integer $length
+     *
+     * @return DoctrineMessage
+     */
+    public function setLength($length)
+    {
+        $this->length = $length;
+
+        return $this;
+    }
+
+    /**
+     * Get length
+     *
+     * @return integer
+     */
+    public function getLength()
+    {
+        return $this->length;
     }
 }
