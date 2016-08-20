@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Message\Message;
+use Uecode\Bundle\QPushBundle\Entity;
 
 class DoctrineProvider extends AbstractProvider
 {
