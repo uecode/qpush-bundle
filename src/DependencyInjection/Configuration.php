@@ -61,7 +61,8 @@ class Configuration implements ConfigurationInterface
             'ironmq' => ['token', 'project_id'],
             'sync' => [],
             'custom' => ['service'],
-            'file' => ['path']
+            'file' => ['path'],
+            'doctrine' => []
         ];
 
         $node
@@ -98,6 +99,10 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     // File
                     ->scalarNode('path')->end()
+                   // Doctrine
+                    ->scalarNode('entity_manager')
+                         ->defaultValue('doctrine.orm.default_entity_manager')
+                    ->end()
                 ->end()
 
                 ->validate()

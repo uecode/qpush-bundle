@@ -1,0 +1,212 @@
+<?php
+namespace Uecode\Bundle\QPushBundle\Provider;
+
+use Doctrine\Common\Cache\Cache;
+use Doctrine\ORM\EntityManager;
+use Monolog\Logger;
+use Uecode\Bundle\QPushBundle\Event\MessageEvent;
+use Uecode\Bundle\QPushBundle\Message\Message;
+
+class DoctrineProvider extends AbstractProvider
+{
+    protected $em;
+    protected $repository;
+
+    /**
+     * Constructor for Provider classes
+     *
+     * @param string $name    Name of the Queue the provider is for
+     * @param array  $options An array of configuration options for the Queue
+     * @param mixed  $client  A Queue Client for the provider
+     * @param Cache  $cache   An instance of Doctrine\Common\Cache\Cache
+     * @param Logger $logger  An instance of Symfony\Bridge\Mongolog\Logger
+     */
+    public function __construct($name, array $options, $client, Cache $cache, Logger $logger) {
+        $this->name = $name;
+        $this->options = $options;
+        $this->cache = $cache;
+        $this->logger = $logger;
+        $this->em = $client;
+        $this->repository = $this->em->getRepository('Uecode\Bundle\QPushBundle\Entity\DoctrineMessage');
+    }
+
+    /**
+     * Returns the name of the Queue that this Provider is for
+     *
+     * @return string
+     */
+    public function getName() {
+        return $this->name;
+    }
+
+    /**
+     * Returns the Queue Name prefixed with the QPush Prefix
+     *
+     * If a Queue name is explicitly set in the configuration, use just that
+     * name - which is beneficial for reuising existing queues not created by
+     * qpush.  Otherwise, create the queue with the qpush prefix/
+     *
+     * @return string
+     */
+    public function getNameWithPrefix() {
+        if (!empty($this->options['queue_name'])) {
+            return $this->options['queue_name'];
+        }
+
+        return sprintf("%s_%s", self::QPUSH_PREFIX, $this->name);
+    }
+
+    /**
+     * Returns the Queue Provider name
+     *
+     * @return string
+     */
+    public function getProvider() {
+        return 'Doctrine';
+    }
+
+    /**
+     * Returns the Provider's Configuration Options
+     *
+     * @return array
+     */
+    public function getOptions() {
+        return $this->options;
+    }
+
+    /**
+     * Returns the Cache service
+     *
+     * @return Cache
+     */
+    public function getCache() {
+        return $this->cache;
+    }
+
+    /**
+     * Returns the Logger service
+     *
+     * @return Logger
+     */
+    public function getLogger() {
+        return $this->logger;
+    }
+    
+    /**
+     * Get repository
+     * 
+     * @return array
+     */
+    public function getRepository() {
+        if (!$this->repository) {
+            return;
+        }        
+        return $this->repository;
+    }
+    
+    /**
+     * Creates the Queue
+     *
+     * All Create methods are idempotent, if the resource exists, the current ARN
+     * will be returned
+     */
+    public function create() {
+        
+    }
+
+    /**
+     * Publishes a message to the Queue
+     *
+     * This method should return a string MessageId or Response
+     *
+     * @param array $message The message to queue
+     * @param  array $options An array of options that override the queue defaults
+     *
+     * @return string
+     */
+    public function publish(array $message, array $options = []) {
+        if (!$this->em) {
+            return '';
+        }
+
+        $doctrineMessage = new DoctrineMessage();
+        $doctrineMessage->setQueue($this->name)
+                ->setDelivered(false)
+                ->setMessage($message)
+                ->setLength(strlen(serialize($message)));
+
+        $this->em->persist($doctrineMessage);
+        $this->em->flush();
+
+        return (string) $doctrineMessage->getId();
+    }
+
+    /**
+     * Polls the Queue for Messages
+     *
+     * Depending on the Provider, this method may keep the connection open for
+     * a configurable amount of time, to allow for long polling.  In most cases,
+     * this method is not meant to be used to long poll indefinitely, but should
+     * return in reasonable amount of time
+     *
+     * @param  array $options An array of options that override the queue defaults
+     *
+     * @return array
+     */
+    public function receive(array $options = []) {
+        if (!$this->em) {
+            return [];
+        }
+
+        $doctrineMessages = $this->repository->findBy(
+                [
+                    'delivered' => false,
+                    'queue' => $this->name
+        ]);
+        
+        $messages = [];
+        foreach ($doctrineMessages as $doctrineMessage) {
+            $messages[] = new Message($doctrineMessage->getId(), $doctrineMessage->getMessage(), []);
+            $doctrineMessage->setDelivered(true);
+        }
+        $this->em->flush();
+        
+        return $messages;
+    }
+
+    /**
+     * Deletes the Queue Message
+     *
+     * @param mixed $id A message identifier or resource
+     */
+    public function delete($id) {
+        $doctrineMessage = $this->repository->findById($id);
+        $doctrineMessage->setDelivered(true);
+         $this->em->flush();
+    }
+
+    /**
+     * Destroys a Queue and clears any Queue related Cache
+     *
+     * @return bool
+     */
+    public function destroy() {
+        
+    }
+
+    /**
+     * Logs data from the library
+     *
+     * This method wraps the Logger to check if logging is enabled and adds
+     * the Queue name and Provider automatically to the context
+     *
+     * @param int    $level   The log level
+     * @param string $message The message to log
+     * @param array  $context The log context
+     *
+     * @return bool Whether the record was logged
+     */
+    public function log($level, $message, array $context) {
+        
+    }
+}
