@@ -182,7 +182,7 @@ class DoctrineProvider extends AbstractProvider
     public function delete($id) {
         $doctrineMessage = $this->repository->findById($id);
         $doctrineMessage->setDelivered(true);
-         $this->em->flush();
+        $this->em->flush();
     }
 
     /**
