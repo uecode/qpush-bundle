@@ -207,11 +207,11 @@ class DoctrineProvider extends AbstractProvider
      */
     public function destroy()
     {
-        $qb = $this->repository->createQueryBuilder();
-        $qb->delete('DoctrineMessage', 'dm');
+        $qb = $this->repository->createQueryBuilder('dm');
+        $qb->delete();
         $qb->where('dm.queue = :queue');
         $qb->setParameter('queue', $this->name);
-        $qb->execute();
+        $qb->getQuery->getResult();
     }
 
     /**
