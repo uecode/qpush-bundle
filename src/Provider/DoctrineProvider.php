@@ -1,4 +1,5 @@
 <?php
+
 namespace Uecode\Bundle\QPushBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
@@ -10,6 +11,7 @@ use Uecode\Bundle\QPushBundle\Entity\DoctrineMessage;
 
 class DoctrineProvider extends AbstractProvider
 {
+
     protected $em;
     protected $repository;
 
@@ -22,7 +24,8 @@ class DoctrineProvider extends AbstractProvider
      * @param Cache  $cache   An instance of Doctrine\Common\Cache\Cache
      * @param Logger $logger  An instance of Symfony\Bridge\Mongolog\Logger
      */
-    public function __construct($name, array $options, $client, Cache $cache, Logger $logger) {
+    public function __construct($name, array $options, $client, Cache $cache, Logger $logger)
+    {
         $this->name = $name;
         $this->options = $options;
         $this->cache = $cache;
@@ -36,7 +39,8 @@ class DoctrineProvider extends AbstractProvider
      *
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
@@ -49,7 +53,8 @@ class DoctrineProvider extends AbstractProvider
      *
      * @return string
      */
-    public function getNameWithPrefix() {
+    public function getNameWithPrefix()
+    {
         if (!empty($this->options['queue_name'])) {
             return $this->options['queue_name'];
         }
@@ -62,7 +67,8 @@ class DoctrineProvider extends AbstractProvider
      *
      * @return string
      */
-    public function getProvider() {
+    public function getProvider()
+    {
         return 'Doctrine';
     }
 
@@ -71,7 +77,8 @@ class DoctrineProvider extends AbstractProvider
      *
      * @return array
      */
-    public function getOptions() {
+    public function getOptions()
+    {
         return $this->options;
     }
 
@@ -80,7 +87,8 @@ class DoctrineProvider extends AbstractProvider
      *
      * @return Cache
      */
-    public function getCache() {
+    public function getCache()
+    {
         return $this->cache;
     }
 
@@ -89,29 +97,32 @@ class DoctrineProvider extends AbstractProvider
      *
      * @return Logger
      */
-    public function getLogger() {
+    public function getLogger()
+    {
         return $this->logger;
     }
-    
+
     /**
      * Get repository
      * 
      * @return array
      */
-    public function getRepository() {
+    public function getRepository()
+    {
         if (!$this->repository) {
             return;
-        }        
+        }
         return $this->repository;
     }
-    
+
     /**
      * Creates the Queue
      *
      * All Create methods are idempotent, if the resource exists, the current ARN
      * will be returned
      */
-    public function create() {
+    public function create()
+    {
         
     }
 
@@ -125,7 +136,8 @@ class DoctrineProvider extends AbstractProvider
      *
      * @return string
      */
-    public function publish(array $message, array $options = []) {
+    public function publish(array $message, array $options = [])
+    {
         if (!$this->em) {
             return '';
         }
@@ -154,7 +166,8 @@ class DoctrineProvider extends AbstractProvider
      *
      * @return array
      */
-    public function receive(array $options = []) {
+    public function receive(array $options = [])
+    {
         if (!$this->em) {
             return [];
         }
@@ -164,14 +177,14 @@ class DoctrineProvider extends AbstractProvider
                     'delivered' => false,
                     'queue' => $this->name
         ]);
-        
+
         $messages = [];
         foreach ($doctrineMessages as $doctrineMessage) {
             $messages[] = new Message($doctrineMessage->getId(), $doctrineMessage->getMessage(), []);
             $doctrineMessage->setDelivered(true);
         }
         $this->em->flush();
-        
+
         return $messages;
     }
 
@@ -180,7 +193,8 @@ class DoctrineProvider extends AbstractProvider
      *
      * @param mixed $id A message identifier or resource
      */
-    public function delete($id) {
+    public function delete($id)
+    {
         $doctrineMessage = $this->repository->findById($id);
         $doctrineMessage->setDelivered(true);
         $this->em->flush();
@@ -191,8 +205,13 @@ class DoctrineProvider extends AbstractProvider
      *
      * @return bool
      */
-    public function destroy() {
-        
+    public function destroy()
+    {
+        $qb = $this->repository->createQueryBuilder();
+        $qb->delete('DoctrineMessage', 'dm');
+        $qb->where('dm.queue = :queue');
+        $qb->setParameter('queue', $this->name);
+        $qb->execute();
     }
 
     /**
@@ -207,7 +226,9 @@ class DoctrineProvider extends AbstractProvider
      *
      * @return bool Whether the record was logged
      */
-    public function log($level, $message, array $context) {
+    public function log($level, $message, array $context)
+    {
         
     }
+
 }
