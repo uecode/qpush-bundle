@@ -211,7 +211,7 @@ class DoctrineProvider extends AbstractProvider
         $qb->delete();
         $qb->where('dm.queue = :queue');
         $qb->setParameter('queue', $this->name);
-        $qb->getQuery->getResult();
+        $qb->getQuery()->getResult();
     }
 
     /**
