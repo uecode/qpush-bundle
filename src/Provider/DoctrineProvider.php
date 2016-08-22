@@ -43,24 +43,6 @@ class DoctrineProvider extends AbstractProvider
     }
 
     /**
-     * Returns the Queue Name prefixed with the QPush Prefix
-     *
-     * If a Queue name is explicitly set in the configuration, use just that
-     * name - which is beneficial for reuising existing queues not created by
-     * qpush.  Otherwise, create the queue with the qpush prefix/
-     *
-     * @return string
-     */
-    public function getNameWithPrefix()
-    {
-        if (!empty($this->options['queue_name'])) {
-            return $this->options['queue_name'];
-        }
-
-        return sprintf("%s_%s", self::QPUSH_PREFIX, $this->name);
-    }
-
-    /**
      * Returns the Queue Provider name
      *
      * @return string
