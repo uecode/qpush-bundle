@@ -3,9 +3,7 @@
 namespace Uecode\Bundle\QPushBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
-use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
-use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Message\Message;
 use Uecode\Bundle\QPushBundle\Entity\DoctrineMessage;
 
@@ -212,23 +210,6 @@ class DoctrineProvider extends AbstractProvider
         $qb->where('dm.queue = :queue');
         $qb->setParameter('queue', $this->name);
         $qb->getQuery()->getResult();
-    }
-
-    /**
-     * Logs data from the library
-     *
-     * This method wraps the Logger to check if logging is enabled and adds
-     * the Queue name and Provider automatically to the context
-     *
-     * @param int    $level   The log level
-     * @param string $message The message to log
-     * @param array  $context The log context
-     *
-     * @return bool Whether the record was logged
-     */
-    public function log($level, $message, array $context)
-    {
-        
     }
 
 }
