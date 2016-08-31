@@ -156,7 +156,11 @@ class DoctrineProvider extends AbstractProvider
                 [
                     'delivered' => false,
                     'queue' => $this->name
-        ]);
+                ],
+                [
+                    'id' => 'ASC'
+                ]
+        );
 
         $messages = [];
         foreach ($doctrineMessages as $doctrineMessage) {
