@@ -154,11 +154,10 @@ class DoctrineProvider extends AbstractProvider
 
         $doctrineMessages = $this->repository->findBy(
                 [
-                    'delivered' => false,
-                    'queue' => $this->name
-                ],
-                [
-                    'id' => 'ASC'
+            'delivered' => false,
+            'queue' => $this->name
+                ], [
+            'id' => 'ASC'
                 ]
         );
 
@@ -196,6 +195,54 @@ class DoctrineProvider extends AbstractProvider
         $qb->where('dm.queue = :queue');
         $qb->setParameter('queue', $this->name);
         $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Returns a specific message
+     * 
+     * @param integer $id
+     * 
+     * @return Message
+     */
+    public function getById($id)
+    {
+        return find($id);
+    }
+
+    /*
+     * Returns a query of the message queue
+     * 
+     * @param string $contains
+     * @param DateTime $from
+     * @param DateTime $to
+     * 
+     * @return Query
+     */
+
+    public function findBy($contains = null, $from = null, $to = null)
+    {
+
+        $qb = $this->repository->createQueryBuilder('dm');
+        $qb->select('dm');
+        $qb->where('dm.queue = :queue');
+        $qb->setParameter('queue', $this->name);
+
+        if ($contains) {
+            $qb->addWhere('dm.message like %:contains%');
+            $qb->setParameter('contains', $contains);
+        }
+        
+        if ($from) {
+            $qb->addWhere('dm.created > %:from%');
+            $qb->setParameter('from', $from);
+        }
+        
+        if ($to) {
+            $qb->addWhere('dm.created < %:to%');
+            $qb->setParameter('to', $to);
+        }
+        
+        return $qb->getQuery();
     }
 
 }
