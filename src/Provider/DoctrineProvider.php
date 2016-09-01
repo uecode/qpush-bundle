@@ -227,7 +227,7 @@ class DoctrineProvider extends AbstractProvider
         $qb->where('dm.queue = :queue');
         $qb->setParameter('queue', $this->name);
 
-        if ($contains) {
+        if ($contains !== null) {
             $qb->addWhere('dm.message like %:contains%');
             $qb->setParameter('contains', $contains);
         }
