@@ -222,23 +222,23 @@ class DoctrineProvider extends AbstractProvider
     public function findBy($contains = null, $from = null, $to = null)
     {
 
-        $qb = $this->repository->createQueryBuilder('dm');
-        $qb->select('dm');
-        $qb->where('dm.queue = :queue');
+        $qb = $this->repository->createQueryBuilder('p');
+        $qb->select('p');
+        $qb->where('p.queue = :queue');
         $qb->setParameter('queue', $this->name);
 
         if ($contains !== null) {
-            $qb->addWhere('dm.message like %:contains%');
+            $qb->addWhere('p.message like %:contains%');
             $qb->setParameter('contains', $contains);
         }
         
         if ($from) {
-            $qb->addWhere('dm.created > %:from%');
+            $qb->addWhere('p.created > %:from%');
             $qb->setParameter('from', $from);
         }
         
         if ($to) {
-            $qb->addWhere('dm.created < %:to%');
+            $qb->addWhere('p.created < %:to%');
             $qb->setParameter('to', $to);
         }
         
