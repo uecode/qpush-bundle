@@ -206,7 +206,7 @@ class DoctrineProvider extends AbstractProvider
      */
     public function getById($id)
     {
-        return find($id);
+        return $this->repository->find($id);
     }
 
     /*
