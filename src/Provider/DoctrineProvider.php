@@ -218,9 +218,9 @@ class DoctrineProvider extends AbstractProvider
      * 
      * @return Query
      */
-
-    public function findBy($contains = null, $from = null, $to = null)
-    {
+     
+     public function findBy($contains = null, $from = null, $to = null)
+     {
 
         $qb = $this->repository->createQueryBuilder('p');
         $qb->select('p');
@@ -228,20 +228,20 @@ class DoctrineProvider extends AbstractProvider
         $qb->setParameter('queue', $this->name);
 
         if ($contains !== null) {
-            $qb->addWhere('p.message like %:contains%');
-            $qb->setParameter('contains', $contains);
+            $qb->andWhere('p.message LIKE :contains');
+            $qb->setParameter('contains', '%'.$contains.'%');
         }
         
         if ($from) {
-            $qb->addWhere('p.created > %:from%');
-            $qb->setParameter('from', $from);
+            $qb->andWhere('p.created > :from');
+            $qb->setParameter('from', '%'.$from.'%');
         }
         
         if ($to) {
-            $qb->addWhere('p.created < %:to%');
-            $qb->setParameter('to', $to);
+            $qb->andWhere('p.created < :to');
+            $qb->setParameter('to', '%'.$to.'%');
         }
-        
+
         return $qb->getQuery();
     }
 
