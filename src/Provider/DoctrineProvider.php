@@ -242,6 +242,8 @@ class DoctrineProvider extends AbstractProvider
             $qb->setParameter('to', $to);
         }
 
+        $qb->orderBy('p.id', 'DESC');
+
         return $qb->getQuery();
     }
 }
