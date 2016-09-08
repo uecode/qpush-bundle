@@ -30,7 +30,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @ORM\Entity
  * @ORM\Table(name="uecode_qpush_message",
  * indexes={@ORM\Index(name="uecode_qpush_queue_idx",columns={"queue"}),
- *          @ORM\Index(name="uecode_qpush_delivered_idx",columns={"delivered"})})
+ *          @ORM\Index(name="uecode_qpush_delivered_idx",columns={"delivered"})
+ *          @ORM\Index(name="uecode_qpush_created_idx",columns={"created"})})
  */
 class DoctrineMessage {
     /** 
