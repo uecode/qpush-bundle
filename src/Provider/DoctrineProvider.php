@@ -32,6 +32,7 @@ class DoctrineProvider extends AbstractProvider
 
     protected $em;
     protected $repository;
+    protected static $entityName = 'Uecode\Bundle\QPushBundle\Entity\DoctrineMessage';
 
     /**
      * Constructor for Provider classes
@@ -49,7 +50,7 @@ class DoctrineProvider extends AbstractProvider
         $this->cache = $cache;
         $this->logger = $logger;
         $this->em = $client;
-        $this->repository = $this->em->getRepository('Uecode\Bundle\QPushBundle\Entity\DoctrineMessage');
+        $this->repository = $this->em->getRepository(self::$entityName);
     }
 
     /**
@@ -112,18 +113,22 @@ class DoctrineProvider extends AbstractProvider
         if (!$this->repository) {
             return;
         }
+        
         return $this->repository;
     }
 
     /**
      * Creates the Queue
-     *
-     * All Create methods are idempotent, if the resource exists, the current ARN
-     * will be returned
+     * Checks to see if the underlying table has been created or not
+     * 
+     * @return bool
      */
     public function create()
     {
+        $sm = $this->em->getConnection()->getSchemaManager();
+        $table = $this->em->getClassMetadata(self::$entityName)->getTableName();
         
+        return $sm->tablesExist(array($table));
     }
 
     /**
@@ -132,7 +137,7 @@ class DoctrineProvider extends AbstractProvider
      * This method should return a string MessageId or Response
      *
      * @param array $message The message to queue
-     * @param  array $options An array of options that override the queue defaults
+     * @param array $options An array of options that override the queue defaults
      *
      * @return string
      */
@@ -173,12 +178,8 @@ class DoctrineProvider extends AbstractProvider
         }
 
         $doctrineMessages = $this->repository->findBy(
-                [
-            'delivered' => false,
-            'queue' => $this->name
-                ], [
-            'id' => 'ASC'
-                ]
+                array('delivered' => false, 'queue' => $this->name),
+                array('id' => 'ASC')
         );
 
         $messages = [];
@@ -201,6 +202,8 @@ class DoctrineProvider extends AbstractProvider
         $doctrineMessage = $this->repository->findById($id);
         $doctrineMessage->setDelivered(true);
         $this->em->flush();
+        
+        return true;
     }
 
     /**
@@ -214,7 +217,9 @@ class DoctrineProvider extends AbstractProvider
         $qb->delete();
         $qb->where('dm.queue = :queue');
         $qb->setParameter('queue', $this->name);
-        $qb->getQuery()->getResult();
+        $qb->getQuery()->execute();
+        
+        return true;
     }
 
     /**
@@ -238,10 +243,10 @@ class DoctrineProvider extends AbstractProvider
      * 
      * @return Query
      */
-     
-     public function findBy($contains = null, $from = null, $to = null)
-     {
-        
+
+    public function findBy($contains = null, $from = null, $to = null)
+    {
+
         $qb = $this->repository->createQueryBuilder('p');
         $qb->select('p');
         $qb->where('p.queue = :queue');
@@ -249,14 +254,14 @@ class DoctrineProvider extends AbstractProvider
 
         if ($contains !== null) {
             $qb->andWhere('p.message LIKE :contains');
-            $qb->setParameter('contains', '%'.$contains.'%');
+            $qb->setParameter('contains', '%' . $contains . '%');
         }
-        
+
         if ($from !== null) {
             $qb->andWhere('p.created >= :from');
             $qb->setParameter('from', $from);
         }
-        
+
         if ($to !== null) {
             $qb->andWhere('p.created <= :to');
             $qb->setParameter('to', $to);
