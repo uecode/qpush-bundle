@@ -39,9 +39,6 @@ class NotificationTest extends BaseMessageTest
         $this->message = null;
     }
 
-    /**
-     * @expectedException PHPUnit_Framework_Error
-     */
     public function testConstructor()
     {
         $notification = new Notification(123, ['foo' => 'bar'], ['baz' => 'qux']);
