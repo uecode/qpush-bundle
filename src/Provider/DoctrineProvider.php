@@ -243,10 +243,6 @@ class DoctrineProvider extends AbstractProvider
      */
     public function findBy($data)
     {
-        if(!is_array($data) || empty($data)) {
-           return; 
-        }
-        
         $qb = $this->repository->createQueryBuilder('p');
         $qb->select('p');
         $qb->where('p.queue = :queue');
