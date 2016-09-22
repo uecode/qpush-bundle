@@ -22,7 +22,7 @@
 
 namespace Uecode\Bundle\QPushBundle\Provider;
 
-use Aws\Sns\Exception\NotFoundException;
+use Aws\Sns\Exception\SnsException;
 use Aws\Sns\SnsClient;
 use Aws\Sqs\Exception\SqsException;
 use Aws\Sqs\SqsClient;
@@ -427,7 +427,7 @@ class AwsProvider extends AbstractProvider
                 $this->sns->getTopicAttributes([
                     'TopicArn' => $topicArn
                 ]);
-            } catch (NotFoundException $e) {
+            } catch (SnsException $e) {
                 return false;
             }
 
