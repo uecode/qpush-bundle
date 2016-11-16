@@ -275,32 +275,27 @@ class DoctrineProvider extends AbstractProvider
      * @return ['time', 'count']
      */
 
-    public function counts($data)
+    public function counts($data=null)
     {
         if (isset($data['period']) && $data['period'] !== null) {
             $period = $data['period'];
         } else {
             $period = self::DEFAULT_PERIOD;
         }
-
         $sql = 'SELECT from_unixtime(floor(unix_timestamp(created)/'
                 . $period . ') * ' . $period . ') as time, 
             count(*) as count 
             FROM uecode_qpush_message
             where queue = "' . $this->name . '"';
-
         if (isset($data['from']) && $data['from'] !== null) {
             $sql = $sql . ' and created >= "' . $data['from'] . '"';
         }
-
         if (isset($data['to']) && $data['to'] !== null) {
             $sql = $sql . ' and created <= "' . $data['to'] . '"';
         }
-
         $sql = $sql . ' group by floor(unix_timestamp(created)/' . $period . ')';
         $sql = $sql . ' order by floor(unix_timestamp(created)/' . $period . ') ASC';
-
-        $statement = $this->em->getConnection() > prepare($sql);
+        $statement = $this->em->getConnection()->prepare($sql);
         $statement->execute();
         $results = $statement->fetchAll();
         
