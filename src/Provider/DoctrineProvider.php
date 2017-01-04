@@ -256,15 +256,11 @@ class DoctrineProvider extends AbstractProvider
             $qb->setParameter('contains', '%' . $data['search'] . '%');
         }
 
-        if (isset($data['from']) && $data['from'] !== null) {
-            $qb->andWhere('p.created >= :from');
+        if (isset($data['from']) && $data['from'] !== null && isset($data['to']) && $data['to'] !== null) {
+            $qb->andWhere('p.created BETWEEN :from AND :to');
             $qb->setParameter('from', $data['from']);
-        }
-
-        if (isset($data['to']) && $data['to'] !== null) {
-            $qb->andWhere('p.created <= :to');
             $qb->setParameter('to', $data['to']);
-        }
+        } 
 
         return $qb->getQuery();
     }
