@@ -211,9 +211,11 @@ class AwsProvider extends AbstractProvider
         }
 
         $result = $this->sqs->sendMessage([
-            'QueueUrl'      => $this->queueUrl,
-            'MessageBody'   => json_encode($message),
-            'DelaySeconds'  => $options['message_delay']
+            'QueueUrl'               => $this->queueUrl,
+            'MessageBody'            => json_encode($message),
+            'DelaySeconds'           => $options['message_delay'],
+            'MessageDeduplicationId' => hash('sha256',json_encode($message)),
+            'MessageGroupId'         => $this->getNameWithPrefix()
         ]);
 
         $context = [
