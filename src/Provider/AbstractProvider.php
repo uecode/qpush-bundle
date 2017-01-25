@@ -144,12 +144,13 @@ abstract class AbstractProvider implements ProviderInterface
      * Merge override options while restricting what keys are allowed
      *
      * @param  array $options An array of options that override the queue defaults
+     * @param  array $extraOptions An extra array of optional options that do not have to exist in the provider's config
      *
      * @return array
      */
-    public function mergeOptions(array $options = [])
+    public function mergeOptions(array $options = [], array $extraOptions = [])
     {
-        return array_merge($this->options, array_intersect_key($options, $this->options));
+        return array_merge(array_merge($this->options, array_intersect_key($options, $this->options)), $extraOptions);
     }
 
     abstract public function getProvider();
