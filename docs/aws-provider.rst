@@ -79,6 +79,17 @@ fetch those messages.
 | ``message_delay``        | Time in seconds before a published Message is available to be read in a Queue             | ``0``         |
 +--------------------------+-------------------------------------------------------------------------------------------+---------------+
 
+There is also support built in for SQS FIFO queues.
+
++----------------------+----------------------------------------------------------------------------------------+---------------------------------+
+| Option               | Description                                                                            | Default Value                   |
++======================+========================================================================================+=================================+
+| ``group_id``         | The ``MessageGroupId`` as specified in the AWS SQS sendMessage() documentation         | ``qpush-group``                 |
++--------------------------+------------------------------------------------------------------------------------+---------------------------------+
+| ``deduplication_id`` | The ``MessageDeduplicationId`` as specified in the AWS SQS sendMessage() documentation | An md5 hash of the message body |
++----------------------+----------------------------------------------------------------------------------------+---------------------------------+
+
+
 .. code-block:: php
 
     $message = ['foo' => 'bar'];
