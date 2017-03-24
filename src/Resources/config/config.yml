@@ -15,13 +15,15 @@ uecode_qpush:
         default:
             provider: aws #or ironmq
             options:
-                push_notifications:     true
-                notification_retries:   3
-                message_delay:          0
-                message_timeout:        30
-                message_expiration:     604800
-                messages_to_receive:    1
-                receive_wait_time:      3
+                push_notifications:          true
+                notification_retries:        3
+                message_delay:               0
+                message_timeout:             30
+                message_expiration:          604800
+                messages_to_receive:         1
+                receive_wait_time:           3
+                fifo:                        false
+                content_based_deduplication: false
                 subscribers:
                     - { endpoint: http://example1.com/qpush, protocol: http }
                     - { endpoint: http://example2.com/qpush, protocol: http }

@@ -56,6 +56,20 @@ uecode_qpush:
                 receive_wait_time:      3
                 subscribers:
                     - { endpoint: http://example.com/qpush, protocol: http }
+        test_aws_fifo:
+            provider: aws
+            options:
+                push_notifications:          true
+                notification_retries:        3
+                message_delay:               0
+                message_timeout:             30
+                message_expiration:          604800
+                messages_to_receive:         1
+                receive_wait_time:           3
+                fifo:                        true
+                content_based_deduplication: true
+                subscribers:
+                    - { endpoint: http://example.com/qpush, protocol: http }
         test_ironmq:
             provider: ironmq
             options:

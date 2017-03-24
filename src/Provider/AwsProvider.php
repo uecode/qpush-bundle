@@ -221,11 +221,28 @@ class AwsProvider extends AbstractProvider
             return $result->get('MessageId');
         }
 
-        $result = $this->sqs->sendMessage([
+        $arguments = [
             'QueueUrl'      => $this->queueUrl,
             'MessageBody'   => json_encode($message),
             'DelaySeconds'  => $options['message_delay']
-        ]);
+        ];
+
+        if ($this->isQueueFIFO()) {
+            if (isset($this->options['message_deduplication_id'])) {
+                // Always use user supplied dedup id
+                $arguments['MessageDeduplicationId'] = $this->options['message_deduplication_id'];
+            } elseif ($this->options['content_based_deduplication'] !== true) {
+                // If none is supplied and option "content_based_deduplication" is not set, generate default
+                $arguments['MessageDeduplicationId'] = hash('sha256',json_encode($message));
+            }
+
+            $arguments['MessageGroupId'] = $this->getNameWithPrefix();
+            if (isset($this->options['message_group_id'])) {
+                $arguments['MessageGroupId'] = $this->options['message_group_id'];
+            }
+        }
+
+        $result = $this->sqs->sendMessage($arguments);
 
         $context = [
             'QueueUrl'              => $this->queueUrl,
@@ -352,14 +369,20 @@ class AwsProvider extends AbstractProvider
      */
     public function createQueue()
     {
-        $result = $this->sqs->createQueue([
-            'QueueName' => $this->getNameWithPrefix(),
-            'Attributes'    => [
-                'VisibilityTimeout'             => $this->options['message_timeout'],
-                'MessageRetentionPeriod'        => $this->options['message_expiration'],
-                'ReceiveMessageWaitTimeSeconds' => $this->options['receive_wait_time']
-            ]
-        ]);
+        $attributes = [
+            'VisibilityTimeout'             => $this->options['message_timeout'],
+            'MessageRetentionPeriod'        => $this->options['message_expiration'],
+            'ReceiveMessageWaitTimeSeconds' => $this->options['receive_wait_time']
+        ];
+
+        if ($this->isQueueFIFO()) {
+            $attributes['FifoQueue'] = 'true';
+            $attributes['ContentBasedDeduplication'] = $this->options['content_based_deduplication'] === true
+                ? 'true'
+                : 'false';
+        }
+
+        $result = $this->sqs->createQueue(['QueueName' => $this->getNameWithPrefix(), 'Attributes' => $attributes]);
 
         $this->queueUrl = $result->get('QueueUrl');
 
@@ -630,5 +653,13 @@ class AwsProvider extends AbstractProvider
         $this->delete($receiptHandle);
 
         $event->stopPropagation();
+    }
+
+    /**
+     * @return bool
+     */
+    private function isQueueFIFO()
+    {
+        return $this->options['fifo'] === true;
     }
 }
