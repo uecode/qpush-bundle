@@ -50,9 +50,7 @@ class UecodeQPushExtensionTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->extension = new UecodeQPushExtension();
-        $this->container = new ContainerBuilder(new ParameterBag([
-            'kernel.cache_dir' => '/tmp'
-        ]));
+        $this->container = new ContainerBuilder(new ParameterBag(['kernel.cache_dir' => '/tmp']));
 
         $this->container->registerExtension($this->extension);
     }

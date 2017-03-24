@@ -40,7 +40,7 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * Mock Client
      *
-     * @var stdClass
+     * @var AwsProvider
      */
     protected $provider;
 
@@ -54,6 +54,11 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider = null;
     }
 
+    /**
+     * @param array $options
+     *
+     * @return AwsProvider
+     */
     private function getAwsProvider(array $options = [])
     {
         $options = array_merge(
@@ -74,9 +79,9 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
         );
 
         $client = new AwsMockClient([
-            'key'       => '123_this_is_a_key',
-            'secret'    => '123_this_is_a_secret',
-            'region'    => 'us-east-1'
+            'key'    => '123_this_is_a_key',
+            'secret' => '123_this_is_a_secret',
+            'region' => 'us-east-1'
         ]);
 
         $cache = $this->getMock(
