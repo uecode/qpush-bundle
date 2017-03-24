@@ -258,8 +258,17 @@ class AwsProvider extends AbstractProvider
         $context = [
             'QueueUrl'              => $this->queueUrl,
             'MessageId'             => $result->get('MessageId'),
-            'push_notifications'    => $options['push_notifications']
+            'push_notifications'    => $options['push_notifications'],
+            'fifo'                  => $options['fifo']
         ];
+
+        if ($this->isQueueFIFO()) {
+            if (isset($arguments['MessageDeduplicationId'])) {
+                $context['message_deduplication_id'] = $arguments['MessageDeduplicationId'];
+            }
+            $context['message_group_id'] = $arguments['MessageGroupId'];
+        }
+
         $this->log(200,"Message published to SQS", $context);
 
         return $result->get('MessageId');
