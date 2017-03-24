@@ -182,7 +182,18 @@ class AwsProvider extends AbstractProvider
      */
     public function publish(array $message, array $options = [])
     {
-        $options      = $this->mergeOptions($options);
+        $mergedOptions = $this->mergeOptions($options);
+
+        if (isset($options['message_deduplication_id'])) {
+            $mergedOptions['message_deduplication_id'] = $options['message_deduplication_id'];
+        }
+
+        if (isset($options['message_group_id'])) {
+            $mergedOptions['message_group_id'] = $options['message_group_id'];
+        }
+
+        $options = $mergedOptions;
+
         $publishStart = microtime(true);
 
         // ensures that the SQS Queue and SNS Topic exist
@@ -228,17 +239,17 @@ class AwsProvider extends AbstractProvider
         ];
 
         if ($this->isQueueFIFO()) {
-            if (isset($this->options['message_deduplication_id'])) {
+            if (isset($options['message_deduplication_id'])) {
                 // Always use user supplied dedup id
-                $arguments['MessageDeduplicationId'] = $this->options['message_deduplication_id'];
-            } elseif ($this->options['content_based_deduplication'] !== true) {
+                $arguments['MessageDeduplicationId'] = $options['message_deduplication_id'];
+            } elseif ($options['content_based_deduplication'] !== true) {
                 // If none is supplied and option "content_based_deduplication" is not set, generate default
                 $arguments['MessageDeduplicationId'] = hash('sha256',json_encode($message));
             }
 
             $arguments['MessageGroupId'] = $this->getNameWithPrefix();
-            if (isset($this->options['message_group_id'])) {
-                $arguments['MessageGroupId'] = $this->options['message_group_id'];
+            if (isset($options['message_group_id'])) {
+                $arguments['MessageGroupId'] = $options['message_group_id'];
             }
         }
 
