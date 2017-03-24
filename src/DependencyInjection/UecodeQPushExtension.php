@@ -143,7 +143,7 @@ class UecodeQPushExtension extends Extension
             $isQueueNameFIFOReady = strpos($reversedQueueName, 'ofif.') === 0;
 
             if ($isQueueNameSet && $isProviderAWS && $values['options']['fifo'] === true && !$isQueueNameFIFOReady) {
-                throw new \InvalidArgumentException('Queue name must end with ".fifo" on AWS FIFO queues');
+                throw new InvalidArgumentException('Queue name must end with ".fifo" on AWS FIFO queues');
             }
 
             $name = sprintf('uecode_qpush.%s', $queue);
