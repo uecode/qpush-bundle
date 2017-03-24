@@ -126,7 +126,7 @@ class UecodeQPushExtension extends Extension
                 );
 
             $isProviderAWS = $config['providers'][$provider]['driver'] === 'aws';
-            $isQueueNameSet = !empty($values['options']['queue_name']);
+            $isQueueNameSet = isset($values['options']['queue_name']) && !empty($values['options']['queue_name']);
 
             if ($isQueueNameSet && $isProviderAWS) {
                 $definition->addTag(
@@ -137,13 +137,13 @@ class UecodeQPushExtension extends Extension
                         'priority' => 255
                     ]
                 );
-            }
 
-            $reversedQueueName = strrev($values['options']['queue_name']);
-            $isQueueNameFIFOReady = strpos($reversedQueueName, 'ofif.') === 0;
+                $reversedQueueName = strrev($values['options']['queue_name']);
+                $isQueueNameFIFOReady = strpos($reversedQueueName, 'ofif.') === 0;
 
-            if ($isQueueNameSet && $isProviderAWS && $values['options']['fifo'] === true && !$isQueueNameFIFOReady) {
-                throw new InvalidArgumentException('Queue name must end with ".fifo" on AWS FIFO queues');
+                if ($values['options']['fifo'] === true && !$isQueueNameFIFOReady) {
+                    throw new InvalidArgumentException('Queue name must end with ".fifo" on AWS FIFO queues');
+                }
             }
 
             $name = sprintf('uecode_qpush.%s', $queue);
