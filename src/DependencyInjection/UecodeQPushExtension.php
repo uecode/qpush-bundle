@@ -42,10 +42,7 @@ class UecodeQPushExtension extends Extension
      * @param array            $configs
      * @param ContainerBuilder $container
      *
-     * @throws Exception
-     * @throws RuntimeException
-     * @throws InvalidArgumentException
-     * @throws ServiceNotFoundException
+     * @throws RuntimeException|InvalidArgumentException|ServiceNotFoundException
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -138,9 +135,8 @@ class UecodeQPushExtension extends Extension
                     ]
                 );
 
-                $reversedQueueName = strrev($values['options']['queue_name']);
-                $isQueueNameFIFOReady = strpos($reversedQueueName, 'ofif.') === 0;
-
+                // Check queue name ends with ".fifo"
+                $isQueueNameFIFOReady = preg_match("/$(?<=(\.fifo))/", $values['options']['queue_name']) === 1;
                 if ($values['options']['fifo'] === true && !$isQueueNameFIFOReady) {
                     throw new InvalidArgumentException('Queue name must end with ".fifo" on AWS FIFO queues');
                 }
