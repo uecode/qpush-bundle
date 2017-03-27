@@ -40,7 +40,7 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * Mock Client
      *
-     * @var stdClass
+     * @var AwsProvider
      */
     protected $provider;
 
@@ -54,18 +54,25 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider = null;
     }
 
+    /**
+     * @param array $options
+     *
+     * @return AwsProvider
+     */
     private function getAwsProvider(array $options = [])
     {
         $options = array_merge(
             [
-                'logging_enabled'       => false,
-                'push_notifications'    => true,
-                'notification_retries'  => 3,
-                'message_delay'         => 0,
-                'message_timeout'       => 30,
-                'message_expiration'    => 604800,
-                'messages_to_receive'   => 1,
-                'receive_wait_time'     => 3,
+                'logging_enabled'             => false,
+                'push_notifications'          => true,
+                'notification_retries'        => 3,
+                'message_delay'               => 0,
+                'message_timeout'             => 30,
+                'message_expiration'          => 604800,
+                'messages_to_receive'         => 1,
+                'receive_wait_time'           => 3,
+                'fifo'                        => false,
+                'content_based_deduplication' => false,
                 'subscribers'           => [
                     [ 'protocol' => 'http', 'endpoint' => 'http://fake.com' ]
                 ]
@@ -74,9 +81,9 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
         );
 
         $client = new AwsMockClient([
-            'key'       => '123_this_is_a_key',
-            'secret'    => '123_this_is_a_secret',
-            'region'    => 'us-east-1'
+            'key'    => '123_this_is_a_key',
+            'secret' => '123_this_is_a_secret',
+            'region' => 'us-east-1'
         ]);
 
         $cache = $this->getMock(
@@ -150,6 +157,32 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
     {
         $provider = $this->getAwsProvider([
             'push_notifications' => false
+        ]);
+
+        $stub = $provider->getCache();
+        $stub->expects($this->once())
+             ->method('contains')
+             ->will($this->returnValue(true));
+
+        $this->assertTrue($provider->queueExists());
+
+        $provider->createQueue();
+        $this->assertTrue($provider->queueExists());
+
+        $this->provider->createQueue();
+        $this->assertTrue($this->provider->queueExists());
+    }
+
+    /**
+     * @covers Uecode\Bundle\QPushBundle\Provider\AwsProvider::createQueue
+     * @covers Uecode\Bundle\QPushBundle\Provider\AwsProvider::queueExists
+     */
+    public function testCreateQueueFIFO()
+    {
+        $provider = $this->getAwsProvider([
+            'push_notifications' => false,
+            'fifo' => true,
+            'content_based_deduplication' => false
         ]);
 
         $stub = $provider->getCache();

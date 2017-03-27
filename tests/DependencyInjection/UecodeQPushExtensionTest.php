@@ -50,9 +50,7 @@ class UecodeQPushExtensionTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->extension = new UecodeQPushExtension();
-        $this->container = new ContainerBuilder(new ParameterBag([
-            'kernel.cache_dir' => '/tmp'
-        ]));
+        $this->container = new ContainerBuilder(new ParameterBag(['kernel.cache_dir' => '/tmp']));
 
         $this->container->registerExtension($this->extension);
     }
@@ -68,6 +66,7 @@ class UecodeQPushExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->container->has('uecode_qpush.test_aws'));
         $this->assertTrue($this->container->has('uecode_qpush.test_file'));
+        $this->assertTrue($this->container->has('uecode_qpush.test_aws_fifo'));
         $this->assertTrue($this->container->has('uecode_qpush.test_secondary_aws'));
         $this->assertNotSame(
             $this->container->get('uecode_qpush.test_aws'),
