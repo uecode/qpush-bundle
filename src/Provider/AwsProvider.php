@@ -244,7 +244,7 @@ class AwsProvider extends AbstractProvider
                 $arguments['MessageDeduplicationId'] = $options['message_deduplication_id'];
             } elseif ($options['content_based_deduplication'] !== true) {
                 // If none is supplied and option "content_based_deduplication" is not set, generate default
-                $arguments['MessageDeduplicationId'] = hash('sha256',json_encode($message));
+                $arguments['MessageDeduplicationId'] = hash('sha256', json_encode($message));
             }
 
             $arguments['MessageGroupId'] = $this->getNameWithPrefix();
