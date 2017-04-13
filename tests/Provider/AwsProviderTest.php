@@ -68,7 +68,8 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
                 'receive_wait_time'     => 3,
                 'subscribers'           => [
                     [ 'protocol' => 'http', 'endpoint' => 'http://fake.com' ]
-                ]
+                ],
+                'queue_url'             => null
             ],
             $options
         );
@@ -164,6 +165,18 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->provider->createQueue();
         $this->assertTrue($this->provider->queueExists());
+    }
+
+    public function testCreatePreConfiguredQueue()
+    {
+        $queueUrl = 'https://sqs.us-east-1.amazonaws.com/321123321123/Example';
+
+        $this->provider = $this->getAwsProvider([
+        	'queue_url' => $queueUrl
+        ]);
+
+        $this->assertTrue($this->provider->queueExists());
+        $this->assertAttributeEquals($queueUrl, 'queueUrl', $this->provider);
     }
 
     public function testCreateSqsPolicy()
