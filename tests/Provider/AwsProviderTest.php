@@ -22,6 +22,11 @@
 
 namespace Uecode\Bundle\QPushBundle\Tests\Provider;
 
+use Aws\Common\Aws;
+use Aws\Sqs\SqsClient;
+use Doctrine\Common\Cache\Cache;
+use Guzzle\Service\Resource\Model;
+use Monolog\Logger;
 use Uecode\Bundle\QPushBundle\Provider\AwsProvider;
 
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
@@ -121,6 +126,64 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(123, $provider->publish(['foo' => 'bar']));
     }
 
+    public function testSqsPublishFifo()
+    {
+        $mockedSqsClient = self::getMockBuilder(SqsClient::class)->disableOriginalConstructor()->setMethods(['sendMessage'])->getMock();
+
+        // First, test that default values are set if no option overrides
+        $mockedSqsClient->expects(self::at(0))
+            ->method('sendMessage')
+            ->with([
+                    'QueueUrl' => null,
+                    'MessageBody' => '{"this":"that"}',
+                    'DelaySeconds' => 0,
+                    'MessageGroupId' => 'qpush-group',
+                    'MessageDeduplicationId' => md5('{"this":"that"}'),
+            ])
+            ->will(self::returnValue(new Model(['MessageId' => 456])));
+        // And, test that that we can set overrides via options
+        $mockedSqsClient->expects(self::at(1))
+            ->method('sendMessage')
+            ->with([
+                'QueueUrl' => null,
+                'MessageBody' => '{"this":"that"}',
+                'DelaySeconds' => 0,
+                'MessageGroupId' => 'override-group-id',
+                'MessageDeduplicationId' => 'override-deduplication-id',
+            ])
+            ->will(self::returnValue(new Model(['MessageId' => 789])));
+
+        $mockedAwsClient = self::getMockBuilder(Aws::class)->disableOriginalConstructor()->setMethods(['get'])->getMock();
+        $mockedAwsClient->expects(self::at(0))
+            ->method('get')
+            ->with('Sqs')
+            ->will(self::returnValue($mockedSqsClient));
+
+        $mockedAwsProvider = self::getMockBuilder(AwsProvider::class)
+            ->setConstructorArgs([
+                'a_queue.fifo',
+                [
+                    'push_notifications' => false,
+                    'message_delay' => 0,
+                ],
+                $mockedAwsClient,
+                self::getMockBuilder(Cache::class)->disableOriginalConstructor()->getMock(),
+                self::getMockBuilder(Logger::class)->disableOriginalConstructor()->getMock(),
+            ])
+            ->setMethods(['queueExists', 'log'])
+            ->getMock();
+
+        $mockedAwsProvider->expects(self::any())
+            ->method('queueExists')
+            ->will(self::returnValue(true));
+        $mockedAwsProvider->expects(self::any())
+            ->method('log')
+            ->will(self::returnValue(null));
+
+        self::assertEquals(456, $mockedAwsProvider->publish(['this' => 'that'], []));
+        self::assertEquals(789, $mockedAwsProvider->publish(['this' => 'that'], ['group_id' => 'override-group-id', 'deduplication_id' => 'override-deduplication-id']));
+    }
+
     public function testSnsPublish()
     {
         $this->assertEquals(123, $this->provider->publish(['foo' => 'bar']));
@@ -143,8 +206,8 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Uecode\Bundle\QPushBundle\Provider\AwsProvider::createQueue
-     * @covers Uecode\Bundle\QPushBundle\Provider\AwsProvider::queueExists
+     * @covers \Uecode\Bundle\QPushBundle\Provider\AwsProvider::createQueue
+     * @covers \Uecode\Bundle\QPushBundle\Provider\AwsProvider::queueExists
      */
     public function testCreateQueue()
     {
@@ -189,8 +252,8 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Uecode\Bundle\QPushBundle\Provider\AwsProvider::createTopic
-     * @covers Uecode\Bundle\QPushBundle\Provider\AwsProvider::topicExists
+     * @covers \Uecode\Bundle\QPushBundle\Provider\AwsProvider::createTopic
+     * @covers \Uecode\Bundle\QPushBundle\Provider\AwsProvider::topicExists
      */
     public function testCreateTopic()
     {

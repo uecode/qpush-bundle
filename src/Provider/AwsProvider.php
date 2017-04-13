@@ -171,7 +171,12 @@ class AwsProvider extends AbstractProvider
      */
     public function publish(array $message, array $options = [])
     {
-        $options      = $this->mergeOptions($options);
+        // There are two 'extra' options that can be sent to this method that are no in the AwsProvider configuration
+        // as they don't make sense in the context of global configuration
+
+        $extraOptions = $this->getExtraOptions($options, ['group_id', 'deduplication_id']);
+
+        $options      = $this->mergeOptions($options, $extraOptions);
         $publishStart = microtime(true);
 
         // ensures that the SQS Queue and SNS Topic exist
@@ -210,11 +215,23 @@ class AwsProvider extends AbstractProvider
             return $result->get('MessageId');
         }
 
-        $result = $this->sqs->sendMessage([
+        // To make this work with AWS FIFO queues we also need to add a MessageId and a MessageDeduplicationId.
+        // Sadly (although I guess it's one less API call) the only way to determine the queue type is to look for
+        // the .fifo suffix on the QueueName
+        // See Note: http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_GetQueueAttributes.html
+
+        $messageParameters = [
             'QueueUrl'      => $this->queueUrl,
             'MessageBody'   => json_encode($message),
             'DelaySeconds'  => $options['message_delay']
-        ]);
+        ];
+
+        if (preg_match('/\.fifo$/', $this->getNameWithPrefix())) {
+            $messageParameters['MessageGroupId'] = array_key_exists('group_id', $options) ? $options['group_id'] : 'qpush-group';
+            $messageParameters['MessageDeduplicationId'] = array_key_exists('deduplication_id', $options) ? $options['deduplication_id'] : md5($messageParameters['MessageBody']);
+        }
+
+        $result = $this->sqs->sendMessage($messageParameters);
 
         $context = [
             'QueueUrl'              => $this->queueUrl,
@@ -616,5 +633,15 @@ class AwsProvider extends AbstractProvider
         $this->delete($receiptHandle);
 
         $event->stopPropagation();
+    }
+
+    /**
+     * @param array $options
+     * @param array $keys
+     * @return array
+     */
+    private function getExtraOptions(array $options, array $keys)
+    {
+        return array_intersect_key($options, array_flip($keys));
     }
 }
