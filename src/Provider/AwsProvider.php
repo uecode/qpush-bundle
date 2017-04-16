@@ -148,7 +148,7 @@ class AwsProvider extends AbstractProvider
             // Delete the SNS Topic
             $topicArn = !empty($this->topicArn)
                 ? $this->topicArn
-                : str_replace('sqs', 'sns', $this->queueUrl)
+                : str_replace('sqs', 'sns', $this->sqs->getQueueArn($this->queueUrl))
             ;
 
             $this->sns->deleteTopic([
