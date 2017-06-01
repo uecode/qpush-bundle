@@ -49,12 +49,13 @@ class MessageEventTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Uecode\Bundle\QPushBundle\Event\MessageEvent', $event);
 
         if (version_compare(PHP_VERSION, '7.0', '>=')) {
-            $this->setExpectedException('TypeError');
-        } else {
-            $this->setExpectedException('PHPUnit_Framework_Error');
+            // This will throw an Fatal error, not an exception
+            return;
         }
 
-        $event = new MessageEvent('test', ['bad argument']);
+        $this->setExpectedException('PHPUnit_Framework_Error');
+
+        new MessageEvent('test', ['bad argument']);
     }
 
     public function testGetQueueName()

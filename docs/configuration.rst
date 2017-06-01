@@ -59,27 +59,31 @@ Queue Options
 Each queue can have their own options that determine how messages are published or received.
 The options and their descriptions are listed below.
 
-+--------------------------+-------------------------------------------------------------------------------------------+---------------+
-| Option                   | Description                                                                               | Default Value |
-+==========================+===========================================================================================+===============+
-| ``queue_name``           | The name used to describe the queue on the Provider's side                                | ``null``      |
-+--------------------------+-------------------------------------------------------------------------------------------+---------------+
-| ``push_notifications``   | Whether or not to POST notifications to subscribers of a Queue                            | ``false``     |
-+--------------------------+-------------------------------------------------------------------------------------------+---------------+
-| ``notification_retries`` | How many attempts notifications are resent in case of errors - if supported               | ``3``         |
-+--------------------------+-------------------------------------------------------------------------------------------+---------------+
-| ``message_delay``        | Time in seconds before a published Message is available to be read in a Queue             | ``0``         |
-+--------------------------+-------------------------------------------------------------------------------------------+---------------+
-| ``message_timeout``      | Time in seconds a worker has to delete a Message before it is available to other workers  | ``30``        |
-+--------------------------+-------------------------------------------------------------------------------------------+---------------+
-| ``message_expiration``   | Time in seconds that Messages may remain in the Queue before being removed                | ``604800``    |
-+--------------------------+-------------------------------------------------------------------------------------------+---------------+
-| ``messages_to_receive``  | Maximum amount of messages that can be received when polling the queue                    | ``1``         |
-+--------------------------+-------------------------------------------------------------------------------------------+---------------+
-| ``receive_wait_time``    | If supported, time in seconds to leave the polling request open - for long polling        | ``3``         |
-+--------------------------+-------------------------------------------------------------------------------------------+---------------+
-| ``subscribers``          | An array of Subscribers, containing an ``endpoint`` and ``protocol``                      | ``empty``     |
-+--------------------------+-------------------------------------------------------------------------------------------+---------------+
++---------------------------------+--------------------------------------------------------------------------------------------+---------------+
+| Option                          | Description                                                                                | Default Value |
++=================================+============================================================================================+===============+
+| ``queue_name``                  | The name used to describe the queue on the Provider's side                                 | ``null``      |
++---------------------------------+--------------------------------------------------------------------------------------------+---------------+
+| ``push_notifications``          | Whether or not to POST notifications to subscribers of a Queue                             | ``false``     |
++---------------------------------+--------------------------------------------------------------------------------------------+---------------+
+| ``notification_retries``        | How many attempts notifications are resent in case of errors - if supported                | ``3``         |
++---------------------------------+--------------------------------------------------------------------------------------------+---------------+
+| ``message_delay``               | Time in seconds before a published Message is available to be read in a Queue              | ``0``         |
++---------------------------------+--------------------------------------------------------------------------------------------+---------------+
+| ``message_timeout``             | Time in seconds a worker has to delete a Message before it is available to other workers   | ``30``        |
++---------------------------------+--------------------------------------------------------------------------------------------+---------------+
+| ``message_expiration``          | Time in seconds that Messages may remain in the Queue before being removed                 | ``604800``    |
++---------------------------------+--------------------------------------------------------------------------------------------+---------------+
+| ``messages_to_receive``         | Maximum amount of messages that can be received when polling the queue                     | ``1``         |
++---------------------------------+--------------------------------------------------------------------------------------------+---------------+
+| ``receive_wait_time``           | If supported, time in seconds to leave the polling request open - for long polling         | ``3``         |
++---------------------------------+--------------------------------------------------------------------------------------------+---------------+
+| ``fifo``                        | If supported (only aws), sets queue into FIFO mode                                         | ``false``     |
++---------------------------------+--------------------------------------------------------------------------------------------+---------------+
+| ``content_based_deduplication`` | If supported (only aws), turns on automatic deduplication id based on the message content  | ``false``     |
++---------------------------------+--------------------------------------------------------------------------------------------+---------------+
+| ``subscribers``                 | An array of Subscribers, containing an ``endpoint`` and ``protocol``                       | ``empty``     |
++---------------------------------+--------------------------------------------------------------------------------------------+---------------+
 
 Symfony Application as a Subscriber
 -----------------------------------
@@ -131,14 +135,32 @@ A working configuration would look like the following
             my_queue_key:
                 provider: ironmq #or aws or in_band or another_aws_provider
                 options:
-                    queue_name:             my_actual_queue_name
-                    push_notifications:     true
-                    notification_retries:   3
-                    message_delay:          0
-                    message_timeout:        30
-                    message_expiration:     604800
-                    messages_to_receive:    1
-                    receive_wait_time:      3
+                    queue_name:                  my_actual_queue_name
+                    push_notifications:          true
+                    notification_retries:        3
+                    message_delay:               0
+                    message_timeout:             30
+                    message_expiration:          604800
+                    messages_to_receive:         1
+                    receive_wait_time:           3
+                    fifo:                        false
+                    content_based_deduplication: false
+                    subscribers:
+                        - { endpoint: http://example1.com/, protocol: http }
+                        - { endpoint: http://example2.com/, protocol: http }
+            my_fifo_queue_key:
+                provider: aws
+                options:
+                    queue_name:                  my_actual_queue_name.fifo
+                    push_notifications:          true
+                    notification_retries:        3
+                    message_delay:               0
+                    message_timeout:             30
+                    message_expiration:          604800
+                    messages_to_receive:         1
+                    receive_wait_time:           3
+                    fifo:                        true
+                    content_based_deduplication: true
                     subscribers:
                         - { endpoint: http://example1.com/, protocol: http }
                         - { endpoint: http://example2.com/, protocol: http }
