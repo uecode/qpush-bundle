@@ -79,6 +79,11 @@ class AwsProvider extends AbstractProvider
         $useGet = method_exists($client, 'get');
         $this->sqs = $useGet ? $client->get('Sqs') : $client->createSqs();
         $this->sns = $useGet ? $client->get('Sns') : $client->createSns();
+
+        if(array_key_exists('queue_url', $options))
+        {
+            $this->queueUrl = $options['queue_url'];
+        }
     }
 
     public function getProvider()
@@ -308,6 +313,7 @@ class AwsProvider extends AbstractProvider
      */
     public function queueExists()
     {
+    	var_dump($this->queueUrl);
         if (isset($this->queueUrl)) {
             return true;
         }

@@ -39,6 +39,7 @@ credentials in your configuration.
             my_queue_name:
                 provider: my_provider
                 options:
+                    queue_url: https://sqs.us-east-1.amazonaws.com/321123321123/Example
                     push_notifications: true
                     subscribers:
                         - { endpoint: http://example.com/qpush, protocol: http }
@@ -77,6 +78,8 @@ fetch those messages.
 | ``push_notifications``   | Whether or not to POST notifications to subscribers of a Queue                            | ``false``     |
 +--------------------------+-------------------------------------------------------------------------------------------+---------------+
 | ``message_delay``        | Time in seconds before a published Message is available to be read in a Queue             | ``0``         |
++--------------------------+-------------------------------------------------------------------------------------------+---------------+
+| ``queue_url``            | The URL of the Queue. If not specified it search the queue via the ``queue_name``         | ``null``      |
 +--------------------------+-------------------------------------------------------------------------------------------+---------------+
 
 .. code-block:: php

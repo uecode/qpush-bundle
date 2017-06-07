@@ -64,6 +64,8 @@ The options and their descriptions are listed below.
 +==========================+===========================================================================================+===============+
 | ``queue_name``           | The name used to describe the queue on the Provider's side                                | ``null``      |
 +--------------------------+-------------------------------------------------------------------------------------------+---------------+
+| ``queue_url``            | The url used to connect to the queue on the Provider's side                               | ``null``      |
++--------------------------+-------------------------------------------------------------------------------------------+---------------+
 | ``push_notifications``   | Whether or not to POST notifications to subscribers of a Queue                            | ``false``     |
 +--------------------------+-------------------------------------------------------------------------------------------+---------------+
 | ``notification_retries`` | How many attempts notifications are resent in case of errors - if supported               | ``3``         |
@@ -129,9 +131,10 @@ A working configuration would look like the following
                 service: YOUR_CUSTOM_SERVICE_ID
         queues:
             my_queue_key:
-                provider: ironmq #or aws or in_band or another_aws_provider
+                provider: ironmq # or aws or in_band or another_aws_provider
                 options:
                     queue_name:             my_actual_queue_name
+                    queue_url:              https://sqs.<Region>.amazonaws.com/<Account ID>/<Queue> # for AWS
                     push_notifications:     true
                     notification_retries:   3
                     message_delay:          0
