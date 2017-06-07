@@ -28,12 +28,22 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use RuntimeException;
+use Exception;
 
 /**
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
 class UecodeQPushExtension extends Extension
 {
+    /**
+     * @param array            $configs
+     * @param ContainerBuilder $container
+     *
+     * @throws RuntimeException|InvalidArgumentException|ServiceNotFoundException
+     */
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
@@ -112,9 +122,10 @@ class UecodeQPushExtension extends Extension
                     ]
                 );
 
-            if (!empty($values['options']['queue_name'])
-                && $config['providers'][$provider]['driver'] == 'aws'
-            ) {
+            $isProviderAWS = $config['providers'][$provider]['driver'] === 'aws';
+            $isQueueNameSet = isset($values['options']['queue_name']) && !empty($values['options']['queue_name']);
+
+            if ($isQueueNameSet && $isProviderAWS) {
                 $definition->addTag(
                     'uecode_qpush.event_listener',
                     [
@@ -123,6 +134,12 @@ class UecodeQPushExtension extends Extension
                         'priority' => 255
                     ]
                 );
+
+                // Check queue name ends with ".fifo"
+                $isQueueNameFIFOReady = preg_match("/$(?<=(\.fifo))/", $values['options']['queue_name']) === 1;
+                if ($values['options']['fifo'] === true && !$isQueueNameFIFOReady) {
+                    throw new InvalidArgumentException('Queue name must end with ".fifo" on AWS FIFO queues');
+                }
             }
 
             $name = sprintf('uecode_qpush.%s', $queue);
@@ -139,6 +156,8 @@ class UecodeQPushExtension extends Extension
      * @param ContainerBuilder $container The container
      * @param string           $name      The provider key
      *
+     * @throws RuntimeException
+     *
      * @return Reference
      */
     private function createAwsClient($config, ContainerBuilder $container, $name)
@@ -150,9 +169,7 @@ class UecodeQPushExtension extends Extension
             $aws2 = class_exists('Aws\Common\Aws');
             $aws3 = class_exists('Aws\Sdk');
             if (!$aws2 && !$aws3) {
-                throw new \RuntimeException(
-                    'You must require "aws/aws-sdk-php" to use the AWS provider.'
-                );
+                throw new RuntimeException('You must require "aws/aws-sdk-php" to use the AWS provider.');
             }
 
             $awsConfig = [
@@ -186,8 +203,7 @@ class UecodeQPushExtension extends Extension
 
             $aws->setArguments([$awsConfig]);
 
-            $container->setDefinition($service, $aws)
-                ->setPublic(false);
+            $container->setDefinition($service, $aws)->setPublic(false);
         }
 
         return new Reference($service);
@@ -200,6 +216,8 @@ class UecodeQPushExtension extends Extension
      * @param ContainerBuilder $container The container
      * @param string           $name      The provider key
      *
+     * @throws RuntimeException
+     *
      * @return Reference
      */
     private function createIronMQClient($config, ContainerBuilder $container, $name)
@@ -209,9 +227,7 @@ class UecodeQPushExtension extends Extension
         if (!$container->hasDefinition($service)) {
 
             if (!class_exists('IronMQ\IronMQ')) {
-                throw new \RuntimeException(
-                    'You must require "iron-io/iron_mq" to use the Iron MQ provider.'
-                );
+                throw new RuntimeException('You must require "iron-io/iron_mq" to use the Iron MQ provider.');
             }
 
             $ironmq = new Definition('IronMQ\IronMQ');
@@ -225,13 +241,15 @@ class UecodeQPushExtension extends Extension
                 ]
             ]);
 
-            $container->setDefinition($service, $ironmq)
-                ->setPublic(false);
+            $container->setDefinition($service, $ironmq)->setPublic(false);
         }
 
         return new Reference($service);
     }
 
+    /**
+     * @return Reference
+     */
     private function createSyncClient()
     {
         return new Reference('event_dispatcher');

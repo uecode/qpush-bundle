@@ -68,6 +68,13 @@ class AwsProvider extends AbstractProvider
      */
     private $topicArn;
 
+    /**
+     * @param string $name
+     * @param array  $options
+     * @param mixed  $client
+     * @param Cache  $cache
+     * @param Logger $logger
+     */
     public function __construct($name, array $options, $client, Cache $cache, Logger $logger)
     {
         $this->name     = $name;
@@ -81,9 +88,12 @@ class AwsProvider extends AbstractProvider
         $this->sns = $useGet ? $client->get('Sns') : $client->createSns();
     }
 
+    /**
+     * @return string
+     */
     public function getProvider()
     {
-        return "AWS";
+        return 'AWS';
     }
 
     /**
@@ -95,24 +105,25 @@ class AwsProvider extends AbstractProvider
      * All Create methods are idempotent, if the resource exists, the current ARN
      * will be returned
      *
+     * @return bool
      */
     public function create()
     {
         $this->createQueue();
 
         if ($this->options['push_notifications']) {
-           // Create the SNS Topic
-           $this->createTopic();
+            // Create the SNS Topic
+            $this->createTopic();
 
-           // Add the SQS Queue as a Subscriber to the SNS Topic
-           $this->subscribeToTopic(
-               $this->topicArn,
-               'sqs',
-               $this->sqs->getQueueArn($this->queueUrl)
-           );
+            // Add the SQS Queue as a Subscriber to the SNS Topic
+            $this->subscribeToTopic(
+                $this->topicArn,
+                'sqs',
+                $this->sqs->getQueueArn($this->queueUrl)
+            );
 
-           // Add configured Subscribers to the SNS Topic
-           foreach ($this->options['subscribers'] as $subscriber) {
+            // Add configured Subscribers to the SNS Topic
+            foreach ($this->options['subscribers'] as $subscriber) {
                 $this->subscribeToTopic(
                     $this->topicArn,
                     $subscriber['protocol'],
@@ -171,7 +182,18 @@ class AwsProvider extends AbstractProvider
      */
     public function publish(array $message, array $options = [])
     {
-        $options      = $this->mergeOptions($options);
+        $mergedOptions = $this->mergeOptions($options);
+
+        if (isset($options['message_deduplication_id'])) {
+            $mergedOptions['message_deduplication_id'] = $options['message_deduplication_id'];
+        }
+
+        if (isset($options['message_group_id'])) {
+            $mergedOptions['message_group_id'] = $options['message_group_id'];
+        }
+
+        $options = $mergedOptions;
+
         $publishStart = microtime(true);
 
         // ensures that the SQS Queue and SNS Topic exist
@@ -186,43 +208,67 @@ class AwsProvider extends AbstractProvider
             }
 
             $message    = [
-                'default'   => $this->getNameWithPrefix(),
-                'sqs'       => json_encode($message),
-                'http'      => $this->getNameWithPrefix(),
-                'https'     => $this->getNameWithPrefix(),
+                'default' => $this->getNameWithPrefix(),
+                'sqs'     => json_encode($message),
+                'http'    => $this->getNameWithPrefix(),
+                'https'   => $this->getNameWithPrefix(),
             ];
 
             $result = $this->sns->publish([
-                'TopicArn'          => $this->topicArn,
-                'Subject'           => $this->getName(),
-                'Message'           => json_encode($message),
-                'MessageStructure'  => 'json'
+                'TopicArn'         => $this->topicArn,
+                'Subject'          => $this->getName(),
+                'Message'          => json_encode($message),
+                'MessageStructure' => 'json'
             ]);
 
             $context = [
-                'TopicArn'              => $this->topicArn,
-                'MessageId'             => $result->get('MessageId'),
-                'push_notifications'    => $options['push_notifications'],
-                'publish_time'          => microtime(true) - $publishStart
+                'TopicArn'           => $this->topicArn,
+                'MessageId'          => $result->get('MessageId'),
+                'push_notifications' => $options['push_notifications'],
+                'publish_time'       => microtime(true) - $publishStart
             ];
             $this->log(200,"Message published to SNS", $context);
 
             return $result->get('MessageId');
         }
 
-        $result = $this->sqs->sendMessage([
-            'QueueUrl'               => $this->queueUrl,
-            'MessageBody'            => json_encode($message),
-            'DelaySeconds'           => $options['message_delay'],
-            'MessageDeduplicationId' => hash('sha256',json_encode($message)),
-            'MessageGroupId'         => $this->getNameWithPrefix()
-        ]);
+        $arguments = [
+            'QueueUrl'      => $this->queueUrl,
+            'MessageBody'   => json_encode($message),
+            'DelaySeconds'  => $options['message_delay']
+        ];
+
+        if ($this->isQueueFIFO()) {
+            if (isset($options['message_deduplication_id'])) {
+                // Always use user supplied dedup id
+                $arguments['MessageDeduplicationId'] = $options['message_deduplication_id'];
+            } elseif ($options['content_based_deduplication'] !== true) {
+                // If none is supplied and option "content_based_deduplication" is not set, generate default
+                $arguments['MessageDeduplicationId'] = hash('sha256', json_encode($message));
+            }
+
+            $arguments['MessageGroupId'] = $this->getNameWithPrefix();
+            if (isset($options['message_group_id'])) {
+                $arguments['MessageGroupId'] = $options['message_group_id'];
+            }
+        }
+
+        $result = $this->sqs->sendMessage($arguments);
 
         $context = [
             'QueueUrl'              => $this->queueUrl,
             'MessageId'             => $result->get('MessageId'),
-            'push_notifications'    => $options['push_notifications']
+            'push_notifications'    => $options['push_notifications'],
+            'fifo'                  => $options['fifo']
         ];
+
+        if ($this->isQueueFIFO()) {
+            if (isset($arguments['MessageDeduplicationId'])) {
+                $context['message_deduplication_id'] = $arguments['MessageDeduplicationId'];
+            }
+            $context['message_group_id'] = $arguments['MessageGroupId'];
+        }
+
         $this->log(200,"Message published to SQS", $context);
 
         return $result->get('MessageId');
@@ -324,7 +370,8 @@ class AwsProvider extends AbstractProvider
                 'QueueName' => $this->getNameWithPrefix()
             ]);
 
-            if ($this->queueUrl = $result->get('QueueUrl')) {
+            $this->queueUrl = $result->get('QueueUrl');
+            if ($this->queueUrl !== null) {
                 $this->cache->save($key, $this->queueUrl);
 
                 return true;
@@ -339,19 +386,23 @@ class AwsProvider extends AbstractProvider
      *
      * The create method for SQS Queues is idempotent - if the queue already
      * exists, this method will return the Queue Url of the existing Queue.
-     *
-     * @return string
      */
     public function createQueue()
     {
-        $result = $this->sqs->createQueue([
-            'QueueName' => $this->getNameWithPrefix(),
-            'Attributes'    => [
-                'VisibilityTimeout'             => $this->options['message_timeout'],
-                'MessageRetentionPeriod'        => $this->options['message_expiration'],
-                'ReceiveMessageWaitTimeSeconds' => $this->options['receive_wait_time']
-            ]
-        ]);
+        $attributes = [
+            'VisibilityTimeout'             => $this->options['message_timeout'],
+            'MessageRetentionPeriod'        => $this->options['message_expiration'],
+            'ReceiveMessageWaitTimeSeconds' => $this->options['receive_wait_time']
+        ];
+
+        if ($this->isQueueFIFO()) {
+            $attributes['FifoQueue'] = 'true';
+            $attributes['ContentBasedDeduplication'] = $this->options['content_based_deduplication'] === true
+                ? 'true'
+                : 'false';
+        }
+
+        $result = $this->sqs->createQueue(['QueueName' => $this->getNameWithPrefix(), 'Attributes' => $attributes]);
 
         $this->queueUrl = $result->get('QueueUrl');
 
@@ -449,7 +500,7 @@ class AwsProvider extends AbstractProvider
      * exists, this method will return the Topic ARN of the existing Topic.
      *
      *
-     * @return false|null
+     * @return bool
      */
     public function createTopic()
     {
@@ -467,6 +518,8 @@ class AwsProvider extends AbstractProvider
         $this->cache->save($key, $this->topicArn);
 
         $this->log(200, "Created SNS Topic", ['TopicARN' => $this->topicArn]);
+
+        return true;
     }
 
     /**
@@ -570,7 +623,8 @@ class AwsProvider extends AbstractProvider
      * @param NotificationEvent $event The Notification Event
      * @param string $eventName Name of the event
      * @param EventDispatcherInterface $dispatcher
-     * @return bool|void
+     *
+     * @return void
      */
     public function onNotification(NotificationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -606,7 +660,8 @@ class AwsProvider extends AbstractProvider
      * Stops Event Propagation after removing the Message
      *
      * @param MessageEvent $event The SQS Message Event
-     * @return bool|void
+     *
+     * @return void
      */
     public function onMessageReceived(MessageEvent $event)
     {
@@ -618,5 +673,13 @@ class AwsProvider extends AbstractProvider
         $this->delete($receiptHandle);
 
         $event->stopPropagation();
+    }
+
+    /**
+     * @return bool
+     */
+    private function isQueueFIFO()
+    {
+        return $this->options['fifo'] === true;
     }
 }
