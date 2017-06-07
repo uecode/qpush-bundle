@@ -13,11 +13,11 @@ needing to run a daemon or background process to continuously poll your queue.
 
 **Full Documentation:** [qpush-bundle.readthedocs.org](http://qpush-bundle.rtfd.org)
 
-##Installation
+## Installation
 
 The bundle should be installed through composer.
 
-####Add the bundle to your composer.json file
+#### Add the bundle to your composer.json file
 
 ```json
 {
@@ -27,7 +27,7 @@ The bundle should be installed through composer.
 }
 ```
 
-####Update AppKernel.php of your Symfony Application
+#### Update AppKernel.php of your Symfony Application
 
 Add the `UecodeQPushBundle` to your kernel bootstrap sequence, in the `$bundles`
 array.
@@ -44,13 +44,13 @@ public function registerBundles()
 }
 ```
 
-##Basic Configuration:
+## Basic Configuration:
 
 Here is a basic configuration that would create a push queue called
 `my_queue_name` using AWS or IronMQ. You can read about the supported providers
 and provider options in the [full documentation](http://qpush-bundle.rtfd.org).
 
-######Example
+###### Example
 
 ```yaml
 #app/config.yml
@@ -76,7 +76,7 @@ uecode_qpush:
 
 You may exclude aws key and secret to default to IAM role on the EC2 machine.
 
-##Publishing messages to your Queue
+## Publishing messages to your Queue
 
 Publishing messages is simple - fetch the registered Provider service from the
 container and call the `publish` method on the respective queue.
@@ -84,7 +84,7 @@ container and call the `publish` method on the respective queue.
 This bundle stores your messages as a json object and the publish method expects
 an array, typically associative.
 
-######Example
+###### Example
 
 ```php
 // src/My/Bundle/ExampleBundle/Controller/MyController.php
@@ -102,13 +102,13 @@ public function publishAction()
 
 ```
 
-##Working with messages from your Queue
+## Working with messages from your Queue
 
 When a message hits your application, this bundle will dispatch a `MessageEvent`
 which can be handled by your services. You need to tag your services to handle
 these events.
 
-######Example
+###### Example
 ```yaml
 services:
     my_example_service:
@@ -117,7 +117,7 @@ services:
     		- { name: uecode_qpush.event_listener, event: my_queue_key.message_received, method: onMessageReceived }
 ```
 
-######Example
+###### Example
 ```php
 // src/My/Bundle/ExampleBundle/Service/ExampleService.php
 
@@ -137,7 +137,7 @@ and a collection of provider specific metadata.
 
 These properties are accessible through simple getters from the message object.
 
-######Example
+###### Example
 ```php
 // src/My/Bundle/ExampleBundle/Service/ExampleService.php
 
@@ -154,7 +154,7 @@ public function onMessageReceived(MessageEvent $event)
 }
 ```
 
-###Cleaning up the Queue
+### Cleaning up the Queue
 
 Once all other Event Listeners have been invoked on a `MessageEvent`, the Bundle
 will automatically attempt to remove the Message from your Queue for you.
