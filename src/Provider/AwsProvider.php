@@ -68,6 +68,13 @@ class AwsProvider extends AbstractProvider
      */
     private $topicArn;
 
+    /**
+     * Flag whether queues should automatically be setup if not available.
+     *
+     * @var boolean
+     */
+    private $queueAutoSetup = true;
+
     public function __construct($name, array $options, $client, Cache $cache, Logger $logger)
     {
         $this->name     = $name;
@@ -79,6 +86,10 @@ class AwsProvider extends AbstractProvider
         $useGet = method_exists($client, 'get');
         $this->sqs = $useGet ? $client->get('Sqs') : $client->createSqs();
         $this->sns = $useGet ? $client->get('Sns') : $client->createSns();
+
+        if (isset($options['disable_queue_auto_setup']) && $options['disable_queue_auto_setup']) {
+            $this->queueAutoSetup = false;
+        }
     }
 
     public function getProvider()
@@ -175,7 +186,7 @@ class AwsProvider extends AbstractProvider
         $publishStart = microtime(true);
 
         // ensures that the SQS Queue and SNS Topic exist
-        if (!$this->queueExists()) {
+        if (!$this->queueExists() && $this->queueAutoSetup) {
             $this->create();
         }
 
@@ -235,7 +246,7 @@ class AwsProvider extends AbstractProvider
     {
         $options = $this->mergeOptions($options);
 
-        if (!$this->queueExists()) {
+        if (!$this->queueExists() && $this->queueAutoSetup) {
             $this->create();
         }
 
