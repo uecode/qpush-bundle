@@ -23,14 +23,14 @@
         "symfony/config": "~2.3|^3.0",
         "symfony/http-kernel": "~2.3|^3.0",
         "symfony/console": "~2.3|^3.0",
-        "symfony/monolog-bundle":   "~2.3|^3.0"
+        "symfony/monolog-bundle":   "~2.3|^3.0",
+        "symfony/finder": "~2.3|^3.0",
+        "symfony/filesystem": "~2.3|^3.0"
     },
     "require-dev": {
         "phpunit/phpunit":        "~3.7",
         "aws/aws-sdk-php":        "~2.5",
-        "iron-io/iron_mq":        "^4.0",
-        "symfony/finder":         "~2.3|^3.0",
-        "symfony/filesystem":     "~2.3|^3.0"
+        "iron-io/iron_mq":        "^4.0"
     },
     "suggest": {
         "aws/aws-sdk-php": "Required to use AWS as a Queue Provider",
