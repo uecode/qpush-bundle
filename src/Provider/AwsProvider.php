@@ -508,13 +508,14 @@ class AwsProvider extends AbstractProvider
             return false;
         }
 
+        $name = str_replace('.', '-', $this->getNameWithPrefix());
         $result = $this->sns->createTopic([
-            'Name' => $this->getNameWithPrefix()
+            'Name' => $name
         ]);
 
         $this->topicArn = $result->get('TopicArn');
 
-        $key = $this->getNameWithPrefix() . '_arn';
+        $key = $name . '_arn';
         $this->cache->save($key, $this->topicArn);
 
         $this->log(200, "Created SNS Topic", ['TopicARN' => $this->topicArn]);
