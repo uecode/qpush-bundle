@@ -70,6 +70,11 @@ class QueuePublishCommand extends Command implements ContainerAwareInterface
                 InputArgument::REQUIRED,
                 'A JSON encoded Message to send to the Queue'
             )
+            ->addArgument(
+                'options',
+                InputArgument::OPTIONAL,
+                'JSON encoded Options to send to the Queue'
+            )
         ;
     }
 
@@ -80,11 +85,12 @@ class QueuePublishCommand extends Command implements ContainerAwareInterface
 
         $name = $input->getArgument('name');
         $message = $input->getArgument('message');
+        $options = $input->getArgument('options');
 
-        return $this->sendMessage($registry, $name, $message);
+        return $this->sendMessage($registry, $name, $message, $options);
     }
 
-    private function sendMessage($registry, $name, $message)
+    private function sendMessage($registry, $name, $message, $options)
     {
         if (!$registry->has($name)) {
             return $this->output->writeln(
@@ -92,7 +98,8 @@ class QueuePublishCommand extends Command implements ContainerAwareInterface
             );
         }
 
-        $registry->get($name)->publish(json_decode($message, true));
+        $messageOptions = isset($options) ? json_decode($options, true) : [];
+        $registry->get($name)->publish(json_decode($message, true), $messageOptions);
         $this->output->writeln("<info>The message has been sent.</info>");
 
         return 0;
