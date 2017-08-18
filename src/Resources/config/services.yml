@@ -17,4 +17,4 @@ services:
         arguments:
             - '@event_dispatcher'
         tags:
-            - { name: kernel.event_listener, event: kernel.request, priority: 254 }
+            - { name: kernel.event_listener, event: kernel.request, priority: '%uecode_qpush.request_listener.priority%' }
