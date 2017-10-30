@@ -153,11 +153,12 @@ class AwsProvider extends AbstractProvider
 
             $this->log(200,"SQS Queue removed", ['QueueUrl' => $this->queueUrl]);
         }
-
+        
+        $topicExists = $this->topicExists();
         $key = $this->getNameWithPrefix() . '_arn';
         $this->cache->delete($key);
 
-        if ($this->options['push_notifications_only'] || ($this->topicExists() || !empty($this->queueUrl))) {
+        if ($this->options['push_notifications_only'] || ($topicExists || !empty($this->queueUrl))) {
             // Delete the SNS Topic
             $topicArn = !empty($this->topicArn)
                 ? $this->topicArn
