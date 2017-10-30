@@ -71,15 +71,16 @@ class CustomProviderTest extends \PHPUnit_Framework_TestCase
     protected function getCustomProvider()
     {
         $options = [
-            'logging_enabled'       => false,
-            'push_notifications'    => true,
-            'notification_retries'  => 3,
-            'message_delay'         => 0,
-            'message_timeout'       => 30,
-            'message_expiration'    => 604800,
-            'messages_to_receive'   => 1,
-            'receive_wait_time'     => 3,
-            'subscribers'           => []
+            'logging_enabled'             => false,
+            'push_notifications'          => true,
+            'push_notifications_only'     => false,
+            'notification_retries'        => 3,
+            'message_delay'               => 0,
+            'message_timeout'             => 30,
+            'message_expiration'          => 604800,
+            'messages_to_receive'         => 1,
+            'receive_wait_time'           => 3,
+            'subscribers'                 => []
         ];
 
         $cache = $this->getMock(

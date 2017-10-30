@@ -74,9 +74,11 @@ fetch those messages.
 +--------------------------+-------------------------------------------------------------------------------------------+---------------+
 | Option                   | Description                                                                               | Default Value |
 +==========================+===========================================================================================+===============+
-| ``push_notifications``   | Whether or not to POST notifications to subscribers of a Queue                            | ``false``     |
+| ``push_notifications``      | Whether or not to POST notifications to subscribers of a Queue                            | ``false``  |
 +--------------------------+-------------------------------------------------------------------------------------------+---------------+
-| ``message_delay``        | Time in seconds before a published Message is available to be read in a Queue             | ``0``         |
+| ``push_notifications_only`` | Use only SNS without SQS. Beware of max retention period of 1 hour for messages           | ``false``  |
++--------------------------+-------------------------------------------------------------------------------------------+---------------+
+| ``message_delay``           | Time in seconds before a published Message is available to be read in a Queue             | ``0``      |
 +--------------------------+-------------------------------------------------------------------------------------------+---------------+
 
 .. code-block:: php

@@ -66,6 +66,8 @@ The options and their descriptions are listed below.
 +---------------------------------+--------------------------------------------------------------------------------------------+---------------+
 | ``push_notifications``          | Whether or not to POST notifications to subscribers of a Queue                             | ``false``     |
 +---------------------------------+--------------------------------------------------------------------------------------------+---------------+
+| ``push_notifications_only``     | AWS Only for now. Disable the Queue Polling if you do not require message for 1 hour+      | ``false``     |
++---------------------------------+--------------------------------------------------------------------------------------------+---------------+
 | ``notification_retries``        | How many attempts notifications are resent in case of errors - if supported                | ``3``         |
 +---------------------------------+--------------------------------------------------------------------------------------------+---------------+
 | ``message_delay``               | Time in seconds before a published Message is available to be read in a Queue              | ``0``         |
@@ -137,6 +139,7 @@ A working configuration would look like the following
                 options:
                     queue_name:                  my_actual_queue_name
                     push_notifications:          true
+                    push_notifications_only:     false
                     notification_retries:        3
                     message_delay:               0
                     message_timeout:             30
@@ -154,6 +157,7 @@ A working configuration would look like the following
                     queue_name:                  my_actual_queue_name.fifo
                     push_notifications:          true
                     notification_retries:        3
+                    push_notifications_only:     false
                     message_delay:               0
                     message_timeout:             30
                     message_expiration:          604800

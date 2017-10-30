@@ -115,12 +115,14 @@ class AwsProvider extends AbstractProvider
             // Create the SNS Topic
             $this->createTopic();
 
-            // Add the SQS Queue as a Subscriber to the SNS Topic
-            $this->subscribeToTopic(
-                $this->topicArn,
-                'sqs',
-                $this->sqs->getQueueArn($this->queueUrl)
-            );
+            if(!$this->options['push_notifications_only']) {
+                // Add the SQS Queue as a Subscriber to the SNS Topic
+                $this->subscribeToTopic(
+                    $this->topicArn,
+                    'sqs',
+                    $this->sqs->getQueueArn($this->queueUrl)
+                );
+            }
 
             // Add configured Subscribers to the SNS Topic
             foreach ($this->options['subscribers'] as $subscriber) {
@@ -155,7 +157,7 @@ class AwsProvider extends AbstractProvider
         $key = $this->getNameWithPrefix() . '_arn';
         $this->cache->delete($key);
 
-        if ($this->topicExists() || !empty($this->queueUrl)) {
+        if ($this->options['push_notifications_only'] || ($this->topicExists() || !empty($this->queueUrl))) {
             // Delete the SNS Topic
             $topicArn = !empty($this->topicArn)
                 ? $this->topicArn
@@ -197,8 +199,10 @@ class AwsProvider extends AbstractProvider
         $publishStart = microtime(true);
 
         // ensures that the SQS Queue and SNS Topic exist
-        if (!$this->queueExists()) {
-            $this->create();
+        if(!$this->options['push_notifications_only']) {
+            if (!$this->queueExists()) {
+                $this->create();
+            }
         }
 
         if ($options['push_notifications']) {
@@ -206,13 +210,22 @@ class AwsProvider extends AbstractProvider
             if (!$this->topicExists()) {
                 $this->create();
             }
-
-            $message    = [
-                'default' => $this->getNameWithPrefix(),
-                'sqs'     => json_encode($message),
-                'http'    => $this->getNameWithPrefix(),
-                'https'   => $this->getNameWithPrefix(),
-            ];
+            
+            if($this->options['push_notifications_only']) {
+                $jsonMessage = json_encode($message);
+                $message    = [
+                    'default'  => $jsonMessage,
+                    'http'     => $jsonMessage,
+                    'https'    => $jsonMessage,
+                ];
+            } else {
+                $message    = [
+                    'default'  => $this->getNameWithPrefix(),
+                    'sqs'      => json_encode($message),
+                    'http'     => $this->getNameWithPrefix(),
+                    'https'    => $this->getNameWithPrefix(),
+                ];
+            }
 
             $result = $this->sns->publish([
                 'TopicArn'         => $this->topicArn,
@@ -325,22 +338,26 @@ class AwsProvider extends AbstractProvider
      */
     public function delete($id)
     {
-        if (!$this->queueExists()) {
-            return false;
+        if($this->options['push_notifications_only']) {
+            return true;
+        } else {
+            if (!$this->queueExists()) {
+                return false;
+            }
+
+            $this->sqs->deleteMessage([
+                'QueueUrl'      => $this->queueUrl,
+                'ReceiptHandle' => $id
+            ]);
+
+            $context = [
+                'QueueUrl'      => $this->queueUrl,
+                'ReceiptHandle' => $id
+            ];
+            $this->log(200,"Message deleted from SQS Queue", $context);
+
+            return true;
         }
-
-        $this->sqs->deleteMessage([
-            'QueueUrl'      => $this->queueUrl,
-            'ReceiptHandle' => $id
-        ]);
-
-        $context = [
-            'QueueUrl'      => $this->queueUrl,
-            'ReceiptHandle' => $id
-        ];
-        $this->log(200,"Message deleted from SQS Queue", $context);
-
-        return true;
     }
 
     /**
@@ -389,40 +406,42 @@ class AwsProvider extends AbstractProvider
      */
     public function createQueue()
     {
-        $attributes = [
-            'VisibilityTimeout'             => $this->options['message_timeout'],
-            'MessageRetentionPeriod'        => $this->options['message_expiration'],
-            'ReceiveMessageWaitTimeSeconds' => $this->options['receive_wait_time']
-        ];
+        if(!$this->options['push_notifications_only']) {
+            $attributes = [
+                'VisibilityTimeout'             => $this->options['message_timeout'],
+                'MessageRetentionPeriod'        => $this->options['message_expiration'],
+                'ReceiveMessageWaitTimeSeconds' => $this->options['receive_wait_time']
+            ];
 
-        if ($this->isQueueFIFO()) {
-            $attributes['FifoQueue'] = 'true';
-            $attributes['ContentBasedDeduplication'] = $this->options['content_based_deduplication'] === true
-                ? 'true'
-                : 'false';
-        }
+            if ($this->isQueueFIFO()) {
+                $attributes['FifoQueue'] = 'true';
+                $attributes['ContentBasedDeduplication'] = $this->options['content_based_deduplication'] === true
+                    ? 'true'
+                    : 'false';
+            }
 
-        $result = $this->sqs->createQueue(['QueueName' => $this->getNameWithPrefix(), 'Attributes' => $attributes]);
+            $result = $this->sqs->createQueue(['QueueName' => $this->getNameWithPrefix(), 'Attributes' => $attributes]);
 
-        $this->queueUrl = $result->get('QueueUrl');
+            $this->queueUrl = $result->get('QueueUrl');
 
-        $key = $this->getNameWithPrefix() . '_url';
-        $this->cache->save($key, $this->queueUrl);
+            $key = $this->getNameWithPrefix() . '_url';
+            $this->cache->save($key, $this->queueUrl);
 
-        $this->log(200, "Created SQS Queue", ['QueueUrl' => $this->queueUrl]);
+            $this->log(200, "Created SQS Queue", ['QueueUrl' => $this->queueUrl]);
 
-        if ($this->options['push_notifications']) {
+            if ($this->options['push_notifications']) {
 
-            $policy = $this->createSqsPolicy();
+                $policy = $this->createSqsPolicy();
 
-            $this->sqs->setQueueAttributes([
-                'QueueUrl'      => $this->queueUrl,
-                'Attributes'    => [
-                    'Policy'    => $policy,
-                ]
-            ]);
+                $this->sqs->setQueueAttributes([
+                    'QueueUrl'      => $this->queueUrl,
+                    'Attributes'    => [
+                        'Policy'    => $policy,
+                    ]
+                ]);
 
-            $this->log(200, "Created Updated SQS Policy");
+                $this->log(200, "Created Updated SQS Policy");
+            }
         }
     }
 
@@ -643,13 +662,20 @@ class AwsProvider extends AbstractProvider
 
             return;
         }
-
-        $messages = $this->receive();
-        foreach ($messages as $message) {
-
+        
+        if($this->options['push_notifications_only']) {
+            $notification = $event->getNotification();
+            $message = new Message($notification->getId(), $notification->getBody(), (array)$notification->getMetadata());
             $messageEvent = new MessageEvent($this->name, $message);
             $dispatcher->dispatch(Events::Message($this->name), $messageEvent);
+        } else {
+            $messages = $this->receive();
+            foreach ($messages as $message) {
+                $messageEvent = new MessageEvent($this->name, $message);
+                $dispatcher->dispatch(Events::Message($this->name), $messageEvent);
+            }
         }
+
     }
 
     /**

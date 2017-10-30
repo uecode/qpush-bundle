@@ -65,6 +65,7 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'logging_enabled'             => false,
                 'push_notifications'          => true,
+                'push_notifications_only'     => false,
                 'notification_retries'        => 3,
                 'message_delay'               => 0,
                 'message_timeout'             => 30,
