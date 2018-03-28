@@ -152,7 +152,7 @@ A working configuration would look like the following
                 provider: aws
                 options:
                     queue_name:                  my_actual_queue_name.fifo
-                    push_notifications:          true
+                    push_notifications:          false
                     notification_retries:        3
                     message_delay:               0
                     message_timeout:             30
@@ -164,3 +164,5 @@ A working configuration would look like the following
                     subscribers:
                         - { endpoint: http://example1.com/, protocol: http }
                         - { endpoint: http://example2.com/, protocol: http }
+                        
+Note that `FIFO` queues are not currently compatible with `push_notifications`. For more information, see: http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-subscribe-queue-sns-topic.html
