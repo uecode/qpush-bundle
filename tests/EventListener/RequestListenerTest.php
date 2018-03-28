@@ -56,7 +56,7 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->addListener(QPushEvents::Notification('ironmq-test'), [$this, 'IronMqOnNotificationReceived']);
         $this->dispatcher->addListener(QPushEvents::Notification('aws-test'), [$this, 'AwsOnNotificationReceived']);
 
-        $this->kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $this->kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
     }
 
     public function testListenerDoesNothingForSubRequests()

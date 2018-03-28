@@ -86,13 +86,13 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
             'region' => 'us-east-1'
         ]);
 
-        $cache = $this->getMock(
+        $cache = $this->createMock(
             'Doctrine\Common\Cache\PhpFileCache',
             [],
             ['/tmp', 'qpush.aws.test.php']
         );
 
-        $logger = $this->getMock(
+        $logger = $this->createMock(
             'Symfony\Bridge\Monolog\Logger', [], ['qpush.test']
         );
 
@@ -316,7 +316,7 @@ class AwsProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider->onNotification(
             $event,
             NotificationEvent::TYPE_MESSAGE,
-            $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface')
+            $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface')
         );
     }
 

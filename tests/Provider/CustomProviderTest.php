@@ -82,13 +82,13 @@ class CustomProviderTest extends \PHPUnit_Framework_TestCase
             'subscribers'           => []
         ];
 
-        $cache = $this->getMock(
+        $cache = $this->createMock(
             'Doctrine\Common\Cache\PhpFileCache',
             [],
             ['/tmp', 'qpush.custom.test.php']
         );
 
-        $this->logger = $this->getMock(
+        $this->logger = $this->createMock(
             'Monolog\Logger', [], ['qpush.test']
         );
 

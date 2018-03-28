@@ -34,13 +34,13 @@ class ProviderRegistryTest extends \PHPUnit_Framework_TestCase
         $registry   = new ProviderRegistry();
         $interface  = 'Uecode\Bundle\QPushBundle\Provider\ProviderInterface';
 
-        $registry->addProvider('test', $this->getMock($interface));
+        $registry->addProvider('test', $this->createMock($interface));
 
-        $this->assertEquals(['test' => $this->getMock($interface)], $registry->all());
+        $this->assertEquals(['test' => $this->createMock($interface)], $registry->all());
 
         $this->assertTrue($registry->has('test'));
 
-        $this->assertEquals($this->getMock($interface), $registry->get('test'));
+        $this->assertEquals($this->createMock($interface), $registry->get('test'));
 
         $this->setExpectedException('InvalidArgumentException');
         $registry->get('foo');

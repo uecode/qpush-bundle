@@ -25,7 +25,7 @@ class SyncProviderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->dispatcher = $this->getMock(
+        $this->dispatcher = $this->createMock(
             'Symfony\Component\EventDispatcher\EventDispatcherInterface'
         );
 
@@ -97,13 +97,13 @@ class SyncProviderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $cache = $this->getMock(
+        $cache = $this->createMock(
             'Doctrine\Common\Cache\PhpFileCache',
             [],
             ['/tmp', 'qpush.aws.test.php']
         );
 
-        $this->logger = $this->getMock(
+        $this->logger = $this->createMock(
             'Monolog\Logger', [], ['qpush.test']
         );
 

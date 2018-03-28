@@ -75,12 +75,12 @@ class AbstractProviderTest extends \PHPUnit_Framework_TestCase
             'test',
             $options,
             new \stdClass,
-            $this->getMock(
+            $this->createMock(
                 'Doctrine\Common\Cache\PhpFileCache',
                 [],
                 ['/tmp', 'qpush.aws.test.php']
             ),
-            $this->getMock(
+            $this->createMock(
                 'Symfony\Bridge\Monolog\Logger',
                 [],
                 ['qpush.test']

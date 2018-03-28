@@ -1,6 +1,10 @@
 parameters:
-    uecode_qpush.provider.aws:           Uecode\Bundle\QPushBundle\Provider\AwsProvider
-    uecode_qpush.provider.ironmq:        Uecode\Bundle\QPushBundle\Provider\IronMqProvider
-    uecode_qpush.provider.sync:          Uecode\Bundle\QPushBundle\Provider\SyncProvider
-    uecode_qpush.provider.custom:        Uecode\Bundle\QPushBundle\Provider\CustomProvider
-    uecode_qpush.provider.file:          Uecode\Bundle\QPushBundle\Provider\FileProvider
+    uecode_qpush.request_listener.priority: 254
+    uecode_qpush.request_listener.class: Uecode\Bundle\QPushBundle\EventListener\RequestListener
+    uecode_qpush.registry.class: Uecode\Bundle\QPushBundle\Provider\ProviderRegistry
+    uecode_qpush.provider.aws: Uecode\Bundle\QPushBundle\Provider\AwsProvider
+    uecode_qpush.provider.ironmq: Uecode\Bundle\QPushBundle\Provider\IronMqProvider
+    uecode_qpush.provider.sync: Uecode\Bundle\QPushBundle\Provider\SyncProvider
+    uecode_qpush.provider.custom: Uecode\Bundle\QPushBundle\Provider\CustomProvider
+    uecode_qpush.provider.file: Uecode\Bundle\QPushBundle\Provider\FileProvider
+    uecode_qpush.provider.doctrine: Uecode\Bundle\QPushBundle\Provider\DoctrineProvider

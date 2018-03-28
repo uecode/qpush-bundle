@@ -100,9 +100,11 @@ class QueueReceiveCommand extends Command implements ContainerAwareInterface
         $dispatcher = $this->container->get('event_dispatcher');
         $messages   = $registry->get($name)->receive();
 
-        foreach ($messages as $message) {
-            $messageEvent = new MessageEvent($name, $message);
-            $dispatcher->dispatch(Events::Message($name), $messageEvent);
+        if($messages) {
+            foreach ($messages as $message) {
+                $messageEvent = new MessageEvent($name, $message);
+                $dispatcher->dispatch(Events::Message($name), $messageEvent);
+            }
         }
 
         $msg = "<info>Finished polling %s Queue, %d messages fetched.</info>";
