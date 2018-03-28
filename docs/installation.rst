@@ -1,17 +1,11 @@
 Installation
 ============
 
-The bundle should be installed through composer.
+**The bundle should be installed through composer.**
 
-**Add the bundle to composer**
+ ::
 
-.. code-block:: js
-
-    {
-        "require": {
-            "uecode/qpush-bundle": "~2.3.0",
-        }
-    }
+    composer require uecode/qpush-bundle
 
 **Update AppKernel.php of your Symfony Application**
 
