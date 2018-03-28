@@ -6,7 +6,7 @@ QPush - Symfony2 Push Queue Bundle
 [![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/uecode/qpush-bundle.svg?style=flat-square)](https://scrutinizer-ci.com/g/uecode/qpush-bundle/)
 [![Total Downloads](http://img.shields.io/packagist/dt/uecode/qpush-bundle.svg?style=flat-square)](https://packagist.org/packages/uecode/qpush-bundle)
 
-##Overview
+## Overview
 This bundle allows you to easily consume messages from Push Queues by simply
 tagging your services and relying on Symfony's event dispatcher - without
 needing to run a daemon or background process to continuously poll your queue.
@@ -158,4 +158,3 @@ public function onMessageReceived(MessageEvent $event)
 
 Once all other Event Listeners have been invoked on a `MessageEvent`, the Bundle
 will automatically attempt to remove the Message from your Queue for you.
-
