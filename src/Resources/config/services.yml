@@ -1,7 +1,7 @@
 services:
     ### QPush Registry
     uecode_qpush.registry:
-        class: '%uecode_qpush.registry.class%'
+        class: Uecode\Bundle\QPushBundle\Provider\ProviderRegistry
     uecode_qpush:
         alias: uecode_qpush.registry
 
@@ -13,8 +13,29 @@ services:
 
     ### QPush Event Listeners
     uecode_qpush.request_listener:
-        class: '%uecode_qpush.request_listener.class%'
+        class: Uecode\Bundle\QPushBundle\EventListener\RequestListener
         arguments:
             - '@event_dispatcher'
         tags:
             - { name: kernel.event_listener, event: kernel.request, priority: '%uecode_qpush.request_listener.priority%' }
+
+    ### QPush Commands
+    uecode_qpush.build_command:
+        class: Uecode\Bundle\QPushBundle\Command\QueueBuildCommand
+        tags:
+             - { name: console.command }
+
+    uecode_qpush.destroy_command:
+        class: Uecode\Bundle\QPushBundle\Command\QueueDestroyCommand
+        tags:
+             - { name: console.command }
+
+    uecode_qpush.publish_command:
+        class: Uecode\Bundle\QPushBundle\Command\QueuePublishCommand
+        tags:
+             - { name: console.command }
+
+    uecode_qpush.receive_command:
+        class: Uecode\Bundle\QPushBundle\Command\QueueReceiveCommand
+        tags:
+             - { name: console.command }
