@@ -31,13 +31,17 @@
         "symfony/finder": "~2.3|^3.0",
         "symfony/filesystem": "~2.3|^3.0",
         "symfony/phpunit-bridge": "^4.0",
-        "symfony/yaml": "~2.8|^3.0"
+        "symfony/yaml": "~2.8|^3.0",
+        "doctrine/orm": "^2.4.8",
+        "stof/doctrine-extensions-bundle": "^1.2"
     },
     "suggest": {
         "aws/aws-sdk-php": "Required to use AWS as a Queue Provider",
         "iron-io/iron_mq": "Required to use IronMQ as a Queue Provider",
         "symfony/finder": "Required to use File as a Queue Provider",
-        "symfony/filesystem": "Required to use File as a Queue Provider"
+        "symfony/filesystem": "Required to use File as a Queue Provider",
+        "doctrine/orm": "Required to use Doctrine as a Queue Provider",
+        "stof/doctrine-extensions-bundle": "Required to use Doctrine as a Queue Provider"
     },
     "autoload": {
         "psr-4": {

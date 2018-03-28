@@ -98,6 +98,10 @@ class UecodeQPushExtension extends Extension
                     $class = $container->getParameter('uecode_qpush.provider.file');
                     $values['options']['path'] = $config['providers'][$provider]['path'];
                     break;
+                case 'doctrine':
+                    $class = $container->getParameter('uecode_qpush.provider.doctrine');
+                    $client = $this->createDoctrineClient($config['providers'][$provider]);
+                    break;
             }
 
             $definition = new Definition(
@@ -255,6 +259,11 @@ class UecodeQPushExtension extends Extension
     private function createSyncClient()
     {
         return new Reference('event_dispatcher');
+    }
+    
+    private function createDoctrineClient($config)
+    {
+        return new Reference($config['entity_manager']);
     }
 
     /**
