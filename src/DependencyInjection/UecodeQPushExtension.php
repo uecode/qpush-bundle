@@ -104,6 +104,8 @@ class UecodeQPushExtension extends Extension
                 $class, [$queue, $values['options'], $client, new Reference($cache), new Reference('logger')]
             );
 
+            $definition->setPublic(true);
+
             $definition->addTag('monolog.logger', ['channel' => 'qpush'])
                 ->addTag(
                     'uecode_qpush.event_listener',

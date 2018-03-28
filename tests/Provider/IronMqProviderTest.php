@@ -85,12 +85,12 @@ class IronMqProviderTest extends \PHPUnit_Framework_TestCase
             'test',
             $options,
             $client,
-            $this->getMock(
+            $this->createMock(
                 'Doctrine\Common\Cache\PhpFileCache',
                 [],
                 ['/tmp', 'qpush.ironmq.test.php']
             ),
-            $this->getMock(
+            $this->createMock(
                 'Symfony\Bridge\Monolog\Logger',
                 [],
                 ['qpush.test']
@@ -181,7 +181,7 @@ class IronMqProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider->onNotification(
             $event,
             NotificationEvent::TYPE_MESSAGE,
-            $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface')
+            $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface')
         );
     }
 
