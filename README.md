@@ -15,16 +15,10 @@ needing to run a daemon or background process to continuously poll your queue.
 
 ## Installation
 
-The bundle should be installed through composer.
+#### The bundle should be installed through composer.
 
-#### Add the bundle to your composer.json file
-
-```json
-{
-    "require": {
-        "uecode/qpush-bundle": "~2.3.0",
-    }
-}
+```
+composer require uecode/qpush-bundle
 ```
 
 #### Update AppKernel.php of your Symfony Application
