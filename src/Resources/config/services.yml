@@ -4,6 +4,7 @@ services:
         class: Uecode\Bundle\QPushBundle\Provider\ProviderRegistry
     uecode_qpush:
         alias: uecode_qpush.registry
+        public: true
 
     ### QPush Default File Cache
     uecode_qpush.file_cache:
