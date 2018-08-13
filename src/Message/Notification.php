@@ -49,6 +49,7 @@ class Notification
      * @var ArrayCollection
      */
     protected $metadata;
+   
 
     /**
      * Constructor.
@@ -101,4 +102,5 @@ class Notification
     {
         return $this->metadata;
     }
+    
 }

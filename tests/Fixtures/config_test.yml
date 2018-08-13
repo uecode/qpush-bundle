@@ -36,6 +36,7 @@ uecode_qpush:
             provider: aws
             options:
                 push_notifications:     true
+                push_notifications_only: false
                 notification_retries:   3
                 message_delay:          0
                 message_timeout:        30
@@ -48,6 +49,7 @@ uecode_qpush:
             provider: secondary_aws
             options:
                 push_notifications:     true
+                push_notifications_only: false
                 notification_retries:   3
                 message_delay:          0
                 message_timeout:        30
@@ -60,6 +62,7 @@ uecode_qpush:
             provider: aws
             options:
                 push_notifications:          true
+                push_notifications_only: false
                 notification_retries:        3
                 message_delay:               0
                 message_timeout:             30
@@ -74,6 +77,7 @@ uecode_qpush:
             provider: ironmq
             options:
                 push_notifications:     true
+                push_notifications_only: false
                 notification_retries:   3
                 message_delay:          0
                 message_timeout:        30
@@ -86,6 +90,7 @@ uecode_qpush:
             provider: secondary_ironmq
             options:
                 push_notifications:     true
+                push_notifications_only: false
                 notification_retries:   3
                 message_delay:          0
                 message_timeout:        30

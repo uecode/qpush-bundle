@@ -57,6 +57,7 @@ class IronMqProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'logging_enabled'            => false,
                 'push_notifications'         => true,
+                'push_notifications_only'    => false,
                 'push_type'                  => 'multicast',
                 'notification_retries'       => 3,
                 'notification_retries_delay' => 60,
