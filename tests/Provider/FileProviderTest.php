@@ -5,11 +5,12 @@ namespace Uecode\Bundle\QPushBundle\Tests\Provider;
 use Symfony\Component\Finder\Finder;
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Provider\FileProvider;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author James Moey <jamesmoey@gmail.com>
  */
-class FileProviderTest extends \PHPUnit_Framework_TestCase
+class FileProviderTest extends TestCase
 {
     /** @var FileProvider */
     protected $provider;

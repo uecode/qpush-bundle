@@ -23,19 +23,17 @@
 namespace Uecode\Bundle\QPushBundle\Tests\Provider;
 
 use Uecode\Bundle\QPushBundle\Provider\IronMqProvider;
-
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
-
 use Uecode\Bundle\QPushBundle\Message\Message;
 use Uecode\Bundle\QPushBundle\Message\Notification;
-
 use Uecode\Bundle\QPushBundle\Tests\MockClient\IronMqMockClient;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
-class IronMqProviderTest extends \PHPUnit_Framework_TestCase
+class IronMqProviderTest extends TestCase
 {
     /**
      * Mock Client

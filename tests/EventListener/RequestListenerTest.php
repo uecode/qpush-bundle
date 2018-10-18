@@ -31,11 +31,12 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Uecode\Bundle\QPushBundle\EventListener\RequestListener;
 use Uecode\Bundle\QPushBundle\Event\Events as QPushEvents;
 use Uecode\Bundle\QPushBundle\Event\NotificationEvent;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
-class RequestListenerTest extends \PHPUnit_Framework_TestCase
+class RequestListenerTest extends TestCase
 {
     /**
      * @var EventDispatcher

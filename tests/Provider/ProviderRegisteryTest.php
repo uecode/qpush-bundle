@@ -23,11 +23,12 @@
 namespace Uecode\Bundle\QPushBundle\Tests\Provider;
 
 use Uecode\Bundle\QPushBundle\Provider\ProviderRegistry;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
-class ProviderRegistryTest extends \PHPUnit_Framework_TestCase
+class ProviderRegistryTest extends TestCase
 {
     public function testRegistry()
     {

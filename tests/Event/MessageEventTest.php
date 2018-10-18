@@ -23,13 +23,13 @@
 namespace Uecode\Bundle\QPushBundle\Tests\Event;
 
 use Uecode\Bundle\QPushBundle\Event\MessageEvent;
-
 use Uecode\Bundle\QPushBundle\Message\Message;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
-class MessageEventTest extends \PHPUnit_Framework_TestCase
+class MessageEventTest extends TestCase
 {
     protected $event;
 
