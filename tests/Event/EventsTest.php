@@ -23,11 +23,12 @@
 namespace Uecode\Bundle\QPushBundle\Tests\Event;
 
 use Uecode\Bundle\QPushBundle\Event\Events;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Keith Kirk <kkirk@undergroundelephant.com>
  */
-class EventsTest extends \PHPUnit_Framework_TestCase
+class EventsTest extends TestCase
 {
     public function testConstants()
     {

@@ -2,11 +2,11 @@
 
 namespace Uecode\Bundle\QPushBundle\Tests\Provider;
 
-
 use Uecode\Bundle\QPushBundle\Event\Events;
 use Uecode\Bundle\QPushBundle\Provider\SyncProvider;
+use PHPUnit\Framework\TestCase;
 
-class SyncProviderTest extends \PHPUnit_Framework_TestCase
+class SyncProviderTest extends TestCase
 {
     /**
      * @var \Uecode\Bundle\QPushBundle\Provider\SyncProvider

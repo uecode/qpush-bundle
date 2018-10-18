@@ -2,11 +2,11 @@
 
 namespace Uecode\Bundle\QPushBundle\Tests\Provider;
 
-
 use Uecode\Bundle\QPushBundle\Provider\CustomProvider;
 use Uecode\Bundle\QPushBundle\Tests\MockClient\CustomMockClient;
+use PHPUnit\Framework\TestCase;
 
-class CustomProviderTest extends \PHPUnit_Framework_TestCase
+class CustomProviderTest extends TestCase
 {
     /**
      * @var \Uecode\Bundle\QPushBundle\Provider\SyncProvider
